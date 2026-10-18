@@ -30,6 +30,7 @@ class CodeIndex:
     symbols: list[Symbol] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     files_by_language: dict[str, int] = field(default_factory=dict)
+    source_paths: list[str] = field(default_factory=list)
     coverage: dict[str, str] = field(default_factory=dict)
     cache_hits: int = 0
     cache_misses: int = 0

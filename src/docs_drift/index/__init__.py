@@ -122,7 +122,10 @@ def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIn
         language = language_for(path)
         if language:
             grouped.setdefault(language, []).append(path)
-    result = CodeIndex(files_by_language={language: len(paths) for language, paths in sorted(grouped.items())})
+    result = CodeIndex(
+        files_by_language={language: len(paths) for language, paths in sorted(grouped.items())},
+        source_paths=[path.relative_to(root).as_posix() for path in files],
+    )
     cache_path = root / ".docs-drift" / "cache" / f"index-v{INDEX_SCHEMA}.json"
     fingerprints = _fingerprints(root, files)
     cached = _read_cache(cache_path) if not no_cache else None

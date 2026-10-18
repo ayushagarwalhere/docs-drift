@@ -8,6 +8,8 @@ from typer.testing import CliRunner
 
 from docs_drift import __version__
 from docs_drift.cli import app
+from docs_drift.config import Config
+from docs_drift.docs.pipeline import scan_claims
 
 
 def test_help_renders() -> None:
@@ -16,6 +18,8 @@ def test_help_renders() -> None:
     for text in (
         "scan",
         "check",
+        "baseline",
+        "ignore",
         "explain",
         "fix",
         "graph",
@@ -36,11 +40,46 @@ def test_help_renders() -> None:
         assert text in result.output
 
 
-@pytest.mark.parametrize("command", ["scan", "check", "explain", "fix", "graph", "init", "serve"])
+@pytest.mark.parametrize("command", ["fix", "graph", "init", "serve"])
 def test_stub_exits_two(command: str, tmp_path: Path) -> None:
     result = CliRunner().invoke(app, ["--repo", str(tmp_path), command])
     assert result.exit_code == 2
     assert result.output.strip() == "not built yet"
+
+
+def test_explain_requires_a_finding_id(tmp_path: Path) -> None:
+    result = CliRunner().invoke(app, ["--repo", str(tmp_path), "explain"])
+    assert result.exit_code == 2
+    assert "FINDING_ID" in result.output
+
+
+def test_baseline_update_then_check_only_fails_for_new_drift(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("Run with `--port`.\n", encoding="utf-8")
+    (tmp_path / "app.py").write_text(
+        'import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument("--listen")\n', encoding="utf-8"
+    )
+    runner = CliRunner()
+    update = runner.invoke(app, ["--repo", str(tmp_path), "baseline", "update"])
+    assert update.exit_code == 0, update.output
+    baseline = tmp_path / ".docs-drift-baseline.json"
+    assert baseline.is_file()
+    clean = runner.invoke(app, ["--repo", str(tmp_path), "check", "--baseline", str(baseline), "--quiet"])
+    assert clean.exit_code == 0, clean.output
+
+
+def test_explain_and_ignore_use_stable_claim_id(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("Run with `--port`.\n", encoding="utf-8")
+    (tmp_path / "app.py").write_text(
+        'import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument("--listen")\n', encoding="utf-8"
+    )
+    claim = scan_claims(tmp_path, Config()).claims[0]
+    runner = CliRunner()
+    explained = runner.invoke(app, ["--repo", str(tmp_path), "explain", claim.claim_id[:8]])
+    assert explained.exit_code == 0, explained.output
+    assert "Finding evidence" in explained.output
+    ignored = runner.invoke(app, ["--repo", str(tmp_path), "ignore", claim.claim_id[:8]])
+    assert ignored.exit_code == 0, ignored.output
+    assert claim.claim_id in (tmp_path / ".docs-drift.toml").read_text(encoding="utf-8")
 
 
 def test_version_uses_metadata_without_loading_config(tmp_path: Path) -> None:
@@ -67,8 +106,8 @@ def test_global_options(output_format: str, tmp_path: Path) -> None:
             "scan",
         ],
     )
-    assert result.exit_code == 2
-    assert result.output.strip() == "not built yet"
+    assert result.exit_code == 0, result.output
+    assert "Documentation findings" in result.output
 
 
 def test_claims_only_scan_renders_rows_and_verbose_timings(tmp_path: Path) -> None:
@@ -106,6 +145,36 @@ def test_index_tree_displays_static_cli_commands_and_flags(tmp_path: Path) -> No
     assert result.exit_code == 0, result.output
     assert "serve" in result.output
     assert "--port" in result.output
+
+
+def test_full_scan_matches_exact_symbols_and_hides_ok_by_default(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("# Usage\n\nUse `--port` and `--missing`.\n", encoding="utf-8")
+    (tmp_path / "app.py").write_text(
+        "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('--port')\n",
+        encoding="utf-8",
+    )
+    result = CliRunner().invoke(app, ["--repo", str(tmp_path), "scan"])
+    assert result.exit_code == 0, result.output
+    assert "--port" not in result.output
+    weak = CliRunner().invoke(app, ["--repo", str(tmp_path), "scan", "--show-low-confidence"])
+    assert "--missing" in weak.output
+    all_result = CliRunner().invoke(app, ["--repo", str(tmp_path), "scan", "--all"])
+    assert all_result.exit_code == 0, all_result.output
+    assert "--port" in all_result.output
+
+
+def test_check_confidence_threshold_and_fail_on(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("# Usage\n\nUse `--missing`.\n", encoding="utf-8")
+    (tmp_path / "app.py").write_text("import argparse\nparser = argparse.ArgumentParser()\n", encoding="utf-8")
+    default = CliRunner().invoke(app, ["--repo", str(tmp_path), "check", "--quiet"])
+    assert default.exit_code == 0 and default.output == ""
+    strict = CliRunner().invoke(
+        app,
+        ["--repo", str(tmp_path), "check", "--fail-on", "drift", "--min-confidence", "0.4", "--quiet"],
+    )
+    assert strict.exit_code == 1
+    invalid = CliRunner().invoke(app, ["--repo", str(tmp_path), "check", "--fail-on", "nothing"])
+    assert invalid.exit_code == 2
 
 
 def test_invalid_format_rejected() -> None:

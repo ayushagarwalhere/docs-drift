@@ -169,7 +169,7 @@ class CommitRef(PipelineModel):
     sha: GitSHA
     short_sha: Annotated[str, Field(pattern=r"^[0-9a-f]{4,64}$")]
     author_name: NonemptyText
-    author_email: NonemptyText
+    author_email: str | None = None
     date: AwareDatetime
     summary: NonemptyText
 

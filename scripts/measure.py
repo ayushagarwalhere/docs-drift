@@ -11,8 +11,11 @@ from typing import Annotated, Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from docs_drift.cli import _full_findings
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import scan_claims
+from docs_drift.index import build_index
+from docs_drift.models import Verdict
 from tests.fixtures.build_fixtures import build_fixtures
 
 
@@ -175,6 +178,72 @@ def measure(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
     return len(key.findings) - len(misses), len(key.findings), misses, noisy
 
 
+def measure_verdicts(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
+    """Score verdicts over keyed positives and explicitly listed clean-repo negatives."""
+    expected_verdict = {
+        "missing": Verdict.missing,
+        "renamed": Verdict.renamed,
+        "default changed": Verdict.default_changed,
+        "invalid command": Verdict.invalid_command,
+    }
+    key_to_kind = {
+        "cli_subcommand": "cli_command",
+        "environment_variable": "env_var",
+        "http_endpoint": "endpoint",
+        "function": "symbol",
+        "shell_command": "code_command",
+    }
+    with tempfile.TemporaryDirectory(prefix="docs-drift-verdict-measure-") as directory:
+        root = Path(directory)
+        build_fixtures(root)
+        results = {}
+        for name in ("py-cli", "fastapi-svc", "node-tool", "clean-repo"):
+            scan = scan_claims(root / name, Config())
+            index = build_index(root / name, Config())
+            results[name] = (scan, _full_findings(scan.claims, index, root / name)[0])
+    true_positive = 0
+    misses: list[str] = []
+    for expected in key.findings:
+        scan, findings = results[expected.repo]
+        kind = key_to_kind.get(expected.claim_kind, expected.claim_kind)
+        value = _expected_value(expected)
+        candidates = [
+            finding
+            for finding in findings
+            if finding.claim.doc_path == expected.doc_path
+            and finding.claim.kind.value == kind
+            and (finding.claim.value == value or expected.claim_kind == "default_value")
+            and (expected.claim_kind != "default_value" or finding.claim.expected_default is not None)
+            and abs(finding.claim.line - expected.line) <= 1
+        ]
+        verdict = expected_verdict[expected.expected_verdict]
+        if any(item.verdict == verdict for item in candidates):
+            true_positive += 1
+        else:
+            observed = ",".join(item.verdict.value for item in candidates) or "not found"
+            misses.append(
+                f"{expected.repo}:{expected.doc_path}:{expected.line} expected {verdict.value}, got {observed}"
+            )
+    false_positives: list[str] = []
+    for negative in key.non_findings:
+        _, findings = results[negative.repo]
+        kind = key_to_kind.get(negative.claim_kind, negative.claim_kind)
+        value = _expected_value(negative)
+        leaked = [
+            item
+            for item in findings
+            if item.claim.doc_path == negative.doc_path
+            and item.claim.kind.value == kind
+            and item.claim.value == value
+            and item.is_drift
+            and abs(item.claim.line - negative.line) <= 1
+        ]
+        false_positives.extend(
+            f"{negative.repo}:{negative.doc_path}:{item.claim.line} {kind} {value}" for item in leaked
+        )
+    return true_positive, len(key.findings), misses, false_positives
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -197,8 +266,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"MISS: {miss}")
     for item in noisy:
         print(f"UNEXPECTED: {item}")
+    true_positive, verdict_total, verdict_misses, false_positives = measure_verdicts(key)
+    false_positive_count = len(false_positives)
+    precision = true_positive / (true_positive + false_positive_count) if true_positive + false_positive_count else 1.0
+    recall = true_positive / verdict_total if verdict_total else 1.0
+    print(f"Keyed finding recall: {true_positive}/{verdict_total} ({recall:.1%})")
+    print(f"Keyed-case precision: {true_positive}/{true_positive + false_positive_count} ({precision:.1%})")
+    for miss in verdict_misses:
+        print(f"VERDICT MISS: {miss}")
+    for item in false_positives:
+        print(f"FALSE POSITIVE: {item}")
     print("Command: uv run python scripts/measure.py")
-    return 0 if not misses and not noisy else 1
+    return 0 if not misses and not noisy and not verdict_misses and not false_positives else 1
 
 
 if __name__ == "__main__":

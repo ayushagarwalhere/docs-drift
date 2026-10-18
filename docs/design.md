@@ -266,8 +266,35 @@ warning and processing continues. This command reports claims only: it does
 not index source code, decide verdicts, or run repository commands.
 
 The fixture measurement command is `uv run python scripts/measure.py`. It
-builds throwaway repositories from the independent fixture script, runs the
-claims-only pipeline, and checks answer-key findings by document, kind, and
-normalized subject. It reports recall only; it does not report precision or
-change the fixed answer key. Clean-repo historical, example-value, and
-third-party near-misses are checked for extraction leakage separately.
+builds throwaway repositories from the independent fixture script and runs
+both extraction and deterministic matching. It reports claim recall, verdict
+recall, and precision over the answer key's enumerated positive and
+clean-repository negative cases. The key remains fixed; measurements do not
+write to it. The reported scope is limited to those keyed cases and is not a
+claim about precision on arbitrary repositories.
+
+### Exact matching, renames, defaults, and commands
+
+`match.engine` checks names in their relevant symbol kind and command scope.
+Routes normalize parameter spelling while preserving HTTP methods. Paths are
+resolved relative to the repository and documentation location with exact-case
+checks. Absence becomes `missing` only when the index can support that claim;
+otherwise it remains `unverifiable`.
+
+Rename suggestions use fixed lexical similarity rules. A same-hunk Git removal
+and addition can confirm the replacement and attach its commit metadata. Git
+inspection is limited to log, patch, and blame text with bounded commit counts
+and timeouts. It never loads repository code. Environment-variable renames
+require shared specific name tokens; generic prefixes are insufficient.
+
+Documented defaults are compared with a single authoritative indexed default
+using `docs.defaults.normalize_value`. Incomparable units and ambiguous
+definitions stay `unverifiable`. Shell snippets are tokenized, never run, and
+validated only when the executable or target is tied to the project by
+manifest metadata or static declarations. Third-party commands are skipped.
+
+Finding confidence is a fixed rules policy documented in
+[`CONFIDENCE.md`](CONFIDENCE.md). It is kept distinct from extraction
+confidence. The CI baseline stores stable claim IDs, reports only new drift
+when explicitly selected, and is refreshed by `docs-drift baseline update`;
+updating it prunes resolved findings.

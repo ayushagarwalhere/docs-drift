@@ -15,22 +15,28 @@ uv run docs-drift --version
 uv run docs-drift --repo . --format json --no-color scan
 ```
 
-The version is `0.1.0`, read from installed distribution metadata. `scan`
-supports an extraction-only mode while matching and verdict reporting are being
-built. It parses docs and fenced snippets as text and never imports or executes
+The version is `0.1.0`, read from installed distribution metadata. Full scans
+compare extracted claims with the static code index and report evidence. The
+scanner parses docs and fenced snippets as text and never imports or executes
 code from the scanned repository:
 
 ```console
 uv run docs-drift --repo . scan --claims-only
 uv run docs-drift --repo tests/fixtures/repos/py-cli scan --claims-only
+uv run docs-drift --repo . scan --all
+uv run docs-drift --repo . check --fail-on drift
+uv run docs-drift --repo . baseline update
 ```
 
 The claims table includes source location, kind, normalized value, qualifier,
 default, extraction source, and confidence. `--show-suppressed` lists inline
-suppression comments; `--verbose` prints stage timings. The other commands and
-full scan mode remain stubs that print `not built yet` and exit with code 2.
-Put global options before the command. Help and version work without loading
-repository configuration.
+suppression comments; `--verbose` prints stage timings. `check` supports
+confidence and finding-count thresholds, and `--baseline PATH` limits CI
+failures to new drift. `baseline update` refreshes the explicit baseline,
+`explain FINDING_ID` prints its evidence chain, and `ignore CLAIM_ID` adds a
+stable claim ID to `.docs-drift.toml`. `fix`, `graph`, `init`, and `serve` are
+still stubs. Put global options before the command. Help and version work
+without loading repository configuration.
 
 ### Configuration
 

@@ -46,6 +46,7 @@ class HistoryConfig(ConfigModel):
     """Limits for static git history inspection."""
 
     max_commits: int = Field(default=2000, ge=0)
+    show_emails: bool = False
 
 
 class Config(ConfigModel):

@@ -2,24 +2,42 @@
 
 import json
 import time
+import tomllib
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, NoReturn
 
+import tomli_w
 import typer
 from rapidfuzz import process
 from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table
 from rich.tree import Tree
 
 from docs_drift import __version__
+from docs_drift.baseline import load_baseline, new_findings, save_baseline
 from docs_drift.config import Config, ConfigError, load_config
+from docs_drift.docs.defaults import normalize_value
 from docs_drift.docs.pipeline import scan_claims
+from docs_drift.history import GitHistory
 from docs_drift.index import build_index, clear_cache
+from docs_drift.index.base import CodeIndex
+from docs_drift.match import match_claims
+from docs_drift.models import Claim, ClaimKind, Evidence, Finding, ScanResult, SymbolKind, Verdict
 
 app = typer.Typer(help="Find drift between repository documentation and code.", add_completion=False)
 cache_app = typer.Typer(help="Manage local index cache.", add_completion=False)
+baseline_app = typer.Typer(help="Manage the finding baseline.", no_args_is_help=True)
+_GENERIC_ENV_TOKENS = {"app", "env", "var", "api", "service"}
+
+
+def _same_env_concept(old: str, new: str) -> bool:
+    """Require a shared specific token; generic prefixes alone do not prove a rename."""
+    old_parts = {part.casefold() for part in old.split("_")} - _GENERIC_ENV_TOKENS
+    new_parts = {part.casefold() for part in new.split("_")} - _GENERIC_ENV_TOKENS
+    return bool(old_parts & new_parts)
 
 
 class OutputFormat(StrEnum):
@@ -89,6 +107,99 @@ def _not_built() -> NoReturn:
     raise typer.Exit(code=2)
 
 
+def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[list[Finding], list[str]]:
+    """Match claims and enrich drift findings with text-only Git history evidence."""
+    findings = match_claims(claims, index, repo)
+    history = GitHistory(repo)
+    enriched: list[Finding] = []
+    history_kinds = {
+        ClaimKind.cli_flag: SymbolKind.cli_flag,
+        ClaimKind.cli_command: SymbolKind.cli_command,
+        ClaimKind.env_var: SymbolKind.env_var,
+        ClaimKind.endpoint: SymbolKind.route,
+        ClaimKind.config_key: SymbolKind.config_key,
+        ClaimKind.package_script: SymbolKind.package_script,
+        ClaimKind.make_target: SymbolKind.make_target,
+    }
+    for original in findings:
+        default_without_subject = (
+            original.claim.kind == ClaimKind.default_value and original.verdict == Verdict.unverifiable
+        )
+        if not original.is_drift and not default_without_subject:
+            enriched.append(original)
+            continue
+        current = original
+        replacements = [current.suggestion] if current.suggestion else []
+        if current.claim.kind in history_kinds:
+            replacements.extend(symbol.name for symbol in index.by_kind.get(history_kinds[current.claim.kind], []))
+        if current.claim.kind == ClaimKind.default_value:
+            replacements.extend(symbol.name for symbol in index.by_kind.get(SymbolKind.config_key, []))
+        old_history_name = current.claim.value
+        if current.claim.kind == ClaimKind.endpoint:
+            old_history_name = current.claim.value.split(maxsplit=1)[-1]
+            replacements = [name.split(maxsplit=1)[-1] for name in replacements]
+            replacements.extend(symbol.name.split(maxsplit=1)[-1] for symbol in index.by_kind.get(SymbolKind.route, []))
+            # Quoting avoids matching /health as a substring of /healthz in Git's string search.
+            old_history_name = f'"{old_history_name}"'
+            replacements = [f'"{name}"' for name in replacements]
+        match = history.search(old_history_name, tuple(replacements))
+        if match.rename:
+            replacement_name = match.rename.new_name.strip('"')
+            replacement_symbol = next(
+                (
+                    symbol
+                    for symbol in index.symbols
+                    if (symbol.name == replacement_name or symbol.name.endswith(" " + replacement_name))
+                    and symbol.file == match.rename.file
+                ),
+                None,
+            )
+            verdict = current.verdict
+            suggestion = current.suggestion
+            reasons = list(current.reasons)
+            if default_without_subject and replacement_symbol and replacement_symbol.default is not None:
+                expected = normalize_value(current.claim.expected_default or "", subject=current.claim.value)
+                actual = normalize_value(replacement_symbol.default, subject=replacement_name)
+                equality = expected.equals(actual)
+                verdict = Verdict.default_changed if equality is False else Verdict.renamed
+                suggestion = (
+                    f"{replacement_name} (default {replacement_symbol.default})"
+                    if equality is False
+                    else replacement_name
+                )
+                reasons.append(
+                    f"The documented setting was renamed to {replacement_name} and its code default is "
+                    f"{replacement_symbol.default}."
+                )
+            elif current.verdict in {Verdict.missing, Verdict.unverifiable} and (
+                current.claim.kind != ClaimKind.env_var or _same_env_concept(current.claim.value, replacement_name)
+            ):
+                verdict = Verdict.renamed
+                suggestion = replacement_name
+                reasons.append(f"Git history confirms this name changed to {replacement_name}.")
+            current = current.model_copy(
+                update={
+                    "verdict": verdict,
+                    "suggestion": suggestion,
+                    "matched_symbol": replacement_symbol or current.matched_symbol,
+                    "confidence": max(current.confidence, 0.92),
+                    "evidence": [
+                        *current.evidence,
+                        Evidence(
+                            file=match.rename.file or current.claim.doc_path,
+                            line=1,
+                            text=match.rename.hunk_excerpt,
+                        ),
+                    ],
+                    "reasons": [*reasons, f"Git history changed this name in {match.rename.commit.short_sha}."],
+                }
+            )
+        if match.commit:
+            current = current.model_copy(update={"introduced_by": match.commit})
+        enriched.append(current)
+    return enriched, history.warnings
+
+
 @app.command()
 def scan(
     ctx: typer.Context,
@@ -98,12 +209,24 @@ def scan(
     show_suppressed: Annotated[
         bool, typer.Option("--show-suppressed", help="Include claims hidden by inline suppressions.")
     ] = False,
+    show_all: Annotated[bool, typer.Option("--all", help="Include OK findings.")] = False,
+    show_low_confidence: Annotated[bool, typer.Option("--show-low-confidence", help="Include weak findings.")] = False,
 ) -> None:
     """Scan a repository and print a report."""
-    if not claims_only:
-        _not_built()
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     result = scan_claims(options.repo, options.config)
+    if claims_only:
+        _print_claims(result, options, show_suppressed)
+        return
+    index = build_index(options.repo, options.config)
+    findings, history_warnings = _full_findings(result.claims, index, options.repo)
+    result = result.model_copy(
+        update={"symbols": index.symbols, "findings": findings, "warnings": [*result.warnings, *history_warnings]}
+    )
+    _print_findings(result, options, show_all=show_all, show_low_confidence=show_low_confidence)
+
+
+def _print_claims(result: ScanResult, options: CLIOptions, show_suppressed: bool) -> None:
     console = Console(no_color=options.no_color, width=180)
     table = Table(title="Documentation claims")
     for heading in (
@@ -155,16 +278,169 @@ def scan(
         )
 
 
-@app.command()
-def check() -> None:
-    """Scan and exit non-zero on drift, for CI."""
-    _not_built()
+def _print_findings(
+    result: ScanResult,
+    options: CLIOptions,
+    *,
+    show_all: bool,
+    show_low_confidence: bool,
+) -> None:
+    findings = [
+        item
+        for item in result.findings
+        if (show_all or item.verdict != Verdict.ok)
+        and (show_low_confidence or item.confidence >= options.config.min_confidence)
+    ]
+    findings.sort(key=lambda item: (not item.is_drift, item.claim.doc_path, item.claim.line, item.claim.kind.value))
+    table = Table(title="Documentation findings")
+    for heading in ("id", "location", "verdict", "claim", "suggestion", "confidence", "reason"):
+        table.add_column(heading)
+    for item in findings:
+        table.add_row(
+            item.claim.claim_id,
+            f"{item.claim.doc_path}:{item.claim.line}",
+            item.verdict.value,
+            item.claim.value,
+            item.suggestion or "",
+            f"{item.confidence:.2f}",
+            item.reasons[0],
+        )
+    console = Console(no_color=options.no_color, width=180)
+    console.print(table)
+    counts = result.summary()["by_verdict"]
+    console.print("Findings: " + ", ".join(f"{name}={count}" for name, count in counts.items()))
+    for warning in result.warnings:
+        console.print(f"Warning: {warning}", style="yellow")
+    if options.verbose:
+        console.print("Timings: " + ", ".join(f"{name}={seconds:.4f}s" for name, seconds in result.timings.items()))
 
 
 @app.command()
-def explain() -> None:
-    """Show the full evidence chain for one finding."""
-    _not_built()
+def check(
+    ctx: typer.Context,
+    fail_on: Annotated[str, typer.Option("--fail-on", help="Exit 1 on drift, missing, or any finding.")] = "drift",
+    min_confidence: Annotated[float | None, typer.Option("--min-confidence")] = None,
+    max_findings: Annotated[int | None, typer.Option("--max-findings")] = None,
+    baseline: Annotated[
+        Path | None, typer.Option("--baseline", help="Fail only for drifts absent from this baseline.")
+    ] = None,
+    quiet: Annotated[bool, typer.Option("--quiet", help="Print nothing unless the check fails.")] = False,
+) -> None:
+    """Run a full scan; exit 1 for configured findings, or 2 for usage errors."""
+    if fail_on not in {"drift", "missing", "any"}:
+        raise typer.BadParameter("Choose drift, missing, or any.", param_hint="--fail-on")
+    if min_confidence is not None and not 0 <= min_confidence <= 1:
+        raise typer.BadParameter("Choose a confidence between 0 and 1.", param_hint="--min-confidence")
+    if max_findings is not None and max_findings < 0:
+        raise typer.BadParameter("Choose a non-negative count.", param_hint="--max-findings")
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    result = scan_claims(options.repo, options.config)
+    index = build_index(options.repo, options.config)
+    findings, history_warnings = _full_findings(result.claims, index, options.repo)
+    if baseline is not None:
+        baseline_path = baseline if baseline.is_absolute() else options.repo / baseline
+        try:
+            findings = new_findings(findings, load_baseline(baseline_path))
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc), param_hint="--baseline") from exc
+    threshold = options.config.min_confidence if min_confidence is None else min_confidence
+    qualifying = [item for item in findings if item.confidence >= threshold]
+    if fail_on == "drift":
+        failures = [item for item in qualifying if item.is_drift]
+    elif fail_on == "missing":
+        failures = [item for item in qualifying if item.verdict in {Verdict.missing, Verdict.invalid_command}]
+    else:
+        failures = [item for item in qualifying if item.verdict != Verdict.ok]
+    if max_findings is not None:
+        failures = failures if len(failures) > max_findings else []
+    if not quiet or failures:
+        _print_findings(
+            result.model_copy(
+                update={
+                    "symbols": index.symbols,
+                    "findings": findings,
+                    "warnings": [*result.warnings, *history_warnings],
+                }
+            ),
+            options,
+            show_all=fail_on == "any",
+            show_low_confidence=True,
+        )
+    if failures:
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def explain(ctx: typer.Context, finding_id_prefix: Annotated[str, typer.Argument(metavar="FINDING_ID")]) -> None:
+    """Show documentation, source, reasons, confidence and history evidence for one finding."""
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    scan = scan_claims(options.repo, options.config)
+    index = build_index(options.repo, options.config)
+    findings, _ = _full_findings(scan.claims, index, options.repo)
+    matches = [item for item in findings if item.claim.claim_id.startswith(finding_id_prefix)]
+    if len(matches) != 1:
+        raise typer.BadParameter("Use a prefix that identifies exactly one finding.", param_hint="FINDING_ID")
+    finding = matches[0]
+    payload = {
+        "id": finding.claim.claim_id,
+        "claim": finding.claim.model_dump(mode="json"),
+        "verdict": finding.verdict.value,
+        "suggestion": finding.suggestion,
+        "confidence": finding.confidence,
+        "reasons": finding.reasons,
+        "evidence": [item.model_dump(mode="json") for item in finding.evidence],
+        "matched_symbol": finding.matched_symbol.model_dump(mode="json") if finding.matched_symbol else None,
+        "introduced_by": finding.introduced_by.model_dump(mode="json") if finding.introduced_by else None,
+    }
+    Console(no_color=options.no_color, width=140).print(
+        Panel.fit(json.dumps(payload, indent=2), title="Finding evidence")
+    )
+
+
+@baseline_app.command("update")
+def baseline_update(ctx: typer.Context, path: Path = Path(".docs-drift-baseline.json")) -> None:
+    """Replace the baseline with current drift findings; fixed findings are pruned."""
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    scan = scan_claims(options.repo, options.config)
+    index = build_index(options.repo, options.config)
+    findings, _ = _full_findings(scan.claims, index, options.repo)
+    target = path if path.is_absolute() else options.repo / path
+    save_baseline(target, findings)
+    typer.echo(f"Saved {sum(item.is_drift for item in findings)} findings to {target}.")
+
+
+@app.command("ignore")
+def ignore_claim(ctx: typer.Context, claim_id_prefix: Annotated[str, typer.Argument(metavar="CLAIM_ID")]) -> None:
+    """Add a stable claim ID to the repository ignore list."""
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    scan = scan_claims(options.repo, options.config)
+    matches = [claim for claim in scan.claims if claim.claim_id.startswith(claim_id_prefix)]
+    if len(matches) != 1:
+        raise typer.BadParameter("Use a prefix that identifies exactly one claim.", param_hint="CLAIM_ID")
+    path = options.repo / ".docs-drift.toml"
+    data: dict[str, object] = {}
+    if not path.exists():
+        pyproject = options.repo / "pyproject.toml"
+        if pyproject.is_file():
+            try:
+                source = tomllib.loads(pyproject.read_text(encoding="utf-8", errors="replace"))
+                tool = source.get("tool", {})
+                if isinstance(tool, dict) and isinstance(tool.get("docs-drift"), dict):
+                    data = tool["docs-drift"]
+            except tomllib.TOMLDecodeError as exc:
+                raise typer.BadParameter(f"Cannot read pyproject.toml: {exc}.") from exc
+    else:
+        try:
+            data = tomllib.loads(path.read_text(encoding="utf-8"))
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            raise typer.BadParameter(f"Cannot update {path}: {exc}.") from exc
+    ignored = data.get("ignore", [])
+    if not isinstance(ignored, list) or not all(isinstance(item, str) for item in ignored):
+        raise typer.BadParameter("The ignore setting must be a list of strings.")
+    if matches[0].claim_id not in ignored:
+        data["ignore"] = [*ignored, matches[0].claim_id]
+        path.write_text(tomli_w.dumps(data), encoding="utf-8", newline="\n")
+    typer.echo(f"Ignored {matches[0].claim_id} in {path}.")
 
 
 @app.command()
@@ -283,3 +559,4 @@ def clear_index_cache(ctx: typer.Context) -> None:
 
 
 app.add_typer(cache_app, name="cache")
+app.add_typer(baseline_app, name="baseline")

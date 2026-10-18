@@ -1,4 +1,4 @@
-"""The measurement stub validates immutable expectations without computing scores."""
+"""Measurement validates the fixed key, scores fixtures, and reports exact commands."""
 
 import json
 from pathlib import Path
@@ -16,6 +16,8 @@ def test_loads_key_and_cli(capsys: pytest.CaptureFixture[str]) -> None:
     assert main([]) == 0
     output = capsys.readouterr().out
     assert "Claim recall: 13/13 (100.0%)" in output
+    assert "Keyed finding recall: 13/13 (100.0%)" in output
+    assert "Keyed-case precision: 13/13 (100.0%)" in output
     assert "Command: uv run python scripts/measure.py" in output
 
 
