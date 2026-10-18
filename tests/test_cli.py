@@ -93,6 +93,21 @@ def test_scan_suppression_can_be_shown(tmp_path: Path) -> None:
     assert "--secret" in result.output
 
 
+def test_index_tree_displays_static_cli_commands_and_flags(tmp_path: Path) -> None:
+    (tmp_path / "cli.py").write_text(
+        "import argparse\n"
+        "parser = argparse.ArgumentParser()\n"
+        "sub = parser.add_subparsers()\n"
+        "serve = sub.add_parser('serve')\n"
+        "serve.add_argument('--port', default=8000)\n",
+        encoding="utf-8",
+    )
+    result = CliRunner().invoke(app, ["--repo", str(tmp_path), "index", "--no-cache", "--tree"])
+    assert result.exit_code == 0, result.output
+    assert "serve" in result.output
+    assert "--port" in result.output
+
+
 def test_invalid_format_rejected() -> None:
     result = CliRunner().invoke(app, ["--format", "pdf", "scan"])
     assert result.exit_code == 2

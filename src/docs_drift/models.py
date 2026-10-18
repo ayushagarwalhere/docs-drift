@@ -66,6 +66,8 @@ class SymbolKind(StrEnum):
     file = "file"
     package_script = "package_script"
     make_target = "make_target"
+    ci_job = "ci_job"
+    cli_argument = "cli_argument"
 
 
 class Verdict(StrEnum):
@@ -152,6 +154,15 @@ class Symbol(PipelineModel):
     language: NonemptyText
     framework: str | None = None
     parent_id: SymbolID | None = None
+    exported: bool = False
+    decorators: list[str] = Field(default_factory=list)
+    derived: bool = False
+    setting_group: str | None = None
+    authoritative: bool = True
+    raw_path: str | None = None
+    handler: str | None = None
+    partial_prefix: bool = False
+    ts_type: bool = False
 
 
 class CommitRef(PipelineModel):

@@ -253,3 +253,15 @@ History: a1b2c3d, Priya, 3 September [illustrative attribution]
 ```
 
 A missing `--port` declaration alone does not prove a rename. Without a supported mapping, the tool must not invent one.
+# Static code index
+
+`docs-drift index` parses tracked source files as text or AST; it never imports or executes a scan repository. Use `--no-cache` to rebuild, `--list KIND` to inspect one symbol type, `--find NAME` for fuzzy lookup, `--tree` to print CLI commands and flags, and `cache clear` to remove the local index cache. The cache is a per-file atomic JSON document under `.docs-drift/cache/`.
+
+The first indexers support Python declarations and argparse/Click/Typer patterns, JavaScript/TypeScript declarations and common Commander/Express patterns, literal Python/JS routes, package scripts, common config formats, Docker snippets, CI jobs, and common task files. Coverage is partial: dynamic plugin registration, generated declarations, complex router composition, and unsupported ecosystems may remain unverifiable. RST parsing is basic. Rust and Go configuration indexing are not implemented.
+
+| Source language or surface | Current index coverage |
+| --- | --- |
+| Python | AST symbols, argparse, partial Click/Typer, FastAPI/Flask patterns, settings defaults |
+| JavaScript/TypeScript | Tree-sitter-backed symbols, partial Commander patterns, Express routes, package scripts and env examples |
+| JSON, YAML, TOML, INI, Docker, CI and task files | Literal keys, jobs, scripts and targets; format-specific coverage is partial |
+| Django/DRF, Next.js, NestJS, OpenAPI and Rust/Go config | Not implemented or only partial; never infer missing solely from absent symbols |
