@@ -17,6 +17,7 @@ coverage.xml
 .venv/
 venv/
 .uv-cache/
+.pre-commit-cache/
 
 # Editors and operating systems
 .idea/
@@ -29,3 +30,6 @@ Thumbs.db
 
 # Local scanner cache
 .docs-drift/
+
+# Generated fixture repositories (including their nested Git metadata).
+/tests/fixtures/repos/

@@ -69,9 +69,7 @@ def test_pyproject_without_section_uses_defaults(tmp_path: Path) -> None:
 
 def test_empty_local_config_shadows_pyproject(tmp_path: Path) -> None:
     (tmp_path / ".docs-drift.toml").write_text("", encoding="utf-8")
-    (tmp_path / "pyproject.toml").write_text(
-        "[tool.docs-drift]\nmin_confidence = 0.9\n", encoding="utf-8"
-    )
+    (tmp_path / "pyproject.toml").write_text("[tool.docs-drift]\nmin_confidence = 0.9\n", encoding="utf-8")
     assert load_config(tmp_path).min_confidence == 0.6
 
 
@@ -88,9 +86,7 @@ def test_unknown_keys_warn_at_each_level(tmp_path: Path) -> None:
     assert config == Config()
 
 
-@pytest.mark.parametrize(
-    "text", ["invalid TOML", "min_confidence = 2", "[history]\nmax_commits = -1"]
-)
+@pytest.mark.parametrize("text", ["invalid TOML", "min_confidence = 2", "[history]\nmax_commits = -1"])
 def test_bad_selected_config_does_not_fall_back(tmp_path: Path, text: str) -> None:
     config_path = tmp_path / ".docs-drift.toml"
     config_path.write_text(text, encoding="utf-8")
@@ -112,9 +108,7 @@ def test_non_utf8_config_has_actionable_error(tmp_path: Path) -> None:
         load_config(tmp_path)
 
 
-def test_relative_explicit_path_uses_working_directory(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_relative_explicit_path_uses_working_directory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
     monkeypatch.chdir(tmp_path)

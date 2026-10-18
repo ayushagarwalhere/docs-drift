@@ -1,0 +1,49 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.13"]
+    env:
+      # Keep the extras installed by sync available to every uv run step.
+      UV_ALL_EXTRAS: "true"
+      UV_LOCKED: "true"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff check
+      - run: uv run ruff format --check
+      - run: uv run mypy src
+      - run: uv run pytest --cov=docs_drift --cov=scripts --cov-report=term-missing
+      - run: uv run pre-commit run --all-files
+
+  dogfood:
+    name: dogfood
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      # TODO: Replace with docs-drift check on this repository's README.
+      - run: uv run docs-drift --help

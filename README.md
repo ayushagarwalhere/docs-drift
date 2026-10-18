@@ -56,6 +56,12 @@ Configuration loading reads TOML text only and executes no repository code.
 
 ### Development and packaging
 
+Use `uv run just setup` to sync all extras and install the local pre-commit hook,
+then `uv run just check` for the full quality gate. We use just rather than both
+just and Make: recipes run with native PowerShell on Windows and sh on Unix.
+`rust-just` is included in the development dependencies, so a separate global
+installation is unnecessary. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
+
 ```console
 uv run pytest -q
 uv run ruff check .
@@ -63,6 +69,20 @@ uv run ruff format --check .
 uv run mypy
 uv build
 ```
+
+CI runs on pushes and pull requests with Ubuntu and Windows, each on Python 3.11
+and 3.13, using full Git history and all extras. The coverage gate is fixed at
+80%; a lower result must be reported, never fixed by lowering the threshold.
+`just test` reports coverage for both the package and the staged-file guard.
+`just fmt` rewrites formatting; `just check` checks formatting without rewriting.
+The `dogfood` CI job and `just demo` currently run CLI help; both will run against
+documentation fixtures when scanning is implemented.
+
+Pre-commit checks Ruff, formatting, final newlines, trailing whitespace, and
+staged-file safety. `scripts/guard.py` checks the Git index, including binary
+files: it blocks files over 1 MB (1,000,000 bytes), `.env` and `.env.*` files,
+and token-shaped Anthropic, GitHub, and AWS keys. It reports locations without
+printing secret values. Text line endings are normalized to LF by `.gitattributes`.
 
 uv installs the default development dependency group in a checkout. A matching
 `dev` extra is available to package users; optional integrations can be installed
@@ -82,6 +102,28 @@ test scratch files inside the ignored scanner cache without changing normal
 pytest behavior for other environments.
 
 ## Working agreement
+
+### Fixed evaluation fixtures
+
+The fixture specification builds `py-cli`, `fastapi-svc`, `node-tool`, and
+`clean-repo` with real, deterministic Git histories. The first three preserve
+stale READMEs across source changes; the clean repository covers historical
+sections, excluded changelogs, example values, and third-party flags.
+
+```console
+uv run python tests/fixtures/build_fixtures.py
+uv run python scripts/measure.py
+uv run pytest tests/test_fixtures_build.py tests/test_measure.py -q
+```
+
+Manual generation writes ignored `tests/fixtures/repos/`; tests use fresh temp
+directories and compare independent builds. The builder refuses existing repo
+destinations; use `--output PATH` to select a fresh directory. Never commit the
+nested `.git` folders or import, install, or run generated fixture programs.
+See the hand-authored [answer key and provenance](tests/fixtures/ANSWER_KEY.md).
+The measurement stub only validates the JSON key; it reports no precision or
+recall until scoring exists. Fix detector behavior against these expectations,
+never the expectations against detector output.
 
 ### Fixed identity and stack
 

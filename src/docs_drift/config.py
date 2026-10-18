@@ -28,8 +28,7 @@ class ConfigModel(BaseModel):
             for key in data:
                 if key not in cls.model_fields:
                     warnings.warn(
-                        f"Unknown configuration key '{cls.__name__}.{key}'; "
-                        "ignored. Check the spelling or remove it.",
+                        f"Unknown configuration key '{cls.__name__}.{key}'; ignored. Check the spelling or remove it.",
                         ConfigWarning,
                         stacklevel=2,
                     )
@@ -75,9 +74,7 @@ def _read_toml(path: Path) -> dict[str, object]:
         with path.open("rb") as stream:
             return tomllib.load(stream)
     except (OSError, UnicodeError, tomllib.TOMLDecodeError) as exc:
-        raise ConfigError(
-            f"Cannot read configuration at {path}: {exc}. Fix the file or path."
-        ) from exc
+        raise ConfigError(f"Cannot read configuration at {path}: {exc}. Fix the file or path.") from exc
 
 
 def load_config(repo: Path | None = None, config_path: Path | None = None) -> Config:
@@ -106,6 +103,4 @@ def load_config(repo: Path | None = None, config_path: Path | None = None) -> Co
     try:
         return Config.model_validate(data)
     except ValidationError as exc:
-        raise ConfigError(
-            f"Invalid configuration in {source}: {exc}. Correct the listed fields."
-        ) from exc
+        raise ConfigError(f"Invalid configuration in {source}: {exc}. Correct the listed fields.") from exc

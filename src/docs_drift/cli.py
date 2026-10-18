@@ -10,9 +10,7 @@ import typer
 from docs_drift import __version__
 from docs_drift.config import Config, ConfigError, load_config
 
-app = typer.Typer(
-    help="Find drift between repository documentation and code.", add_completion=False
-)
+app = typer.Typer(help="Find drift between repository documentation and code.", add_completion=False)
 
 
 class OutputFormat(StrEnum):

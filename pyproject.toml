@@ -28,31 +28,49 @@ docs-drift = "docs_drift.cli:app"
 graph = ["falkordb>=1.0"]
 llm = ["anthropic>=0.40"]
 web = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "jinja2>=3.1"]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.9", "mypy>=1.14"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40"]
 
 # Mirror the published dev extra so plain `uv run pytest` works in a checkout.
 # All imported dependencies currently provide their own typing information.
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.9", "mypy>=1.14"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/docs_drift"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/", "tests/", "docs/", "README.md", "LICENSE", "pyproject.toml"]
+include = ["src/", "scripts/", "tests/", "docs/", "README.md", "CONTRIBUTING.md", "LICENSE", "pyproject.toml", "justfile", ".gitattributes", ".pre-commit-config.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
+# Generated fixture programs are untrusted input, never executable tests.
+addopts = ["--ignore=tests/fixtures/repos"]
+
+[tool.coverage.run]
+source = ["docs_drift", "scripts"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
 
 [tool.ruff]
 target-version = "py311"
-line-length = 100
+line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "PL"]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer callbacks intentionally declare all global options as parameters.
+"src/docs_drift/cli.py" = ["PLR0913", "PLR0917"]
+# Expected values in tests are concrete examples, not unexplained production constants.
+"tests/**" = ["PLR2004"]
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "tests"]
+files = ["src", "scripts", "tests"]
 plugins = ["pydantic.mypy"]
+# Fixture code is scan input, not part of the typed implementation.
+exclude = ["^tests/fixtures/repos/"]

@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "findings": [
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 4,
+      "claim_kind": "cli_flag", "claim_text": "--port",
+      "expected_verdict": "renamed", "expected_new": "--listen",
+      "introduced_by": "450a93d2afb517459abbb7ca15b4a87692553a21"
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 6,
+      "claim_kind": "default_value", "claim_text": "The `--workers` default is `4`.",
+      "expected_verdict": "default changed", "expected_new": 8,
+      "introduced_by": "397bff7d54a7a3861ccf619af032c19c9a646d9d"
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 7,
+      "claim_kind": "environment_variable", "claim_text": "APP_DEBUG",
+      "expected_verdict": "missing", "expected_new": null,
+      "introduced_by": "f686fb7b16409911edc904a10bd26afcf3682487"
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 8,
+      "claim_kind": "cli_subcommand", "claim_text": "migrate",
+      "expected_verdict": "renamed", "expected_new": "db-upgrade",
+      "introduced_by": "3fb52f15482ad07d8de83c72fc4ad3ab46dd9548"
+    },
+    {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 3,
+      "claim_kind": "http_endpoint", "claim_text": "GET /users/{id}",
+      "expected_verdict": "renamed", "expected_new": "/v2/users/{id}",
+      "introduced_by": "2d94162dcf4e30283d9b39de7ad354a83b22cdeb"
+    },
+    {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 4,
+      "claim_kind": "http_endpoint", "claim_text": "POST /login",
+      "expected_verdict": "missing", "expected_new": null,
+      "introduced_by": "a6da42660fd9269d32e105ad2477d12a24b9afff"
+    },
+    {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 5,
+      "claim_kind": "config_key", "claim_text": "request_timeout",
+      "expected_verdict": "renamed", "expected_new": "timeout_seconds",
+      "introduced_by": "b7d9a6dbecd5200a369f7fa67814ae18756e7f05"
+    },
+    {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 6,
+      "claim_kind": "default_value", "claim_text": "The request timeout defaults to `30` seconds.",
+      "expected_verdict": "default changed", "expected_new": 60,
+      "introduced_by": "b7d9a6dbecd5200a369f7fa67814ae18756e7f05"
+    },
+    {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 7,
+      "claim_kind": "function", "claim_text": "create_app",
+      "expected_verdict": "renamed", "expected_new": "build_app",
+      "introduced_by": "5b559ed74770a06859fe6e5450978b7c1ff31c05"
+    },
+    {
+      "repo": "node-tool", "doc_path": "README.md", "line": 3,
+      "claim_kind": "package_script", "claim_text": "build:prod",
+      "expected_verdict": "renamed", "expected_new": "build",
+      "introduced_by": "3ef9444ea509abf03bd7a22340d43b0d8dcfd373"
+    },
+    {
+      "repo": "node-tool", "doc_path": "README.md", "line": 4,
+      "claim_kind": "environment_variable", "claim_text": "process.env.API_URL",
+      "expected_verdict": "renamed", "expected_new": "API_BASE_URL",
+      "introduced_by": "6bd2e416c699a51e45d11a6b56784df6e6061218"
+    },
+    {
+      "repo": "node-tool", "doc_path": "README.md", "line": 5,
+      "claim_kind": "http_endpoint", "claim_text": "GET /health",
+      "expected_verdict": "renamed", "expected_new": "/healthz",
+      "introduced_by": "12804ce9b1afc1a2326d9b0828c1fcea429811a5"
+    },
+    {
+      "repo": "node-tool", "doc_path": "README.md", "line": 10,
+      "claim_kind": "shell_command", "claim_text": "npx node-tool deploy --dry-run",
+      "expected_verdict": "invalid command", "expected_new": null,
+      "introduced_by": "e36fa00d8efd0c431f810f11ada620cddb44eb7f"
+    }
+  ],
+  "non_findings": [
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 3,
+      "claim_kind": "cli_subcommand", "claim_text": "serve",
+      "reason": "The serve subcommand is unchanged."
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 4,
+      "claim_kind": "default_value", "claim_text": "default 8000",
+      "reason": "The port option was renamed but its default did not change."
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 5,
+      "claim_kind": "cli_flag", "claim_text": "--host",
+      "reason": "The host flag still exists."
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 5,
+      "claim_kind": "default_value", "claim_text": "default 127.0.0.1",
+      "reason": "The host default is unchanged."
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 6,
+      "claim_kind": "cli_flag", "claim_text": "--workers",
+      "reason": "The workers flag exists; report its stale default as the separate default-value finding."
+    },
+    {
+      "repo": "py-cli", "doc_path": "README.md", "line": 10,
+      "claim_kind": "make_target", "claim_text": "make test",
+      "reason": "The Makefile test target is unchanged."
+    },
+    {
+      "repo": "node-tool", "doc_path": "README.md", "line": 10,
+      "claim_kind": "cli_subcommand", "claim_text": "deploy",
+      "reason": "Deploy still exists; the command's removed option is the separate invalid-command finding."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 5,
+      "claim_kind": "shell_command", "claim_text": "clean-tool serve --listen 9000",
+      "reason": "The current command agrees with the current argparse declarations."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 5,
+      "claim_kind": "cli_flag", "claim_text": "--listen",
+      "reason": "The current listen flag exists."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 6,
+      "claim_kind": "cli_flag", "claim_text": "--workers",
+      "reason": "The current workers flag exists."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 6,
+      "claim_kind": "default_value", "claim_text": "The `--workers` default is `8`.",
+      "reason": "The current worker default is eight."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 7,
+      "claim_kind": "environment_variable", "claim_text": "APP_LOG_LEVEL",
+      "reason": "The current code reads this environment variable."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 8,
+      "claim_kind": "make_target", "claim_text": "make test",
+      "reason": "The Makefile declares test."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 10,
+      "claim_kind": "cli_flag", "claim_text": "--name alice",
+      "reason": "The sentence explicitly marks this as example data, not a clean-tool option."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 14,
+      "claim_kind": "cli_flag", "claim_text": "--port",
+      "reason": "The Migrating from v1 section explicitly describes historical behavior."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 19,
+      "claim_kind": "shell_command", "claim_text": "git commit --amend",
+      "reason": "Git is a third-party tool; its flags are outside this repository's CLI namespace."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "README.md", "line": 20,
+      "claim_kind": "shell_command", "claim_text": "pip install -e .",
+      "reason": "Pip is a third-party tool; its flags are outside this repository's CLI namespace."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "CHANGELOG.md", "line": 5,
+      "claim_kind": "cli_flag", "claim_text": "--port",
+      "reason": "The root changelog intentionally describes a past release and is excluded by default."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "CHANGELOG.md", "line": 5,
+      "claim_kind": "cli_flag", "claim_text": "--debug",
+      "reason": "A historical changelog mention is not a current-interface assertion."
+    },
+    {
+      "repo": "clean-repo", "doc_path": "docs/CHANGELOG.md", "line": 3,
+      "claim_kind": "cli_flag", "claim_text": "--port",
+      "reason": "Nested changelogs are excluded by default for the same historical reason."
+    }
+  ]
+}
