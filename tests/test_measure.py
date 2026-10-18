@@ -14,7 +14,9 @@ def test_loads_key_and_cli(capsys: pytest.CaptureFixture[str]) -> None:
     assert key.findings
     assert key.non_findings
     assert main([]) == 0
-    assert "Precision and recall are not implemented" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "Claim recall: 13/13 (100.0%)" in output
+    assert "Command: uv run python scripts/measure.py" in output
 
 
 @pytest.mark.parametrize("change", ["bad_sha", "bad_line", "unsafe_path", "unknown_key", "duplicate", "new_name"])

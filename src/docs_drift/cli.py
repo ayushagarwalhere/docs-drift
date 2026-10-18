@@ -6,9 +6,12 @@ from pathlib import Path
 from typing import Annotated, NoReturn
 
 import typer
+from rich.console import Console
+from rich.table import Table
 
 from docs_drift import __version__
 from docs_drift.config import Config, ConfigError, load_config
+from docs_drift.docs.pipeline import scan_claims
 
 app = typer.Typer(help="Find drift between repository documentation and code.", add_completion=False)
 
@@ -81,9 +84,69 @@ def _not_built() -> NoReturn:
 
 
 @app.command()
-def scan() -> None:
+def scan(
+    ctx: typer.Context,
+    claims_only: Annotated[
+        bool, typer.Option("--claims-only", help="Run extraction only and list documented claims.")
+    ] = False,
+    show_suppressed: Annotated[
+        bool, typer.Option("--show-suppressed", help="Include claims hidden by inline suppressions.")
+    ] = False,
+) -> None:
     """Scan a repository and print a report."""
-    _not_built()
+    if not claims_only:
+        _not_built()
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    result = scan_claims(options.repo, options.config)
+    console = Console(no_color=options.no_color, width=180)
+    table = Table(title="Documentation claims")
+    for heading in (
+        "doc:line",
+        "section",
+        "kind",
+        "value",
+        "qualifier",
+        "expected default",
+        "source",
+        "confidence",
+    ):
+        table.add_column(heading)
+    docs = {doc.path for doc in result.docs}
+    for path in sorted(docs):
+        parsed_claims = [claim for claim in result.claims if claim.doc_path == path]
+        section_by_id = {section.section_id: section for section in result.sections if section.doc_path == path}
+        parsed_claims.sort(key=lambda claim: (section_by_id[claim.section_id].heading_path, claim.line, claim.column))
+        for claim in parsed_claims:
+            table.add_row(
+                f"{claim.doc_path}:{claim.line}",
+                " / ".join(section_by_id[claim.section_id].heading_path),
+                claim.kind.value,
+                claim.value,
+                claim.qualifier or "",
+                claim.expected_default or "",
+                ", ".join(source.value for source in claim.extraction_sources),
+                f"{claim.extraction_confidence:.2f}",
+            )
+    console.print(table)
+    if show_suppressed and result.suppressed:
+        suppressed_table = Table(title="Suppressed claims")
+        suppressed_table.add_column("location")
+        suppressed_table.add_column("claim")
+        suppressed_table.add_column("reason")
+        for item in result.suppressed:
+            suppressed_table.add_row(f"{item.claim.doc_path}:{item.claim.line}", item.claim.value, item.reason)
+        console.print(suppressed_table)
+    by_kind: dict[str, int] = {}
+    for claim in result.claims:
+        by_kind[claim.kind.value] = by_kind.get(claim.kind.value, 0) + 1
+    console.print("Claims: " + ", ".join(f"{kind}={count}" for kind, count in sorted(by_kind.items())))
+    console.print(f"Suppressed: {len(result.suppressed)} | historical ignored: {result.historical_ignored}")
+    for warning in result.warnings:
+        console.print(f"Warning: {warning}", style="yellow")
+    if options.verbose:
+        console.print(
+            "Timings: " + ", ".join(f"{name}={seconds:.4f}s" for name, seconds in sorted(result.timings.items()))
+        )
 
 
 @app.command()

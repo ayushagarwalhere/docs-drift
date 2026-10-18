@@ -1,1 +1,1 @@
-"""Tests for docs-drift's public contracts and local tools."""
+"""Project tests and text-only fixture builders."""

@@ -15,11 +15,22 @@ uv run docs-drift --version
 uv run docs-drift --repo . --format json --no-color scan
 ```
 
-The version is `0.1.0`, read from installed distribution metadata. All seven
-commands (`scan`, `check`, `explain`, `fix`, `graph`, `init`, `serve`) currently
-print `not built yet` and exit with code 2. Format options reserve the future
-report interface; they do not format the stub message. Put global options before
-the command. Help and version work without loading repository configuration.
+The version is `0.1.0`, read from installed distribution metadata. `scan`
+supports an extraction-only mode while matching and verdict reporting are being
+built. It parses docs and fenced snippets as text and never imports or executes
+code from the scanned repository:
+
+```console
+uv run docs-drift --repo . scan --claims-only
+uv run docs-drift --repo tests/fixtures/repos/py-cli scan --claims-only
+```
+
+The claims table includes source location, kind, normalized value, qualifier,
+default, extraction source, and confidence. `--show-suppressed` lists inline
+suppression comments; `--verbose` prints stage timings. The other commands and
+full scan mode remain stubs that print `not built yet` and exit with code 2.
+Put global options before the command. Help and version work without loading
+repository configuration.
 
 ### Configuration
 
@@ -103,6 +114,73 @@ pytest behavior for other environments.
 
 ## Working agreement
 
+### Documentation parsing
+
+Discovery applies configured globs and ignores, returning sorted documentation
+metadata. Git roots scan tracked files; other directories use a vendor-pruned
+walk with nested `.gitignore` support. Files over 2 MB warn and are skipped;
+UTF-8 decoding replaces bad bytes. Markdown, `.markdown`, and MDX use static
+Markdown parsing. **RST support is basic and opt-in** through configured globs;
+it recognizes simple heading adornments, not full Sphinx directives or roles.
+
+```python
+from pathlib import Path
+from docs_drift.config import Config
+from docs_drift.docs.discover import discover_docs, read_doc
+from docs_drift.docs.sections import parse_document
+
+root = Path("tests/fixtures/repos/clean-repo")
+for doc in discover_docs(root, Config()):
+    parsed = parse_document(doc, read_doc(root, doc))
+    for section in parsed.sections:
+        print(section.heading, section.start_line, section.end_line, section.context)
+```
+
+Sections retain heading trails, source line ranges, and historical context.
+`is_historical_span(section, line)` also recognizes historical paragraphs inside
+current sections. `Section.historical_spans` stores those ranges without global
+state. Claim extraction is available as a conservative pipeline step:
+
+```python
+from docs_drift.docs.extract_inline import extract_claims
+
+result = extract_claims(parsed)
+for claim in result.claims:
+    print(claim.kind, claim.value, claim.doc_path, claim.line)
+print("historical mentions ignored:", result.historical_skipped)
+```
+
+Backticked flags, environment variables, endpoints, paths, commands, and clearly
+named symbols are stronger evidence than table entries or explicit default
+phrases. Shell fences are inspected as text and known invocations are retained
+as command claims; commands are never run. Historical mentions are suppressed
+and counted. The integrated `scan --claims-only` pipeline merges duplicate
+locations, applies confidence and ignore filters, retains explicitly suppressed
+claims, and counts historical mentions. Matching and verdict generation remain
+unimplemented. Fixture claim recall can be reproduced with
+`uv run python scripts/measure.py`; the command prints its own provenance.
+
+### Shared data contracts
+
+The pipeline shares typed models in `docs_drift.models`. Pure ID helpers in
+`docs_drift.ids` use meaningful content instead of line numbers or UUIDs:
+
+```python
+from docs_drift.ids import make_claim_id
+from docs_drift.models import ClaimKind
+
+before = make_claim_id("docs/usage.md", ["Usage"], ClaimKind.cli_flag, "--port")
+after_line_shift = make_claim_id("docs/usage.md", ["Usage"], ClaimKind.cli_flag, "--port")
+assert before == after_line_shift
+```
+
+`ScanResult.model_dump_json()` writes a versioned report and
+`ScanResult.model_validate_json(text)` restores it. `summary()` counts findings
+by verdict and claim kind; `Finding.is_drift` identifies actionable drift.
+Historical-section classification and matching stay in the pipeline. See
+[the model contract](docs/design.md#shared-models-and-identity-contract) for path,
+location, identity, timestamp, and default-value conventions.
+
 ### Fixed evaluation fixtures
 
 The fixture specification builds `py-cli`, `fastapi-svc`, `node-tool`, and
@@ -134,18 +212,6 @@ never the expectations against detector output.
 - Optional extras named `graph`, `llm`, and `web`; basic rule-based scanning must work without them.
 - The optional integrations target FalkorDB (`graph`), Anthropic (`llm`), and FastAPI, Uvicorn, and Jinja2 (`web`), as specified in the scaffold requirements.
 - The current scaffold provides packaging, configuration loading, and CLI stubs only. Scanning and optional integrations are not implemented. Never create automatic commits.
-
-### Non-negotiable rules
-
-1. Never import or execute code from a repository being scanned. Parse it only as text or AST. Never execute documented shell commands, package scripts, Makefile targets, or generated scan reports as code.
-2. Rules first, model second: every check that code and deterministic rules can decide must be decided by those rules.
-3. The optional LLM only assesses prose claims rules cannot decide. It cannot replace a deterministic verdict, suppress detected drift, or turn code-detected drift into `OK`. Label model assessments and preserve their evidence separately.
-4. Keep a fixed answer key for fixture reports. Never tune rules, thresholds, or answer keys to improve a score. Correctness changes require independently justified evidence and a visible explanation.
-5. Report every metric with the exact command that produced it, including bad results. Do not invent measurements or omit failures. Record enough context to reproduce a reported result.
-6. Every finding carries its evidence: file path, line, and exact supporting text. Include documentation and source evidence where available; if no source exists, record the search scope and relevant rule rather than fabricating a source location.
-7. Prefer false negatives to false positives. An uncertain match or unsupported history attribution is `unverifiable`, not an asserted defect.
-8. Use small, pure functions, type hints everywhere, and no global mutable state. Errors use plain English and say what to do next.
-9. After each prompt, run the applicable checks, read the diff, and prepare a commit-message suggestion for dictation. Never create a commit automatically.
 
 ### Definition of done for each change
 
@@ -187,15 +253,3 @@ History: a1b2c3d, Priya, 3 September [illustrative attribution]
 ```
 
 A missing `--port` declaration alone does not prove a rename. Without a supported mapping, the tool must not invent one.
-
-## Hackathon delivery agreement
-
-- Provide a working project link that opens without sign-in, or supply a test login and sample input.
-- Provide a demo video no longer than two minutes.
-- Include a screenshot of the Wispr usage card.
-- Include a short description of the problem, intended users, and how Wispr Flow was used.
-- Record actual Flow use honestly; do not claim that text passed through Flow without evidence.
-- Per the supplied brief, judging emphasizes writing through Flow and Wispr verifies winners' counts; no other weights were supplied. Scores and comments are public, with additional prizes described for builder time, usage, and weekly highlights. These details have not been independently verified.
-- The dictated word-count window, “16 to 13 October,” is ambiguous. Confirm the official dates and timezone before using them in submission materials.
-
-See [docs/design.md](docs/design.md) for the data flow, claim taxonomy, verdict definitions, and non-goals.

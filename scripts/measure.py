@@ -1,12 +1,19 @@
-"""Validate the fixed answer key; precision and recall are intentionally not implemented."""
+"""Measure extracted-claim recall against the manually authored fixture key."""
 
 import argparse
+import re
 import sys
+import tempfile
 from collections.abc import Sequence
 from pathlib import Path, PurePosixPath
 from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from docs_drift.config import Config
+from docs_drift.docs.pipeline import scan_claims
+from tests.fixtures.build_fixtures import build_fixtures
 
 
 class Claim(BaseModel):
@@ -86,6 +93,88 @@ def load_key(path: Path) -> AnswerKey:
     return AnswerKey.model_validate_json(path.read_text(encoding="utf-8"))
 
 
+_KIND = {
+    "cli_subcommand": "cli_command",
+    "environment_variable": "env_var",
+    "http_endpoint": "endpoint",
+    "function": "symbol",
+    "shell_command": "code_command",
+}
+MAX_DEFAULT_LINK_DISTANCE = 2
+
+
+def _expected_value(claim: Claim) -> str:
+    if claim.claim_kind == "environment_variable" and claim.claim_text.startswith("process.env."):
+        return claim.claim_text.removeprefix("process.env.")
+    if claim.claim_kind == "http_endpoint":
+        return re.sub(r"\{[^}]+\}|:[A-Za-z_]\w*|<[A-Za-z_]\w*>", "{param}", claim.claim_text)
+    if claim.claim_kind == "default_value":
+        name = re.search(r"`([^`]+)`", claim.claim_text)
+        return name.group(1) if name else ""
+    return claim.claim_text
+
+
+def measure(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
+    with tempfile.TemporaryDirectory(prefix="docs-drift-measure-") as directory:
+        root = Path(directory)
+        build_fixtures(root)
+        scans = {
+            name: scan_claims(root / name, Config()) for name in ("py-cli", "fastapi-svc", "node-tool", "clean-repo")
+        }
+    misses = []
+    for expected in key.findings:
+        actual_kind = _KIND.get(expected.claim_kind, expected.claim_kind)
+        value = _expected_value(expected)
+        if expected.claim_kind == "default_value" and value == "30":
+            subjects = [
+                item.value
+                for item in scans[expected.repo].claims
+                if item.doc_path == expected.doc_path
+                and item.kind.value == "config_key"
+                and abs(item.line - expected.line) <= MAX_DEFAULT_LINK_DISTANCE
+            ]
+            value = subjects[0] if len(subjects) == 1 else ""
+        found = any(
+            item.doc_path == expected.doc_path
+            and item.kind.value == actual_kind
+            and item.value == value
+            and (expected.claim_kind != "default_value" or item.expected_default is not None)
+            and (expected.claim_kind != "default_value" or item.line == expected.line or item.line == expected.line - 1)
+            for item in scans[expected.repo].claims
+        )
+        if not found:
+            misses.append(
+                f"{expected.repo}:{expected.doc_path}:{expected.line} {expected.claim_kind} {expected.claim_text}"
+            )
+    noisy = []
+    for expected_nf in (item for item in key.non_findings if item.repo == "clean-repo"):
+        actual_kind = _KIND.get(expected_nf.claim_kind, expected_nf.claim_kind)
+        value = _expected_value(expected_nf)
+        result = scans[expected_nf.repo]
+        found = any(
+            item.doc_path == expected_nf.doc_path
+            and item.kind.value == actual_kind
+            and item.value == value
+            and item.line == expected_nf.line
+            for item in result.claims
+        )
+        suppressed = any(
+            item.claim.doc_path == expected_nf.doc_path
+            and item.claim.kind.value == actual_kind
+            and item.claim.value == value
+            and item.claim.line == expected_nf.line
+            for item in result.suppressed
+        )
+        excluded = expected_nf.doc_path not in {doc.path for doc in result.docs}
+        near_miss = any(word in expected_nf.reason.casefold() for word in ("historical", "example data", "third-party"))
+        if near_miss and found and not (suppressed or excluded):
+            noisy.append(
+                f"{expected_nf.repo}:{expected_nf.doc_path}:{expected_nf.line} "
+                f"{expected_nf.claim_kind} {expected_nf.claim_text}"
+            )
+    return len(key.findings) - len(misses), len(key.findings), misses, noisy
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -93,7 +182,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     try:
-        load_key(args.key)
+        key = load_key(args.key)
     except (OSError, ValueError) as exc:
         print(
             f"Cannot validate the answer key: {exc}. "
@@ -101,8 +190,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    print("Answer key is valid. Precision and recall are not implemented.")
-    return 0
+    hit, total, misses, noisy = measure(key)
+    print(f"Claim recall: {hit}/{total} ({hit / total:.1%})")
+    print(f"Clean-repo historical/example/third-party near-miss leaks: {len(noisy)}")
+    for miss in misses:
+        print(f"MISS: {miss}")
+    for item in noisy:
+        print(f"UNEXPECTED: {item}")
+    print("Command: uv run python scripts/measure.py")
+    return 0 if not misses and not noisy else 1
 
 
 if __name__ == "__main__":

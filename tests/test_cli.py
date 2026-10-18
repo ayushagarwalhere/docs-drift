@@ -1,4 +1,4 @@
-"""Public CLI behavior for the package skeleton."""
+"""Public CLI behavior for the CLI and extraction-only scan."""
 
 from importlib.metadata import version
 from pathlib import Path
@@ -69,6 +69,28 @@ def test_global_options(output_format: str, tmp_path: Path) -> None:
     )
     assert result.exit_code == 2
     assert result.output.strip() == "not built yet"
+
+
+def test_claims_only_scan_renders_rows_and_verbose_timings(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("# Usage\n\nRun `--port` to listen.\n", encoding="utf-8")
+    result = CliRunner().invoke(
+        app,
+        ["--repo", str(tmp_path), "--verbose", "scan", "--claims-only"],
+    )
+    assert result.exit_code == 0, result.output
+    assert "cli_flag" in result.output
+    assert "--port" in result.output
+    assert "Timings:" in result.output
+
+
+def test_scan_suppression_can_be_shown(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text(
+        "# Usage\n\n<!-- docs-drift-ignore-next-line -->\n`--secret`\n", encoding="utf-8"
+    )
+    result = CliRunner().invoke(app, ["--repo", str(tmp_path), "scan", "--claims-only", "--show-suppressed"])
+    assert result.exit_code == 0, result.output
+    assert "Suppressed claims" in result.output
+    assert "--secret" in result.output
 
 
 def test_invalid_format_rejected() -> None:

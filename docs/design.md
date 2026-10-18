@@ -107,3 +107,167 @@ Unknown keys warn and are ignored; invalid known fields and unreadable selected
 files produce actionable errors. Global options are carried in invocation-local
 context. All command bodies remain stubs that print `not built yet` and exit 2.
 No discovery, indexing, matching, history, graph, LLM, or web behavior exists yet.
+
+## Shared models and identity contract
+
+`src/docs_drift/models.py` defines the shared Pydantic models, enums, and evidence
+structure. `Section.historical_spans` additionally stores inclusive paragraph
+line ranges, so historical-span lookup works without global parser state and
+survives JSON round trips. Other fields follow the requested contract.
+`Evidence` simply gives `{file, line, text}` a reusable type. Unknown model fields
+are rejected to expose pipeline mistakes; configuration retains its existing
+warn-and-ignore behavior for unknown keys.
+
+Repository-relative paths are stored as forward-slash strings on every platform.
+Absolute paths, drive-relative paths, and parent traversal are rejected; the
+pipeline must make them relative to the repository first. Path normalization
+does not read the filesystem or change case. `ScanResult.repo_path` is a host-native
+`Path` for the scan root, rather than a repository-relative evidence path.
+
+Locations are one-based; section bounds are inclusive. Heading level zero and
+an empty heading trail describe a document's introductory, unheaded section.
+The heading trail includes the current heading, e.g. `['Usage', 'Server options']`.
+`context` is `current` or `historical`; the docs pipeline classifies changelogs,
+migration, deprecated, legacy, and past-version sections and suppresses their
+claims before matching. Models do not classify headings or decide verdicts.
+
+`ids.py` provides pure `make_section_id`, `make_claim_id`, and `make_symbol_id`
+helpers. IDs are required model inputs, not random values or hidden defaults.
+The pipeline already owns heading context, so `Claim` needs no extra heading-path
+or occurrence fields. Helpers hash compact UTF-8 JSON arrays with SHA-256, a
+namespace, and identity version one. JSON boundaries avoid concatenation
+collisions. Section IDs hash document path and heading trail. Claim IDs hash
+document path, heading trail, kind, and normalized value. Symbol IDs hash kind,
+qualified name, and file. Lines, columns, defaults, raw spans, and confidence do
+not enter the IDs. A zero-based occurrence counter is appended only for
+duplicates; the extractor assigns counters within each section's repeated
+kind/value group. Duplicate heading trails can likewise receive section counters.
+Counters are explicit inputs, never global state. Their scope and ordering must
+remain consistent when extraction is implemented.
+
+Content hashes use lowercase SHA-256. Commit hashes support Git SHA-1 or SHA-256;
+short hashes must be hexadecimal prefixes of their full hashes, at least four
+characters long. Commit dates and `scan_time` are timezone-aware timestamps;
+`timings` maps stage names to finite, nonnegative elapsed seconds. Timestamps
+are supplied by callers, never populated from the clock by the models.
+
+Both default fields use optional strings, preserving literal forms such as
+`'008'` or expressions without evaluating source. Qualifiers, frameworks,
+parent links, matched symbols, suggestions, and introducing commits may be
+absent rather than guessed. Every finding requires nonempty evidence and reasons.
+Confidence fields are finite values from zero to one. `decided_by` records
+provenance; enforcing rule precedence and LLM restrictions remains pipeline work.
+
+`schema_version: 1` belongs on the serialized `ScanResult` envelope; nested models
+do not repeat it. All models support Pydantic's `model_dump_json()` and
+`model_validate_json()`. `Finding.is_drift` is a derived property and is not an
+extra serialized field. `ScanResult.summary()` returns `by_verdict` and `by_kind`
+counts for findings, including zero categories; it does not count unjudged claims
+or compute evaluation scores.
+
+## Documentation discovery and section parsing
+
+`docs.discover.discover_docs(repo, config)` returns sorted `DocFile` metadata.
+Configured include/exclude globs are anchored at the scan root, use forward
+slashes, and support `**/` matching zero or more directories. In Git roots,
+`git ls-files` supplies tracked paths; untracked files are not scanned. Tracked
+paths that match Git's standard ignore rules are also excluded deliberately.
+Git queries disable fsmonitor commands, hooks, pagers, and optional index writes.
+Deleted, unreadable, oversized, and external/symlink files are not scanned.
+Unreadable or oversized candidates warn rather than terminating discovery.
+
+Without Git, or when Git listing fails, discovery walks the selected root,
+honors root and nested `.gitignore` rules (including negations), and prunes
+common VCS, environment, vendor, and scanner-cache directories. The `pathspec`
+core dependency supplies Git ignore semantics. A broken Git listing warns;
+ordinary non-Git directories simply use the walk. A directory inside a parent
+checkout is treated as a standalone root unless it has its own `.git` marker.
+
+Documents are limited to 2,000,000 bytes; content hashes cover the original
+bytes. `read_doc(repo, doc)` decodes UTF-8 with replacement and checks that the
+hash still matches discovery. If a file changes between those stages, rediscover
+it rather than reporting evidence against a stale snapshot. Only configured
+paths with supported extensions are read. `.md` and `.markdown` use Markdown;
+`.mdx` retains the MDX format label but follows the same static Markdown parser,
+without evaluating JSX or imports. `.rst` is opt-in through configured globs.
+`.txt` and `.text` receive plain paragraph parsing when configured.
+
+`docs.sections.parse_document(doc, text)` returns `ParsedDoc`: metadata, original
+source text, tokens, sections, and an O(1) `line_to_section` mapping. Keeping the
+original text lets later extractors recover exact spans and columns; tokens
+alone can normalize away Markdown syntax. ParsedDoc is transient parser state,
+not an additional serialized report envelope.
+
+Markdown uses markdown-it-py's CommonMark parser with built-in tables enabled
+and HTML rendering disabled. Fences are never executed or interpreted as
+headings. ATX and setext headings use token maps for original locations. Closed
+YAML front matter at the top is blanked, preserving line numbers, and receives
+no section mapping. Unclosed front matter is treated as ordinary Markdown.
+Content before the first heading receives `(top)`, level zero, and an empty
+heading trail. Empty or whitespace-only input has no sections.
+
+Section ranges are inclusive and partition the source at every heading, even
+subheadings: a parent section ends before its next child heading. Descendants
+retain their full heading trail, so historical context is inherited without
+overlapping ranges. Duplicate heading trails receive deterministic section
+occurrence counters. Paragraph maps with historical prose markers are saved
+as `historical_spans`; the whole paragraph is suppressed, favoring false
+negatives over flags on correctly documented migrations. Fenced code and code
+values themselves do not trigger prose markers. `is_historical_span(section,
+line)` checks section context or these paragraph ranges, within section bounds.
+
+RST support is basic: repeated punctuation underlines and optional matching
+overlines establish heading levels in first-seen adornment order. Paragraphs
+and historical context are retained. This is not full reStructuredText/Sphinx
+support: directives, roles, substitutions, includes, and executable extensions
+are not resolved or executed.
+
+### Claim extraction
+
+`docs.extract_inline.extract_claims(parsed)` returns `ExtractionResult`, with
+claims and a count of candidate mentions skipped because their section or
+paragraph is historical. Inline code has the strongest confidence. It recognizes
+flags (stripping an inline `=example` value), environment-variable spellings,
+HTTP routes with normalized path parameters, file paths, known command wrappers,
+and symbols only when call syntax or surrounding/API-reference context supports
+that reading. A closed stoplist prevents common all-caps prose such as `HTTP`
+and `API` from being mistaken for environment variables. URLs are excluded from
+file-path detection. Single-dash flags receive lower confidence because they
+are easier to confuse with examples.
+
+Tables are considered only when a header names a checkable field; that header
+selects the kind of the first-column value, and a `default` column attaches an
+expected default. Prose rules cover explicit default phrases and explicit
+backticked assignments, keeping example values separate from names. Known
+commands in shell-labeled fences are parsed as text, never executed; only known
+project-command shapes are emitted, which leaves third-party commands such as
+`git commit --amend` and `pip install -e .` outside the project's claim set.
+Explicit command labels in a sentence or subcommand heading qualify flags.
+Each heuristic uses fixed lexical evidence and confidence; there is no answer-key
+feedback or threshold tuning in extraction.
+
+### Claims-only scan pipeline
+
+`docs.pipeline.scan_claims(repo, config)` discovers the configured documents,
+then parses and extracts each file in isolation. Inline/table/prose claims and
+fenced-block claims are combined before explicit defaults are linked to nearby
+subjects. Duplicate claims collapse only within the same document section and
+retain each source location and extraction source; the stable group key omits
+the section so reports can group matching concepts across docs. Confidence
+below `0.3`, exact claim IDs, and `kind:glob` ignore rules are filtered after
+merge. Historical mentions are omitted and counted. HTML ignore comments keep
+the suppressed claim and its reason in the result for optional display.
+
+`docs-drift scan --claims-only` renders the result grouped by document and
+section order, with a per-kind count footer. `--show-suppressed` adds a second
+table, and `--verbose` shows elapsed seconds for discovery, parsing, inline,
+block, defaults, and merge/filter stages. A document exception becomes a named
+warning and processing continues. This command reports claims only: it does
+not index source code, decide verdicts, or run repository commands.
+
+The fixture measurement command is `uv run python scripts/measure.py`. It
+builds throwaway repositories from the independent fixture script, runs the
+claims-only pipeline, and checks answer-key findings by document, kind, and
+normalized subject. It reports recall only; it does not report precision or
+change the fixed answer key. Clean-repo historical, example-value, and
+third-party near-misses are checked for extraction leakage separately.
