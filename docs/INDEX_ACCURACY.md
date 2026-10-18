@@ -1,7 +1,7 @@
 # Index accuracy report
 
 Date: 2026-10-18
-Code baseline before this change: `17099be6317fb95a7505ef854a122cd585bade17`
+Indexing implementation commit: `cf574a9`
 
 ## Controlled fixtures
 
