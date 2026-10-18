@@ -1,0 +1,31 @@
+# Python and build output
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# uv environments and caches; keep uv.lock for reproducible development.
+.venv/
+venv/
+.uv-cache/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Local scanner cache
+.docs-drift/

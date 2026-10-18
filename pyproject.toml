@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "docs-drift"
+version = "0.1.0"
+description = "Find evidence-backed drift between repository documentation and code."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.9",
+    "pydantic>=2.7",
+    "markdown-it-py>=3.0",
+    "tree-sitter>=0.25",
+    "tree-sitter-language-pack>=0.10",
+    "rapidfuzz>=3.9",
+    "tomli-w>=1.0",
+]
+
+[project.scripts]
+docs-drift = "docs_drift.cli:app"
+
+[project.optional-dependencies]
+graph = ["falkordb>=1.0"]
+llm = ["anthropic>=0.40"]
+web = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "jinja2>=3.1"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.9", "mypy>=1.14"]
+
+# Mirror the published dev extra so plain `uv run pytest` works in a checkout.
+# All imported dependencies currently provide their own typing information.
+[dependency-groups]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.9", "mypy>=1.14"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/docs_drift"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/", "tests/", "docs/", "README.md", "LICENSE", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
