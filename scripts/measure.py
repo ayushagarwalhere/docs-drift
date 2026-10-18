@@ -38,6 +38,7 @@ class Claim(BaseModel):
         "shell_command",
         "default_value",
         "make_target",
+        "prose",
     ]
     claim_text: Annotated[str, Field(min_length=1)]
 
@@ -54,6 +55,7 @@ class Claim(BaseModel):
 
 
 class Finding(Claim):
+    requires_llm: bool = False
     expected_verdict: Literal["missing", "renamed", "default changed", "invalid command"]
     expected_new: str | int | None
     introduced_by: Annotated[str, Field(pattern=r"^[0-9a-f]{40}$")]
@@ -125,7 +127,7 @@ def measure(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
             name: scan_claims(root / name, Config()) for name in ("py-cli", "fastapi-svc", "node-tool", "clean-repo")
         }
     misses = []
-    for expected in key.findings:
+    for expected in (item for item in key.findings if not item.requires_llm):
         actual_kind = _KIND.get(expected.claim_kind, expected.claim_kind)
         value = _expected_value(expected)
         if expected.claim_kind == "default_value" and value == "30":
@@ -175,7 +177,8 @@ def measure(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
                 f"{expected_nf.repo}:{expected_nf.doc_path}:{expected_nf.line} "
                 f"{expected_nf.claim_kind} {expected_nf.claim_text}"
             )
-    return len(key.findings) - len(misses), len(key.findings), misses, noisy
+    total = sum(not item.requires_llm for item in key.findings)
+    return total - len(misses), total, misses, noisy
 
 
 def measure_verdicts(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
@@ -203,7 +206,7 @@ def measure_verdicts(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
             results[name] = (scan, _full_findings(scan.claims, index, root / name)[0])
     true_positive = 0
     misses: list[str] = []
-    for expected in key.findings:
+    for expected in (item for item in key.findings if not item.requires_llm):
         scan, findings = results[expected.repo]
         kind = key_to_kind.get(expected.claim_kind, expected.claim_kind)
         value = _expected_value(expected)
@@ -241,7 +244,7 @@ def measure_verdicts(key: AnswerKey) -> tuple[int, int, list[str], list[str]]:
         false_positives.extend(
             f"{negative.repo}:{negative.doc_path}:{item.claim.line} {kind} {value}" for item in leaked
         )
-    return true_positive, len(key.findings), misses, false_positives
+    return true_positive, sum(not item.requires_llm for item in key.findings), misses, false_positives
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -261,6 +264,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     hit, total, misses, noisy = measure(key)
     print(f"Claim recall: {hit}/{total} ({hit / total:.1%})")
+    print(f"Model-required cases excluded from rule-only metrics: {sum(item.requires_llm for item in key.findings)}")
     print(f"Clean-repo historical/example/third-party near-miss leaks: {len(noisy)}")
     for miss in misses:
         print(f"MISS: {miss}")

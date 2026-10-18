@@ -16,6 +16,7 @@ def test_loads_key_and_cli(capsys: pytest.CaptureFixture[str]) -> None:
     assert main([]) == 0
     output = capsys.readouterr().out
     assert "Claim recall: 13/13 (100.0%)" in output
+    assert "Model-required cases excluded from rule-only metrics: 1" in output
     assert "Keyed finding recall: 13/13 (100.0%)" in output
     assert "Keyed-case precision: 13/13 (100.0%)" in output
     assert "Command: uv run python scripts/measure.py" in output

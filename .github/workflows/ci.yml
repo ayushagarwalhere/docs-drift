@@ -18,6 +18,7 @@ jobs:
       # Keep the extras installed by sync available to every uv run step.
       UV_ALL_EXTRAS: "true"
       UV_LOCKED: "true"
+      DOCS_DRIFT_LLM_MODE: "replay"
     steps:
       - uses: actions/checkout@v6
         with:

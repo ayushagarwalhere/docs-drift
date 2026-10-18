@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from docs_drift.models import Finding, Verdict
+from docs_drift.models import DecidedBy, Finding, Verdict
 
 
 class BaselineEntry(BaseModel):
@@ -17,6 +17,8 @@ class BaselineEntry(BaseModel):
     verdict: Verdict
     doc_path: str = Field(min_length=1)
     claim: str = Field(min_length=1)
+    decided_by: DecidedBy = DecidedBy.rules
+    replayed: bool = False
 
 
 class FindingBaseline(BaseModel):
@@ -46,6 +48,8 @@ def save_baseline(path: Path, findings: list[Finding]) -> None:
             verdict=item.verdict,
             doc_path=item.claim.doc_path,
             claim=item.claim.value,
+            decided_by=item.decided_by,
+            replayed=item.replayed,
         )
         for item in findings
         if item.is_drift

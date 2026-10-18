@@ -27,14 +27,14 @@ docs-drift = "docs_drift.cli:app"
 
 [project.optional-dependencies]
 graph = ["falkordb>=1.0"]
-llm = ["anthropic>=0.40"]
+llm = ["httpx>=0.28"]
 web = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "jinja2>=3.1"]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40", "httpx>=0.28"]
 
 # Mirror the published dev extra so plain `uv run pytest` works in a checkout.
 # All imported dependencies currently provide their own typing information.
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40", "httpx>=0.28"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/docs_drift"]

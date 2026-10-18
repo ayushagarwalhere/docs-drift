@@ -121,8 +121,10 @@ def _classify(  # noqa: PLR0911
         return ClaimKind.file_path, value, 0.88
     # A code command's own target is useful; flags belonging to unrelated tools are not.
     symbol_context = api_reference or re.search(r"\b(?:function|class|method|call|returns?)\b", sentence, re.IGNORECASE)
-    # A create_* name explicitly introduced as the way to create the application is a constructor claim.
-    application_factory = re.search(r"\bapplication\s+with\b", sentence, re.IGNORECASE) and value.startswith("create_")
+    # Factory context establishes the role independently of the identifier's verb prefix.
+    application_factory = re.search(
+        r"\b(?:create|build|construct)\s+the\s+application\s+with\b", sentence, re.IGNORECASE
+    )
     if _IDENTIFIER.fullmatch(value) and (
         "(" in value
         or "." in value

@@ -1,6 +1,8 @@
 """Command-line skeleton; scanning and reporting are not implemented yet."""
 
+import asyncio
 import json
+import math
 import time
 import tomllib
 from dataclasses import dataclass
@@ -21,9 +23,15 @@ from docs_drift.baseline import load_baseline, new_findings, save_baseline
 from docs_drift.config import Config, ConfigError, load_config
 from docs_drift.docs.defaults import normalize_value
 from docs_drift.docs.pipeline import scan_claims
+from docs_drift.fix.edits import StaleDocumentError, apply_file, unified_patch
+from docs_drift.fix.model import add_model_fixes
+from docs_drift.fix.rules import plan_rule_fixes
 from docs_drift.history import GitHistory
 from docs_drift.index import build_index, clear_cache
 from docs_drift.index.base import CodeIndex
+from docs_drift.llm.client import ClientError
+from docs_drift.llm.pricing import format_usage
+from docs_drift.llm.verify import verify_prose
 from docs_drift.match import match_claims
 from docs_drift.models import Claim, ClaimKind, Evidence, Finding, ScanResult, SymbolKind, Verdict
 
@@ -107,6 +115,33 @@ def _not_built() -> NoReturn:
     raise typer.Exit(code=2)
 
 
+def _model_layer(result: ScanResult, enabled: bool, budget: float | None) -> ScanResult:
+    config = result.config_used
+    if not enabled and not config.llm.enabled:
+        return result
+    if budget is not None and (not math.isfinite(budget) or budget < 0):
+        raise typer.BadParameter("Use a finite, non-negative USD amount.", param_hint="--llm-budget")
+    llm_config = config.llm.model_copy(update={"enabled": True, **({"budget": budget} if budget is not None else {})})
+    result = result.model_copy(update={"config_used": config.model_copy(update={"llm": llm_config})})
+    marker = result.repo_path / ".docs-drift" / "llm-privacy-v1"
+    if not marker.exists():
+        typer.echo(
+            "Model privacy notice: live/record mode sends selected doc sentences and up to 6 redacted source "
+            "snippets of 60 lines each through OpenRouter to the configured model provider. Replay stays local. "
+            "Recordings store request hashes and validated responses. See docs/SECURITY.md.",
+            err=True,
+        )
+        try:
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            marker.write_text("notice-v1\n", encoding="utf-8")
+        except OSError:
+            pass
+    try:
+        return asyncio.run(verify_prose(result))
+    except (ClientError, ValueError) as exc:
+        raise typer.BadParameter(str(exc), param_hint="--llm") from exc
+
+
 def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[list[Finding], list[str]]:
     """Match claims and enrich drift findings with text-only Git history evidence."""
     findings = match_claims(claims, index, repo)
@@ -136,12 +171,12 @@ def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[l
             replacements.extend(symbol.name for symbol in index.by_kind.get(SymbolKind.config_key, []))
         old_history_name = current.claim.value
         if current.claim.kind == ClaimKind.endpoint:
-            old_history_name = current.claim.value.split(maxsplit=1)[-1]
+            old_history_name = current.claim.raw_text.strip("`").split(maxsplit=1)[-1]
             replacements = [name.split(maxsplit=1)[-1] for name in replacements]
-            replacements.extend(symbol.name.split(maxsplit=1)[-1] for symbol in index.by_kind.get(SymbolKind.route, []))
-            # Quoting avoids matching /health as a substring of /healthz in Git's string search.
-            old_history_name = f'"{old_history_name}"'
-            replacements = [f'"{name}"' for name in replacements]
+            replacements.extend(
+                symbol.raw_path or symbol.name.split(maxsplit=1)[-1]
+                for symbol in index.by_kind.get(SymbolKind.route, [])
+            )
         match = history.search(old_history_name, tuple(replacements))
         if match.rename:
             replacement_name = match.rename.new_name.strip('"')
@@ -149,7 +184,11 @@ def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[l
                 (
                     symbol
                     for symbol in index.symbols
-                    if (symbol.name == replacement_name or symbol.name.endswith(" " + replacement_name))
+                    if (
+                        symbol.name == replacement_name
+                        or symbol.name.endswith(" " + replacement_name)
+                        or symbol.raw_path == replacement_name
+                    )
                     and symbol.file == match.rename.file
                 ),
                 None,
@@ -211,6 +250,8 @@ def scan(
     ] = False,
     show_all: Annotated[bool, typer.Option("--all", help="Include OK findings.")] = False,
     show_low_confidence: Annotated[bool, typer.Option("--show-low-confidence", help="Include weak findings.")] = False,
+    llm: Annotated[bool, typer.Option("--llm", help="Assess anchored prose through OpenRouter.")] = False,
+    llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
 ) -> None:
     """Scan a repository and print a report."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
@@ -223,6 +264,7 @@ def scan(
     result = result.model_copy(
         update={"symbols": index.symbols, "findings": findings, "warnings": [*result.warnings, *history_warnings]}
     )
+    result = _model_layer(result, llm, llm_budget)
     _print_findings(result, options, show_all=show_all, show_low_confidence=show_low_confidence)
 
 
@@ -285,6 +327,9 @@ def _print_findings(
     show_all: bool,
     show_low_confidence: bool,
 ) -> None:
+    if options.output_format == OutputFormat.json:
+        typer.echo(result.model_dump_json(indent=2))
+        return
     findings = [
         item
         for item in result.findings
@@ -299,7 +344,7 @@ def _print_findings(
         table.add_row(
             item.claim.claim_id,
             f"{item.claim.doc_path}:{item.claim.line}",
-            item.verdict.value,
+            item.verdict.value + (" [llm]" if item.decided_by == "llm" else ""),
             item.claim.value,
             item.suggestion or "",
             f"{item.confidence:.2f}",
@@ -309,6 +354,13 @@ def _print_findings(
     console.print(table)
     counts = result.summary()["by_verdict"]
     console.print("Findings: " + ", ".join(f"{name}={count}" for name, count in counts.items()))
+    console.print(
+        "Decided by: " + ", ".join(f"{name}={count}" for name, count in result.summary()["by_decider"].items())
+    )
+    if result.llm_usage:
+        console.print(format_usage(result.llm_usage))
+    if any(item.replayed for item in result.findings):
+        console.print("Model verdicts replayed from recordings.")
     for warning in result.warnings:
         console.print(f"Warning: {warning}", style="yellow")
     if options.verbose:
@@ -325,6 +377,8 @@ def check(
         Path | None, typer.Option("--baseline", help="Fail only for drifts absent from this baseline.")
     ] = None,
     quiet: Annotated[bool, typer.Option("--quiet", help="Print nothing unless the check fails.")] = False,
+    llm: Annotated[bool, typer.Option("--llm")] = False,
+    llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
 ) -> None:
     """Run a full scan; exit 1 for configured findings, or 2 for usage errors."""
     if fail_on not in {"drift", "missing", "any"}:
@@ -337,6 +391,8 @@ def check(
     result = scan_claims(options.repo, options.config)
     index = build_index(options.repo, options.config)
     findings, history_warnings = _full_findings(result.claims, index, options.repo)
+    result = _model_layer(result.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, llm_budget)
+    findings = result.findings
     if baseline is not None:
         baseline_path = baseline if baseline.is_absolute() else options.repo / baseline
         try:
@@ -371,12 +427,18 @@ def check(
 
 
 @app.command()
-def explain(ctx: typer.Context, finding_id_prefix: Annotated[str, typer.Argument(metavar="FINDING_ID")]) -> None:
+def explain(
+    ctx: typer.Context,
+    finding_id_prefix: Annotated[str, typer.Argument(metavar="FINDING_ID")],
+    llm: Annotated[bool, typer.Option("--llm")] = False,
+) -> None:
     """Show documentation, source, reasons, confidence and history evidence for one finding."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     scan = scan_claims(options.repo, options.config)
     index = build_index(options.repo, options.config)
     findings, _ = _full_findings(scan.claims, index, options.repo)
+    scan = _model_layer(scan.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, None)
+    findings = scan.findings
     matches = [item for item in findings if item.claim.claim_id.startswith(finding_id_prefix)]
     if len(matches) != 1:
         raise typer.BadParameter("Use a prefix that identifies exactly one finding.", param_hint="FINDING_ID")
@@ -387,6 +449,8 @@ def explain(ctx: typer.Context, finding_id_prefix: Annotated[str, typer.Argument
         "verdict": finding.verdict.value,
         "suggestion": finding.suggestion,
         "confidence": finding.confidence,
+        "decided_by": finding.decided_by.value,
+        "replayed": finding.replayed,
         "reasons": finding.reasons,
         "evidence": [item.model_dump(mode="json") for item in finding.evidence],
         "matched_symbol": finding.matched_symbol.model_dump(mode="json") if finding.matched_symbol else None,
@@ -398,12 +462,18 @@ def explain(ctx: typer.Context, finding_id_prefix: Annotated[str, typer.Argument
 
 
 @baseline_app.command("update")
-def baseline_update(ctx: typer.Context, path: Path = Path(".docs-drift-baseline.json")) -> None:
+def baseline_update(
+    ctx: typer.Context,
+    path: Path = Path(".docs-drift-baseline.json"),
+    llm: Annotated[bool, typer.Option("--llm")] = False,
+) -> None:
     """Replace the baseline with current drift findings; fixed findings are pruned."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     scan = scan_claims(options.repo, options.config)
     index = build_index(options.repo, options.config)
     findings, _ = _full_findings(scan.claims, index, options.repo)
+    scan = _model_layer(scan.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, None)
+    findings = scan.findings
     target = path if path.is_absolute() else options.repo / path
     save_baseline(target, findings)
     typer.echo(f"Saved {sum(item.is_drift for item in findings)} findings to {target}.")
@@ -444,9 +514,64 @@ def ignore_claim(ctx: typer.Context, claim_id_prefix: Annotated[str, typer.Argum
 
 
 @app.command()
-def fix() -> None:
-    """Suggest documentation patches."""
-    _not_built()
+def fix(  # noqa: PLR0912 - preview, confirmation, and stale-scan retry paths.
+    ctx: typer.Context,
+    write: Annotated[bool, typer.Option("--write", help="Apply edits after confirmation per file.")] = False,
+    yes: Annotated[bool, typer.Option("--yes", help="Skip --write confirmations.")] = False,
+    patch: Annotated[Path | None, typer.Option("--patch", help="Write a git-applyable patch.")] = None,
+    llm: Annotated[bool, typer.Option("--llm")] = False,
+    llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
+) -> None:
+    """Preview exact documentation edits; only --write applies them."""
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    for attempt in range(2):
+        scan_result = scan_claims(options.repo, options.config)
+        index = build_index(options.repo, options.config)
+        findings, warnings = _full_findings(scan_result.claims, index, options.repo)
+        scan_result = _model_layer(
+            scan_result.model_copy(update={"symbols": index.symbols, "findings": findings, "warnings": warnings}),
+            llm,
+            llm_budget,
+        )
+        try:
+            plan = plan_rule_fixes(scan_result)
+            if llm or options.config.llm.enabled:
+                try:
+                    plan = asyncio.run(add_model_fixes(scan_result, index, plan))
+                except (ClientError, ValueError) as exc:
+                    raise typer.BadParameter(str(exc), param_hint="--llm") from exc
+            diff = unified_patch(options.repo, plan)
+            if options.output_format == OutputFormat.json:
+                typer.echo(plan.model_dump_json(indent=2))
+            else:
+                console = Console(no_color=options.no_color, highlight=False)
+                for line in diff.splitlines(keepends=True):
+                    style = "green" if line.startswith("+") else "red" if line.startswith("-") else None
+                    console.print(line, style=style, end="", markup=False)
+                for note in plan.suggestions:
+                    console.print(f"Review: {note}", markup=False)
+                fixed = len({edit.claim_id for edit in plan.edits})
+                total = sum(item.is_drift for item in scan_result.findings)
+                console.print(f"Fixes: {fixed} auto-fixable, {max(0, total - fixed)} suggestion-only findings.")
+                if scan_result.llm_usage:
+                    console.print(format_usage(scan_result.llm_usage))
+                if any(edit.decided_by == "llm" for edit in plan.edits):
+                    console.print(
+                        "Model-assisted sentence edits passed static validation; review them before applying."
+                    )
+                if any(item.replayed for item in scan_result.findings) or any(edit.replayed for edit in plan.edits):
+                    console.print("Model verdicts replayed from recordings.")
+            if patch:
+                patch.write_bytes(diff.encode("utf-8"))
+            if write:
+                for relative in sorted({edit.file for edit in plan.edits}):
+                    if yes or typer.confirm(f"Apply proposed edits to {relative}?", default=False):
+                        apply_file(options.repo, plan, relative)
+            return
+        except StaleDocumentError as exc:
+            if attempt:
+                raise typer.BadParameter(str(exc)) from exc
+            typer.echo(f"{exc} Re-scanning before presenting fresh edits.", err=True)
 
 
 @app.command()

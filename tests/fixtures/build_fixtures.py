@@ -131,7 +131,14 @@ def _fastapi_svc() -> Repository:
     timeout = _commit(4, "Rename timeout setting and increase its default", ("service.py", source))
     source = source.replace("def create_app():", "def build_app():")
     factory = _commit(5, "Rename the application factory", ("service.py", source))
-    return Repository("fastapi-svc", (initial, users, login, timeout, factory))
+    prose = Commit(
+        "Document the stale behavioural timeout",
+        "Ada Chen",
+        "ada@example.invalid",
+        "2026-10-06T09:00:00+00:00",
+        (("README.md", readme + "\nRequests time out after 30 seconds.\n"),),
+    )
+    return Repository("fastapi-svc", (initial, users, login, timeout, factory, prose))
 
 
 def _node_tool() -> Repository:

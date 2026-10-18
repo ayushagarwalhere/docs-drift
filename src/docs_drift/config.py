@@ -40,6 +40,11 @@ class LLMConfig(ConfigModel):
 
     enabled: bool = False
     model: str | None = None
+    max_claims: int = Field(default=40, ge=0, le=1000)
+    concurrency: int = Field(default=4, ge=1, le=16)
+    timeout: float = Field(default=60, gt=0, le=600)
+    budget: float = Field(default=0.50, ge=0, allow_inf_nan=False)
+    redact_paths: list[str] = Field(default_factory=list)
 
 
 class HistoryConfig(ConfigModel):

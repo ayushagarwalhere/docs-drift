@@ -74,7 +74,8 @@ def test_key_locations_and_introducing_commits(builds: tuple[Path, Path, dict[st
     for finding in key.findings:
         repo = first / finding.repo
         assert finding.introduced_by in histories[finding.repo][1:]
-        assert git(repo, "diff", f"{finding.introduced_by}^", finding.introduced_by, "--", finding.doc_path) == ""
+        if not finding.requires_llm:
+            assert git(repo, "diff", f"{finding.introduced_by}^", finding.introduced_by, "--", finding.doc_path) == ""
         assert git(repo, "diff", "--name-only", f"{finding.introduced_by}^", finding.introduced_by)
     assert all(finding.repo != "clean-repo" for finding in key.findings)
 
@@ -82,10 +83,12 @@ def test_key_locations_and_introducing_commits(builds: tuple[Path, Path, dict[st
 def test_stale_readmes_are_unchanged(builds: tuple[Path, Path, dict[str, tuple[str, ...]]]) -> None:
     first, _, histories = builds
     for name in ("py-cli", "fastapi-svc", "node-tool"):
-        assert (
-            git(first / name, "show", f"{histories[name][0]}:README.md")
-            == (first / name / "README.md").read_text().strip()
-        )
+        original = git(first / name, "show", f"{histories[name][0]}:README.md")
+        assert (first / name / "README.md").read_text().strip().startswith(original)
+        if name == "fastapi-svc":
+            assert git(first / name, "show", f"{histories[name][-2]}:README.md") == original
+        else:
+            assert (first / name / "README.md").read_text().strip() == original
     service = (first / "fastapi-svc/service.py").read_text()
     assert '@app.post("/login")' not in service
     assert "timeout_seconds: int = 60" in service

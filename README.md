@@ -34,7 +34,7 @@ suppression comments; `--verbose` prints stage timings. `check` supports
 confidence and finding-count thresholds, and `--baseline PATH` limits CI
 failures to new drift. `baseline update` refreshes the explicit baseline,
 `explain FINDING_ID` prints its evidence chain, and `ignore CLAIM_ID` adds a
-stable claim ID to `.docs-drift.toml`. `fix`, `graph`, `init`, and `serve` are
+stable claim ID to `.docs-drift.toml`. `graph`, `init`, and `serve` are
 still stubs. Put global options before the command. Help and version work
 without loading repository configuration.
 
@@ -61,13 +61,59 @@ min_confidence = 0.6
 
 [llm]
 enabled = false
-# model = "your-model-id" # Unset by default; no model is silently selected.
+# model = "anthropic/claude-sonnet-4.6" # Selected only when the model layer is enabled.
+max_claims = 40
+concurrency = 4
+budget = 0.50
+timeout = 60
+redact_paths = ["private/**"]
 
 [history]
 max_commits = 2000
 ```
 
 Changelogs are excluded because they intentionally describe past behavior.
+
+### Optional OpenRouter prose checks
+
+Install with `uv sync --extra llm`. Set `OPENROUTER_API_KEY` in your environment;
+the key is never a configuration field. For PowerShell, enter it without echoing:
+
+```powershell
+$modelKey = Read-Host "OpenRouter API key" -AsSecureString
+$env:OPENROUTER_API_KEY = [System.Net.NetworkCredential]::new("", $modelKey).Password
+uv run docs-drift --repo . scan --llm --llm-budget 0.50
+```
+
+The optional layer assesses code-anchored behavioural prose after rules run.
+Rule-decided claims are excluded, and every model judgement must cite an exact
+quote in a supplied source snippet. `[llm]` marks model findings, which are counted
+separately and capped at 0.75 confidence. Read [the security and privacy policy](docs/SECURITY.md)
+for exactly what is sent, redaction limits, injection defence, and budget estimates.
+
+`DOCS_DRIFT_LLM_MODE` accepts `live`, `record`, or `replay`. Replay is key-free and
+fails on a missing request hash. Checked-in recordings are explicitly synthetic
+test responses; they do not demonstrate live-model accuracy. To record genuine
+fixture calls: `uv run python scripts/record.py`; `--dry-run` sends nothing and
+`--prune` removes stale recordings after a successful recording run.
+
+### Reviewable documentation fixes
+
+```console
+uv run docs-drift --repo . fix
+uv run docs-drift --repo . fix --patch changes.diff
+uv run docs-drift --repo . --format json fix
+uv run docs-drift --repo . fix --write
+uv run docs-drift --repo . fix --write --yes
+uv run docs-drift --repo . fix --llm
+```
+
+The default previews a coloured unified diff. `--write` asks per file; `--yes`
+explicitly skips those prompts. Certain renames, defaults, and removed flags get
+rule edits. Missing names without a replacement remain suggestions. A removed
+`--dry-run` flag carries a reviewer note about changed meaning. Hash checks trigger
+a fresh scan if the file changed; edits preserve BOMs and line endings. Optional
+model sentence rewrites must pass identifier and claim checks before presentation.
 Confidence is between 0 and 1; history limits are nonnegative integers.
 Configuration loading reads TOML text only and executes no repository code.
 

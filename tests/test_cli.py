@@ -40,7 +40,7 @@ def test_help_renders() -> None:
         assert text in result.output
 
 
-@pytest.mark.parametrize("command", ["fix", "graph", "init", "serve"])
+@pytest.mark.parametrize("command", ["graph", "init", "serve"])
 def test_stub_exits_two(command: str, tmp_path: Path) -> None:
     result = CliRunner().invoke(app, ["--repo", str(tmp_path), command])
     assert result.exit_code == 2
@@ -107,7 +107,10 @@ def test_global_options(output_format: str, tmp_path: Path) -> None:
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "Documentation findings" in result.output
+    if output_format == "json":
+        assert '"schema_version": 1' in result.output
+    else:
+        assert "Documentation findings" in result.output
 
 
 def test_claims_only_scan_renders_rows_and_verbose_timings(tmp_path: Path) -> None:

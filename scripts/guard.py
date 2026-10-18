@@ -38,6 +38,7 @@ def staged_files(repo: Path) -> list[StagedFile]:
 def secret_findings(path: Path, content: bytes) -> list[str]:
     """Recognize token-shaped strings, including binary files; never echo matched bytes."""
     patterns = (
+        ("OpenRouter API key", rb"\bsk-or-v1-[A-Za-z0-9_-]{8,}"),
         ("Anthropic API key", rb"\bsk-ant-[A-Za-z0-9_-]{8,}"),
         ("GitHub token", rb"\bghp_[A-Za-z0-9]{20,}"),
         ("GitHub fine-grained token", rb"\bgithub_pat_[A-Za-z0-9_]{20,}"),

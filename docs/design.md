@@ -298,3 +298,44 @@ Finding confidence is a fixed rules policy documented in
 confidence. The CI baseline stores stable claim IDs, reports only new drift
 when explicitly selected, and is refreshed by `docs-drift baseline update`;
 updating it prunes resolved findings.
+
+### Optional prose and fix lane
+
+`llm.candidates` selects behavioural sentences with static identifier or section
+anchors, excluding historical text, suppressions, and lines already decided by
+rules. This adds `ClaimKind.prose`, a separate kind so prose is never misreported
+as an indexable symbol. `llm.retrieve` follows claim/section-to-source links and
+keyword anchors to at most six snippets of at most 60 lines. Secret/path filtering
+happens before request construction. There is no persistent graph database dependency
+for this local link traversal.
+
+The default model ID and price table are centralized in `llm/pricing.py`.
+`llm.client` routes through OpenRouter using the optional HTTPX extra and
+`OPENROUTER_API_KEY`. Strict JSON Schema output and local Pydantic validation are
+both required. Frozen verifier and rewrite instructions are versioned resources;
+all repository content is escaped data after the stable cache prefix. Model fixes
+receive the existing rule verdict as authoritative correction data, not a verdict
+they can overturn.
+
+`llm.verify` checks snippet IDs and literal quotations, derives `Evidence.end_line`
+from their positions, and guards the merge so every decided rule finding survives.
+Accepted model findings carry `decided_by=llm`, a confidence cap of 0.75, and a
+`replayed` flag. `ScanResult.llm_usage` records aggregate token/cache counts,
+estimated cost and latency; `summary().by_decider` separates model and rules counts.
+These fields expose provenance and evidence ranges rather than adding pipeline
+logic to the shared models.
+
+`fix.rules` creates exact edits only for certain replacements. `FixPlan` stores
+the original hashes and `TextEdit` stores inclusive start/exclusive end positions,
+the literal old/new text, reason, claim ID and provenance. Edits are previewed as
+unified diffs or JSON, never silently applied. Hashes and spans are revalidated;
+stale files cause a rescan. Bottom-up atomic writes preserve encoding/BOM and
+line endings. UTF-16 exact writes are supported by the edit layer; textual unified
+patch export is limited to UTF-8. Optional sentence rewrites are checked for
+unknown identifiers, rename targets and new non-OK extracted claims.
+
+See [SECURITY.md](SECURITY.md) for the trust boundary, concrete privacy policy,
+budget reservations and injection tests. Synthetic replay fixtures test contracts
+and rejection behaviour; they are deliberately distinguished from live-model
+measurements. The authorized prose-key extension is documented before evaluation
+in `tests/fixtures/ANSWER_KEY.md` and excluded explicitly from rule-only metrics.

@@ -42,7 +42,14 @@ def test_size_boundary(repo: Path, size: int, blocked: bool) -> None:
 
 @pytest.mark.parametrize(
     "prefix,suffix",
-    [("sk-ant-", "a" * 32), ("ghp_", "b" * 36), ("github_pat_", "c" * 82), ("AKIA", "D" * 16), ("ASIA", "E" * 16)],
+    [
+        ("sk-ant-", "a" * 32),
+        ("sk-or-v1-", "a" * 32),
+        ("ghp_", "b" * 36),
+        ("github_pat_", "c" * 82),
+        ("AKIA", "D" * 16),
+        ("ASIA", "E" * 16),
+    ],
 )
 def test_secrets_blocked_without_echoing_values(
     repo: Path, capsys: pytest.CaptureFixture[str], prefix: str, suffix: str

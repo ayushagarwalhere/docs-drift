@@ -2,6 +2,13 @@
   "schema_version": 1,
   "findings": [
     {
+      "repo": "fastapi-svc", "doc_path": "README.md", "line": 9,
+      "claim_kind": "prose", "claim_text": "Requests time out after 30 seconds.",
+      "expected_verdict": "default changed", "expected_new": 60,
+      "introduced_by": "aba2bcad7be0e906ceee4516aa9cf64dfb3f6479",
+      "requires_llm": true
+    },
+    {
       "repo": "py-cli", "doc_path": "README.md", "line": 4,
       "claim_kind": "cli_flag", "claim_text": "--port",
       "expected_verdict": "renamed", "expected_new": "--listen",

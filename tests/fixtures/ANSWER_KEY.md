@@ -56,6 +56,18 @@ wall-clock time, detector output, or absolute file path enters commit contents.
 
 ## Corrections
 
-None. Future corrections must identify the incorrect scripted change, the reason,
+### 2026-10-18: authorized model-path extension, before model evaluation
+
+Codex added the user-requested prose timeout case to fastapi-svc README line 9:
+"Requests time out after 30 seconds." The existing code declares 60 seconds.
+The expected verdict is `default changed`, expected new value is 60, and the
+introducing documentation commit is `aba2bcad7be0e906ceee4516aa9cf64dfb3f6479`.
+This expectation was written from the scripted change before building or running
+the model verifier. `requires_llm: true` keeps this case separate from rule-only
+metrics. All existing expectations and fixture commit SHAs are unchanged.
+The new sixth commit intentionally adds stale prose after the original history;
+it is the only exception to the original unchanged-README invariant.
+
+Future corrections must identify the incorrect scripted change, the reason,
 date, author, affected key entries, and resulting history changes. A detector's
 failure to match the fixed expectations is not grounds for a correction.

@@ -44,6 +44,7 @@ class ClaimKind(StrEnum):
     make_target = "make_target"
     default_value = "default_value"
     code_command = "code_command"
+    prose = "prose"
 
 
 class Extraction(StrEnum):
@@ -184,6 +185,7 @@ class Evidence(PipelineModel):
     file: RepoPath
     line: Line
     text: str
+    end_line: Line | None = None
 
 
 class Finding(PipelineModel):
@@ -196,6 +198,7 @@ class Finding(PipelineModel):
     confidence: Confidence
     reasons: Annotated[list[NonemptyText], Field(min_length=1)]
     decided_by: DecidedBy = DecidedBy.rules
+    replayed: bool = False
 
     @property
     def is_drift(self) -> bool:
@@ -217,12 +220,15 @@ class ScanResult(PipelineModel):
     warnings: list[str] = Field(default_factory=list)
     suppressed: list[SuppressedClaim] = Field(default_factory=list)
     historical_ignored: int = Field(default=0, ge=0)
+    llm_usage: dict[str, float] = Field(default_factory=dict)
 
     def summary(self) -> dict[str, dict[str, int]]:
         """Count findings by verdict and claim kind, including zero-count categories."""
         verdicts = dict.fromkeys((verdict.value for verdict in Verdict), 0)
         kinds = dict.fromkeys((kind.value for kind in ClaimKind), 0)
+        deciders = dict.fromkeys((decider.value for decider in DecidedBy), 0)
         for finding in self.findings:
             verdicts[finding.verdict.value] += 1
             kinds[finding.claim.kind.value] += 1
-        return {"by_verdict": verdicts, "by_kind": kinds}
+            deciders[finding.decided_by.value] += 1
+        return {"by_verdict": verdicts, "by_kind": kinds, "by_decider": deciders}
