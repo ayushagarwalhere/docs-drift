@@ -1,0 +1,133 @@
+{
+  "pre-commit/pre-commit": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\pre-commit--pre-commit\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\pre-commit--pre-commit.json"
+    ]
+  },
+  "simonw/sqlite-utils": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\simonw--sqlite-utils\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\simonw--sqlite-utils.json"
+    ]
+  },
+  "fastapi/fastapi-cli": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\fastapi--fastapi-cli\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\fastapi--fastapi-cli.json"
+    ]
+  },
+  "fastapi/full-stack-fastapi-template": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\fastapi--full-stack-fastapi-template\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\fastapi--full-stack-fastapi-template.json"
+    ]
+  },
+  "pallets/flask": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\pallets--flask\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\pallets--flask.json"
+    ]
+  },
+  "django-oscar/django-oscar": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\django-oscar--django-oscar\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\django-oscar--django-oscar.json"
+    ]
+  },
+  "tj/commander.js": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\tj--commander.js\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\tj--commander.js.json"
+    ]
+  },
+  "yargs/yargs": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\yargs--yargs\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\yargs--yargs.json"
+    ]
+  },
+  "expressjs/express": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\expressjs--express\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\expressjs--express.json"
+    ]
+  },
+  "dubinc/dub": {
+    "status": "timeout",
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\dubinc--dub\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\dubinc--dub.json"
+    ]
+  },
+  "encode/httpx": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\encode--httpx\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-r2\\encode--httpx.json"
+    ]
+  }
+}

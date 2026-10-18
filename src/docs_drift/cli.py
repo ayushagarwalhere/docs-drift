@@ -1,14 +1,16 @@
-"""Command-line skeleton; scanning and reporting are not implemented yet."""
+"""Consistent command-line entry points for scanning, reporting and fixes."""
 
 import asyncio
 import json
 import math
+import sys
 import time
 import tomllib
 from dataclasses import dataclass
 from enum import StrEnum
+from io import TextIOWrapper
 from pathlib import Path
-from typing import Annotated, NoReturn
+from typing import Annotated
 
 import tomli_w
 import typer
@@ -20,9 +22,10 @@ from rich.tree import Tree
 
 from docs_drift import __version__
 from docs_drift.baseline import load_baseline, new_findings, save_baseline
-from docs_drift.config import Config, ConfigError, load_config
+from docs_drift.config import Config, ConfigError, HistoryConfig, load_config
 from docs_drift.docs.defaults import normalize_value
 from docs_drift.docs.pipeline import scan_claims
+from docs_drift.errors import Command, Group
 from docs_drift.fix.edits import StaleDocumentError, apply_file, unified_patch
 from docs_drift.fix.model import add_model_fixes
 from docs_drift.fix.rules import plan_rule_fixes
@@ -34,10 +37,13 @@ from docs_drift.llm.pricing import format_usage
 from docs_drift.llm.verify import verify_prose
 from docs_drift.match import match_claims
 from docs_drift.models import Claim, ClaimKind, Evidence, Finding, ScanResult, SymbolKind, Verdict
+from docs_drift.report import RenderOptions, render
 
-app = typer.Typer(help="Find drift between repository documentation and code.", add_completion=False)
-cache_app = typer.Typer(help="Manage local index cache.", add_completion=False)
-baseline_app = typer.Typer(help="Manage the finding baseline.", no_args_is_help=True)
+app = typer.Typer(
+    help="Find drift between repository documentation and code.", cls=Group, pretty_exceptions_enable=False
+)
+cache_app = typer.Typer(help="Manage local index cache.", cls=Group, add_completion=False)
+baseline_app = typer.Typer(help="Manage the finding baseline.", cls=Group, no_args_is_help=True)
 _GENERIC_ENV_TOKENS = {"app", "env", "var", "api", "service"}
 
 
@@ -49,13 +55,15 @@ def _same_env_concept(old: str, new: str) -> bool:
 
 
 class OutputFormat(StrEnum):
-    """Planned report formats."""
+    """Supported report formats."""
 
     terminal = "terminal"
     json = "json"
     markdown = "markdown"
     sarif = "sarif"
     html = "html"
+    junit = "junit"
+    github = "github"
 
 
 @dataclass(frozen=True)
@@ -67,6 +75,11 @@ class CLIOptions:
     output_format: OutputFormat
     verbose: bool
     no_color: bool
+    quiet: bool = False
+    output: Path | None = None
+    output_json: Path | None = None
+    output_sarif: Path | None = None
+    show_authors: bool = False
 
 
 def _version(value: bool) -> None:
@@ -85,34 +98,42 @@ def main(
         typer.Option(
             "--format",
             metavar="FORMAT",
-            help="Report format: terminal, json, markdown, sarif, or html.",
+            help="Report format: terminal, json, markdown, sarif, html, junit, or github.",
         ),
     ] = OutputFormat.terminal,
-    verbose: Annotated[bool, typer.Option("--verbose", help="Show detailed diagnostics.")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Show detailed diagnostics.")] = False,
     no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output.")] = False,
+    quiet: Annotated[bool, typer.Option("--quiet", "-q", help="Suppress routine stdout output.")] = False,
+    debug: Annotated[bool, typer.Option("--debug", help="Show the traceback when an operation fails.")] = False,
+    output: Annotated[Path | None, typer.Option(help="Write the selected report to this file.")] = None,
+    output_json: Annotated[Path | None, typer.Option(help="Also write the full JSON report.")] = None,
+    output_sarif: Annotated[Path | None, typer.Option(help="Also write a SARIF report.")] = None,
+    show_authors: Annotated[bool, typer.Option(help="Include author names in HTML reports.")] = False,
     version: Annotated[
         bool, typer.Option("--version", callback=_version, is_eager=True, help="Print the version.")
     ] = False,
 ) -> None:
     """Read global options and configuration before dispatching a command."""
+    if isinstance(sys.stdout, TextIOWrapper) and not sys.stdout.isatty():
+        sys.stdout.reconfigure(encoding="utf-8")
     if no_color:
         ctx.color = False
     if ctx.invoked_subcommand is None:
         typer.echo(ctx.get_help(), color=not no_color)
         return
+    destinations = [path.resolve() for path in (output, output_json, output_sarif) if path is not None]
+    if len(set(destinations)) != len(destinations):
+        raise typer.BadParameter("Choose a different path for each report destination.", param_hint="--output")
     root = repo.resolve()
     if not root.is_dir():
         raise typer.BadParameter("Choose an existing repository directory.", param_hint="--repo")
     try:
-        settings = load_config(root, config)
+        settings = Config() if ctx.meta.get("help_only") else load_config(root, config)
     except ConfigError as exc:
         raise typer.BadParameter(str(exc), param_hint="--config") from exc
-    ctx.obj = CLIOptions(root, settings, output_format, verbose, no_color)
-
-
-def _not_built() -> NoReturn:
-    typer.echo("not built yet")
-    raise typer.Exit(code=2)
+    ctx.obj = CLIOptions(
+        root, settings, output_format, verbose, no_color, quiet, output, output_json, output_sarif, show_authors
+    )
 
 
 def _model_layer(result: ScanResult, enabled: bool, budget: float | None) -> ScanResult:
@@ -142,10 +163,19 @@ def _model_layer(result: ScanResult, enabled: bool, budget: float | None) -> Sca
         raise typer.BadParameter(str(exc), param_hint="--llm") from exc
 
 
-def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[list[Finding], list[str]]:
+def _full_findings(
+    claims: list[Claim],
+    index: CodeIndex,
+    repo: Path,
+    *,
+    initial: list[Finding] | None = None,
+    history_config: HistoryConfig | None = None,
+) -> tuple[list[Finding], list[str]]:
     """Match claims and enrich drift findings with text-only Git history evidence."""
-    findings = match_claims(claims, index, repo)
-    history = GitHistory(repo)
+    findings = match_claims(claims, index, repo) if initial is None else initial
+    history = GitHistory(repo, history_config)
+    if any(f.is_drift or f.verdict == Verdict.unverifiable for f in findings):
+        history.prepare()
     enriched: list[Finding] = []
     history_kinds = {
         ClaimKind.cli_flag: SymbolKind.cli_flag,
@@ -158,12 +188,35 @@ def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[l
     }
     for original in findings:
         default_without_subject = (
-            original.claim.kind == ClaimKind.default_value and original.verdict == Verdict.unverifiable
+            original.claim.kind == ClaimKind.default_value
+            and original.verdict == Verdict.unverifiable
+            and not any(
+                symbol.name == original.claim.value or original.claim.value in symbol.aliases
+                for symbol in index.symbols
+            )
         )
         if not original.is_drift and not default_without_subject:
             enriched.append(original)
             continue
         current = original
+        if current.verdict == Verdict.default_changed:
+            commit, excerpt = history.default_change(current)
+            if commit:
+                current = current.model_copy(
+                    update={
+                        "introduced_by": commit,
+                        "evidence": [
+                            *current.evidence,
+                            Evidence(
+                                file=current.matched_symbol.file if current.matched_symbol else current.claim.doc_path,
+                                line=current.matched_symbol.line if current.matched_symbol else 1,
+                                text=excerpt,
+                            ),
+                        ],
+                    }
+                )
+            enriched.append(current)
+            continue
         replacements = [current.suggestion] if current.suggestion else []
         if current.claim.kind in history_kinds:
             replacements.extend(symbol.name for symbol in index.by_kind.get(history_kinds[current.claim.kind], []))
@@ -193,7 +246,7 @@ def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[l
                 ),
                 None,
             )
-            verdict = current.verdict
+            verdict: Verdict = current.verdict
             suggestion = current.suggestion
             reasons = list(current.reasons)
             if default_without_subject and replacement_symbol and replacement_symbol.default is not None:
@@ -239,7 +292,7 @@ def _full_findings(claims: list[Claim], index: CodeIndex, repo: Path) -> tuple[l
     return enriched, history.warnings
 
 
-@app.command()
+@app.command(cls=Command)
 def scan(
     ctx: typer.Context,
     claims_only: Annotated[
@@ -252,24 +305,39 @@ def scan(
     show_low_confidence: Annotated[bool, typer.Option("--show-low-confidence", help="Include weak findings.")] = False,
     llm: Annotated[bool, typer.Option("--llm", help="Assess anchored prose through OpenRouter.")] = False,
     llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
+    docs_repo: Annotated[
+        Path | None, typer.Option("--docs-repo", help="Read documentation from a separate repository.")
+    ] = None,
+    package: Annotated[str | None, typer.Option("--package", help="Scan only the named workspace package.")] = None,
 ) -> None:
     """Scan a repository and print a report."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
-    result = scan_claims(options.repo, options.config)
     if claims_only:
-        _print_claims(result, options, show_suppressed)
+        result = scan_claims(docs_repo or options.repo, options.config)
+        if options.output_format != OutputFormat.terminal:
+            _print_findings(result, options, show_all=True, show_low_confidence=True)
+        else:
+            _print_claims(result, options, show_suppressed)
         return
-    index = build_index(options.repo, options.config)
-    findings, history_warnings = _full_findings(result.claims, index, options.repo)
-    result = result.model_copy(
-        update={"symbols": index.symbols, "findings": findings, "warnings": [*result.warnings, *history_warnings]}
+    import sys  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    result = run_scan(
+        options.repo,
+        options.config,
+        docs_repo=docs_repo,
+        package=package,
+        progress=sys.stderr.isatty() and not options.quiet and not options.no_color,
     )
     result = _model_layer(result, llm, llm_budget)
     _print_findings(result, options, show_all=show_all, show_low_confidence=show_low_confidence)
 
 
 def _print_claims(result: ScanResult, options: CLIOptions, show_suppressed: bool) -> None:
-    console = Console(no_color=options.no_color, width=180)
+    console = Console(
+        force_terminal=sys.stdout.isatty() and not options.no_color, markup=False, no_color=options.no_color, width=180
+    )
     table = Table(title="Documentation claims")
     for heading in (
         "doc:line",
@@ -327,47 +395,36 @@ def _print_findings(
     show_all: bool,
     show_low_confidence: bool,
 ) -> None:
-    if options.output_format == OutputFormat.json:
-        typer.echo(result.model_dump_json(indent=2))
-        return
-    findings = [
-        item
-        for item in result.findings
-        if (show_all or item.verdict != Verdict.ok)
-        and (show_low_confidence or item.confidence >= options.config.min_confidence)
-    ]
-    findings.sort(key=lambda item: (not item.is_drift, item.claim.doc_path, item.claim.line, item.claim.kind.value))
-    table = Table(title="Documentation findings")
-    for heading in ("id", "location", "verdict", "claim", "suggestion", "confidence", "reason"):
-        table.add_column(heading)
-    for item in findings:
-        table.add_row(
-            item.claim.claim_id,
-            f"{item.claim.doc_path}:{item.claim.line}",
-            item.verdict.value + (" [llm]" if item.decided_by == "llm" else ""),
-            item.claim.value,
-            item.suggestion or "",
-            f"{item.confidence:.2f}",
-            item.reasons[0],
-        )
-    console = Console(no_color=options.no_color, width=180)
-    console.print(table)
-    counts = result.summary()["by_verdict"]
-    console.print("Findings: " + ", ".join(f"{name}={count}" for name, count in counts.items()))
-    console.print(
-        "Decided by: " + ", ".join(f"{name}={count}" for name, count in result.summary()["by_decider"].items())
+    import shutil  # noqa: PLC0415 - optional dependency or shared pipeline import.
+    import sys  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    tty = sys.stdout.isatty() and not options.output
+    render_options = RenderOptions(
+        color=tty and not options.no_color,
+        hyperlinks=tty and not options.no_color,
+        width=shutil.get_terminal_size((100, 24)).columns,
+        verbose=options.verbose,
+        show_all=show_all,
+        show_low_confidence=show_low_confidence,
+        show_authors=options.show_authors,
     )
-    if result.llm_usage:
-        console.print(format_usage(result.llm_usage))
-    if any(item.replayed for item in result.findings):
-        console.print("Model verdicts replayed from recordings.")
-    for warning in result.warnings:
-        console.print(f"Warning: {warning}", style="yellow")
-    if options.verbose:
-        console.print("Timings: " + ", ".join(f"{name}={seconds:.4f}s" for name, seconds in result.timings.items()))
+    destinations = [
+        (options.output_format.value, options.output),
+        ("json", options.output_json),
+        ("sarif", options.output_sarif),
+    ]
+    for number, (format_name, destination) in enumerate(destinations):
+        if number and destination is None:
+            continue
+        text = render(result, format_name, render_options)
+        if destination:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(text, encoding="utf-8", newline="\n")
+        elif not options.quiet:
+            typer.echo(text, nl=False, color=render_options.color)
 
 
-@app.command()
+@app.command(cls=Command)
 def check(
     ctx: typer.Context,
     fail_on: Annotated[str, typer.Option("--fail-on", help="Exit 1 on drift, missing, or any finding.")] = "drift",
@@ -388,15 +445,19 @@ def check(
     if max_findings is not None and max_findings < 0:
         raise typer.BadParameter("Choose a non-negative count.", param_hint="--max-findings")
     options: CLIOptions = ctx.ensure_object(CLIOptions)
-    result = scan_claims(options.repo, options.config)
-    index = build_index(options.repo, options.config)
-    findings, history_warnings = _full_findings(result.claims, index, options.repo)
-    result = _model_layer(result.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, llm_budget)
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    result = _model_layer(run_scan(options.repo, options.config), llm, llm_budget)
+    history_warnings: list[str] = []
+    findings = result.findings
+    baselined = 0
     findings = result.findings
     if baseline is not None:
         baseline_path = baseline if baseline.is_absolute() else options.repo / baseline
         try:
+            original_count = len(findings)
             findings = new_findings(findings, load_baseline(baseline_path))
+            baselined = original_count - len(findings)
         except ValueError as exc:
             raise typer.BadParameter(str(exc), param_hint="--baseline") from exc
     threshold = options.config.min_confidence if min_confidence is None else min_confidence
@@ -409,11 +470,11 @@ def check(
         failures = [item for item in qualifying if item.verdict != Verdict.ok]
     if max_findings is not None:
         failures = failures if len(failures) > max_findings else []
-    if not quiet or failures:
+    if not (quiet or options.quiet) or failures or options.output or options.output_json or options.output_sarif:
         _print_findings(
             result.model_copy(
                 update={
-                    "symbols": index.symbols,
+                    "baselined": baselined,
                     "findings": findings,
                     "warnings": [*result.warnings, *history_warnings],
                 }
@@ -426,7 +487,7 @@ def check(
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command(cls=Command)
 def explain(
     ctx: typer.Context,
     finding_id_prefix: Annotated[str, typer.Argument(metavar="FINDING_ID")],
@@ -434,15 +495,19 @@ def explain(
 ) -> None:
     """Show documentation, source, reasons, confidence and history evidence for one finding."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
-    scan = scan_claims(options.repo, options.config)
-    index = build_index(options.repo, options.config)
-    findings, _ = _full_findings(scan.claims, index, options.repo)
-    scan = _model_layer(scan.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, None)
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    scan = _model_layer(run_scan(options.repo, options.config), llm, None)
     findings = scan.findings
     matches = [item for item in findings if item.claim.claim_id.startswith(finding_id_prefix)]
     if len(matches) != 1:
         raise typer.BadParameter("Use a prefix that identifies exactly one finding.", param_hint="FINDING_ID")
     finding = matches[0]
+    if options.output_format != OutputFormat.terminal:
+        _print_findings(
+            scan.model_copy(update={"findings": [finding]}), options, show_all=True, show_low_confidence=True
+        )
+        return
     payload = {
         "id": finding.claim.claim_id,
         "claim": finding.claim.model_dump(mode="json"),
@@ -456,12 +521,12 @@ def explain(
         "matched_symbol": finding.matched_symbol.model_dump(mode="json") if finding.matched_symbol else None,
         "introduced_by": finding.introduced_by.model_dump(mode="json") if finding.introduced_by else None,
     }
-    Console(no_color=options.no_color, width=140).print(
-        Panel.fit(json.dumps(payload, indent=2), title="Finding evidence")
-    )
+    Console(
+        force_terminal=sys.stdout.isatty() and not options.no_color, markup=False, no_color=options.no_color, width=140
+    ).print(Panel.fit(json.dumps(payload, indent=2), title="Finding evidence"))
 
 
-@baseline_app.command("update")
+@baseline_app.command("update", cls=Command)
 def baseline_update(
     ctx: typer.Context,
     path: Path = Path(".docs-drift-baseline.json"),
@@ -469,17 +534,16 @@ def baseline_update(
 ) -> None:
     """Replace the baseline with current drift findings; fixed findings are pruned."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
-    scan = scan_claims(options.repo, options.config)
-    index = build_index(options.repo, options.config)
-    findings, _ = _full_findings(scan.claims, index, options.repo)
-    scan = _model_layer(scan.model_copy(update={"symbols": index.symbols, "findings": findings}), llm, None)
+    from docs_drift.scanning import run_scan  # noqa: PLC0415
+
+    scan = _model_layer(run_scan(options.repo, options.config), llm, None)
     findings = scan.findings
     target = path if path.is_absolute() else options.repo / path
     save_baseline(target, findings)
     typer.echo(f"Saved {sum(item.is_drift for item in findings)} findings to {target}.")
 
 
-@app.command("ignore")
+@app.command("ignore", cls=Command)
 def ignore_claim(ctx: typer.Context, claim_id_prefix: Annotated[str, typer.Argument(metavar="CLAIM_ID")]) -> None:
     """Add a stable claim ID to the repository ignore list."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
@@ -513,7 +577,7 @@ def ignore_claim(ctx: typer.Context, claim_id_prefix: Annotated[str, typer.Argum
     typer.echo(f"Ignored {matches[0].claim_id} in {path}.")
 
 
-@app.command()
+@app.command(cls=Command)
 def fix(  # noqa: PLR0912 - preview, confirmation, and stale-scan retry paths.
     ctx: typer.Context,
     write: Annotated[bool, typer.Option("--write", help="Apply edits after confirmation per file.")] = False,
@@ -525,14 +589,11 @@ def fix(  # noqa: PLR0912 - preview, confirmation, and stale-scan retry paths.
     """Preview exact documentation edits; only --write applies them."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     for attempt in range(2):
-        scan_result = scan_claims(options.repo, options.config)
+        from docs_drift.scanning import run_scan  # noqa: PLC0415
+
+        scan_result = run_scan(options.repo, options.config)
         index = build_index(options.repo, options.config)
-        findings, warnings = _full_findings(scan_result.claims, index, options.repo)
-        scan_result = _model_layer(
-            scan_result.model_copy(update={"symbols": index.symbols, "findings": findings, "warnings": warnings}),
-            llm,
-            llm_budget,
-        )
+        scan_result = _model_layer(scan_result, llm, llm_budget)
         try:
             plan = plan_rule_fixes(scan_result)
             if llm or options.config.llm.enabled:
@@ -544,7 +605,12 @@ def fix(  # noqa: PLR0912 - preview, confirmation, and stale-scan retry paths.
             if options.output_format == OutputFormat.json:
                 typer.echo(plan.model_dump_json(indent=2))
             else:
-                console = Console(no_color=options.no_color, highlight=False)
+                console = Console(
+                    force_terminal=sys.stdout.isatty() and not options.no_color,
+                    markup=False,
+                    no_color=options.no_color,
+                    highlight=False,
+                )
                 for line in diff.splitlines(keepends=True):
                     style = "green" if line.startswith("+") else "red" if line.startswith("-") else None
                     console.print(line, style=style, end="", markup=False)
@@ -574,25 +640,76 @@ def fix(  # noqa: PLR0912 - preview, confirmation, and stale-scan retry paths.
             typer.echo(f"{exc} Re-scanning before presenting fresh edits.", err=True)
 
 
-@app.command()
-def graph() -> None:
-    """Export or query the graph."""
-    _not_built()
+@app.command(cls=Command)
+def graph(ctx: typer.Context) -> None:
+    """Export a scan with the evidence graph in HTML or JSON."""
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    _print_findings(run_scan(options.repo, options.config), options, show_all=True, show_low_confidence=True)
 
 
-@app.command()
-def init() -> None:
-    """Write a starter configuration."""
-    _not_built()
+@app.command("insights", cls=Command)
+def insights_command(ctx: typer.Context) -> None:
+    """Summarize findings by verdict, document and workspace package."""
+    from docs_drift.analysis import insights  # noqa: PLC0415 - optional command path.
+    from docs_drift.scanning import run_scan  # noqa: PLC0415
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    text = json.dumps(insights(run_scan(options.repo, options.config)), indent=2, sort_keys=True) + "\n"
+    if options.output:
+        options.output.write_text(text, encoding="utf-8")
+    elif not options.quiet:
+        typer.echo(text, nl=False)
 
 
-@app.command()
-def serve() -> None:
-    """Start the web demo."""
-    _not_built()
+@app.command("impact", cls=Command)
+def impact_command(
+    ctx: typer.Context,
+    base: Annotated[str, typer.Option(help="Base revision, for example HEAD~1.")],
+    head: Annotated[str, typer.Option(help="Current checkout revision.")] = "HEAD",
+) -> None:
+    """Show current findings connected to documentation or source changed since a revision."""
+    from docs_drift.analysis import impact  # noqa: PLC0415 - optional command path.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    _print_findings(impact(options.repo, options.config, base, head), options, show_all=True, show_low_confidence=True)
 
 
-@app.command("index")
+@app.command(cls=Command)
+def init(
+    ctx: typer.Context,
+    yes: Annotated[bool, typer.Option("--yes", help="Accept detected defaults without prompting.")] = False,
+) -> None:
+    """Detect documentation and write a commented repository configuration."""
+    from docs_drift.setup import initialize  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    initialize(options.repo, yes=yes, quiet=options.quiet)
+
+
+@app.command(cls=Command)
+def serve(
+    ctx: typer.Context, port: Annotated[int, typer.Option(help="Local HTTP port.", min=1, max=65535)] = 8000
+) -> None:
+    """Serve a local HTML report in the browser."""
+    from functools import partial  # noqa: PLC0415 - optional dependency or shared pipeline import.
+    from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    directory = options.repo / ".docs-drift" / "report"
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / "index.html").write_text(render(run_scan(options.repo, options.config), "html"), encoding="utf-8")
+    typer.echo(f"Report available at http://127.0.0.1:{port}; press Ctrl+C to stop.")
+    with ThreadingHTTPServer(
+        ("127.0.0.1", port), partial(SimpleHTTPRequestHandler, directory=str(directory))
+    ) as server:
+        server.serve_forever()
+
+
+@app.command("index", cls=Command)
 def index_command(  # noqa: PLR0912
     ctx: typer.Context,
     list_kind: Annotated[str | None, typer.Option("--list", help="List symbols of this kind.")] = None,
@@ -606,7 +723,7 @@ def index_command(  # noqa: PLR0912
     started = time.perf_counter()
     result = build_index(options.repo, options.config, no_cache=no_cache)
     elapsed = time.perf_counter() - started
-    if json_output:
+    if json_output or options.output_format == OutputFormat.json:
         typer.echo(
             json.dumps(
                 {
@@ -640,7 +757,9 @@ def index_command(  # noqa: PLR0912
             )
             if matching is not None:
                 branches[matching].add(flag_symbol.name)
-        Console(no_color=options.no_color).print(command_tree)
+        Console(
+            force_terminal=sys.stdout.isatty() and not options.no_color, markup=False, no_color=options.no_color
+        ).print(command_tree)
         return
     if list_kind:
         matches = [item for item in result.symbols if item.kind.value == list_kind]
@@ -651,7 +770,12 @@ def index_command(  # noqa: PLR0912
             table.add_row(
                 item.name, item.qualified_name, f"{item.file}:{item.line}", item.default or "", item.framework or ""
             )
-        Console(no_color=options.no_color, width=180).print(table)
+        Console(
+            force_terminal=sys.stdout.isatty() and not options.no_color,
+            markup=False,
+            no_color=options.no_color,
+            width=180,
+        ).print(table)
         return
     if find:
         choices = {f"{item.name}  {item.qualified_name}  {item.file}:{item.line}": item for item in result.symbols}
@@ -668,7 +792,9 @@ def index_command(  # noqa: PLR0912
         table.add_row(language, str(count))
     for item in result.symbols:
         kinds[item.kind.value] = kinds.get(item.kind.value, 0) + 1
-    Console(no_color=options.no_color, width=180).print(table)
+    Console(
+        force_terminal=sys.stdout.isatty() and not options.no_color, markup=False, no_color=options.no_color, width=180
+    ).print(table)
     typer.echo("Symbols: " + ", ".join(f"{kind}={count}" for kind, count in sorted(kinds.items())))
     typer.echo("Frameworks: " + (", ".join(frameworks) or "none detected"))
     typer.echo(f"Cache: hits={result.cache_hits}, misses={result.cache_misses}; elapsed={elapsed:.3f}s")
@@ -676,7 +802,7 @@ def index_command(  # noqa: PLR0912
         typer.echo(f"Warning: {warning}", err=True)
 
 
-@cache_app.command("clear")
+@cache_app.command("clear", cls=Command)
 def clear_index_cache(ctx: typer.Context) -> None:
     """Remove this repository's cached static index."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
@@ -685,3 +811,21 @@ def clear_index_cache(ctx: typer.Context) -> None:
 
 app.add_typer(cache_app, name="cache")
 app.add_typer(baseline_app, name="baseline")
+
+
+@app.command(cls=Command)
+def watch(ctx: typer.Context) -> None:
+    """Recheck changed documents and source files with immediate feedback."""
+    from docs_drift.watch import watch_repository  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    watch_repository(options.repo, options.config, quiet=options.quiet)
+
+
+@app.command(cls=Command)
+def lsp(ctx: typer.Context) -> None:
+    """Start the language server over standard input and output."""
+    from docs_drift.lsp import start  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    start(options.repo, options.config)

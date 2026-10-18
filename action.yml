@@ -1,0 +1,30 @@
+name: docs-drift
+description: Scan repository documentation with static source evidence; no target code execution or model calls.
+inputs:
+  repo:
+    description: Repository subdirectory under the checked-out workspace.
+    default: .
+  fail-on-drift:
+    description: Fail the step on findings at default confidence.
+    default: 'true'
+outputs:
+  report-directory:
+    description: Runner-local HTML, JSON, SARIF and Markdown report directory.
+    value: ${{ steps.scan.outputs.report-directory }}
+runs:
+  using: composite
+  steps:
+    - name: Install trusted action source in an isolated environment
+      shell: bash
+      env:
+        ACTION_SOURCE: ${{ github.action_path }}
+      run: |
+        python -m venv "$RUNNER_TEMP/docs-drift-action"
+        "$RUNNER_TEMP/docs-drift-action/bin/python" -m pip install "$ACTION_SOURCE"
+    - id: scan
+      shell: bash
+      env:
+        SCAN_REPO: ${{ inputs.repo }}
+        FAIL_ON_DRIFT: ${{ inputs.fail-on-drift }}
+        ACTION_SOURCE: ${{ github.action_path }}
+      run: '"$RUNNER_TEMP/docs-drift-action/bin/python" "$ACTION_SOURCE/scripts/action_runner.py"'

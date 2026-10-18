@@ -7,6 +7,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from docs_drift.safe_files import metadata_text
+
 
 class ConfigWarning(UserWarning):
     """An unrecognized configuration key was ignored."""
@@ -77,8 +79,7 @@ class Config(ConfigModel):
 
 def _read_toml(path: Path) -> dict[str, object]:
     try:
-        with path.open("rb") as stream:
-            return tomllib.load(stream)
+        return tomllib.loads(metadata_text(path))
     except (OSError, UnicodeError, tomllib.TOMLDecodeError) as exc:
         raise ConfigError(f"Cannot read configuration at {path}: {exc}. Fix the file or path.") from exc
 

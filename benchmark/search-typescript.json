@@ -1,0 +1,402 @@
+[
+  {
+    "name": "freeCodeCamp/freeCodeCamp",
+    "stars": 457392
+  },
+  {
+    "name": "openclaw/openclaw",
+    "stars": 392338
+  },
+  {
+    "name": "nilbuild/developer-roadmap",
+    "stars": 369744
+  },
+  {
+    "name": "morluto/rea",
+    "stars": 315711
+  },
+  {
+    "name": "deepseek-ai/deepseek-harness",
+    "stars": 252769
+  },
+  {
+    "name": "anomalyco/opencode",
+    "stars": 215979
+  },
+  {
+    "name": "vuejs/vue",
+    "stars": 212622
+  },
+  {
+    "name": "n8n-io/n8n",
+    "stars": 207882
+  },
+  {
+    "name": "microsoft/vscode",
+    "stars": 193808
+  },
+  {
+    "name": "firecrawl/firecrawl",
+    "stars": 192642
+  },
+  {
+    "name": "anthropics/claude-code",
+    "stars": 152207
+  },
+  {
+    "name": "yangshun/tech-interview-handbook",
+    "stars": 143056
+  },
+  {
+    "name": "iptv-org/iptv",
+    "stars": 141264
+  },
+  {
+    "name": "garrytan/gstack",
+    "stars": 136813
+  },
+  {
+    "name": "excalidraw/excalidraw",
+    "stars": 134099
+  },
+  {
+    "name": "shadcn-ui/ui",
+    "stars": 125846
+  },
+  {
+    "name": "immich-app/immich",
+    "stars": 116539
+  },
+  {
+    "name": "earendil-works/pi",
+    "stars": 116054
+  },
+  {
+    "name": "supabase/supabase",
+    "stars": 111717
+  },
+  {
+    "name": "google-gemini/gemini-cli",
+    "stars": 107435
+  },
+  {
+    "name": "paperclipai/paperclip",
+    "stars": 103884
+  },
+  {
+    "name": "nexu-io/open-design",
+    "stars": 102087
+  },
+  {
+    "name": "thedotmack/claude-mem",
+    "stars": 101529
+  },
+  {
+    "name": "angular/angular",
+    "stars": 101090
+  },
+  {
+    "name": "ant-design/ant-design",
+    "stars": 99806
+  },
+  {
+    "name": "microsoft/playwright",
+    "stars": 97980
+  },
+  {
+    "name": "tailwindlabs/tailwindcss",
+    "stars": 97915
+  },
+  {
+    "name": "stablyai/orca",
+    "stars": 95989
+  },
+  {
+    "name": "puppeteer/puppeteer",
+    "stars": 95715
+  },
+  {
+    "name": "OpenCut-app/OpenCut",
+    "stars": 95182
+  },
+  {
+    "name": "Stirling-Tools/Stirling-PDF",
+    "stars": 94425
+  },
+  {
+    "name": "storybookjs/storybook",
+    "stars": 91326
+  },
+  {
+    "name": "OpenHands/OpenHands",
+    "stars": 91184
+  },
+  {
+    "name": "mermaid-js/mermaid",
+    "stars": 90728
+  },
+  {
+    "name": "ChatGPTNextWeb/NextChat",
+    "stars": 88853
+  },
+  {
+    "name": "koala73/worldmonitor",
+    "stars": 88679
+  },
+  {
+    "name": "Egonex-AI/Understand-Anything",
+    "stars": 86854
+  },
+  {
+    "name": "realworld-apps/realworld",
+    "stars": 84299
+  },
+  {
+    "name": "vitejs/vite",
+    "stars": 83380
+  },
+  {
+    "name": "lobehub/lobehub",
+    "stars": 83305
+  },
+  {
+    "name": "hoppscotch/hoppscotch",
+    "stars": 80642
+  },
+  {
+    "name": "coder/code-server",
+    "stars": 79642
+  },
+  {
+    "name": "diegosouzapw/OmniRoute",
+    "stars": 77931
+  },
+  {
+    "name": "grafana/grafana",
+    "stars": 77345
+  },
+  {
+    "name": "nestjs/nest",
+    "stars": 76858
+  },
+  {
+    "name": "ruvnet/ruflo",
+    "stars": 76301
+  },
+  {
+    "name": "Eugeny/tabby",
+    "stars": 75014
+  },
+  {
+    "name": "toeverything/AFFiNE",
+    "stars": 73625
+  },
+  {
+    "name": "strapi/strapi",
+    "stars": 73331
+  },
+  {
+    "name": "Fission-AI/OpenSpec",
+    "stars": 72302
+  },
+  {
+    "name": "cline/cline",
+    "stars": 70497
+  },
+  {
+    "name": "code-yeongyu/oh-my-openagent",
+    "stars": 70154
+  },
+  {
+    "name": "apache/echarts",
+    "stars": 67538
+  },
+  {
+    "name": "facebook/docusaurus",
+    "stars": 66518
+  },
+  {
+    "name": "heygen-com/hyperframes",
+    "stars": 66362
+  },
+  {
+    "name": "nocodb/nocodb",
+    "stars": 65292
+  },
+  {
+    "name": "remotion-dev/remotion",
+    "stars": 64906
+  },
+  {
+    "name": "withastro/astro",
+    "stars": 63302
+  },
+  {
+    "name": "upstash/context7",
+    "stars": 63233
+  },
+  {
+    "name": "socketio/socket.io",
+    "stars": 63219
+  },
+  {
+    "name": "marktext/marktext",
+    "stars": 62783
+  },
+  {
+    "name": "reduxjs/redux",
+    "stars": 61474
+  },
+  {
+    "name": "makeplane/plane",
+    "stars": 61050
+  },
+  {
+    "name": "nuxt/nuxt",
+    "stars": 60963
+  },
+  {
+    "name": "pmndrs/zustand",
+    "stars": 58835
+  },
+  {
+    "name": "twentyhq/twenty",
+    "stars": 58475
+  },
+  {
+    "name": "appwrite/appwrite",
+    "stars": 57718
+  },
+  {
+    "name": "agalwood/Motrix",
+    "stars": 57001
+  },
+  {
+    "name": "laurent22/joplin",
+    "stars": 56786
+  },
+  {
+    "name": "remix-run/react-router",
+    "stars": 56612
+  },
+  {
+    "name": "TryGhost/Ghost",
+    "stars": 55562
+  },
+  {
+    "name": "vuejs/core",
+    "stars": 54670
+  },
+  {
+    "name": "lyswhut/lx-music-desktop",
+    "stars": 54557
+  },
+  {
+    "name": "ChromeDevTools/chrome-devtools-mcp",
+    "stars": 53780
+  },
+  {
+    "name": "expo/expo",
+    "stars": 52806
+  },
+  {
+    "name": "CherryHQ/cherry-studio",
+    "stars": 52725
+  },
+  {
+    "name": "ionic-team/ionic-framework",
+    "stars": 52709
+  },
+  {
+    "name": "DefinitelyTyped/DefinitelyTyped",
+    "stars": 51445
+  },
+  {
+    "name": "justjavac/wechat-miniapp-radar",
+    "stars": 51176
+  },
+  {
+    "name": "cypress-io/cypress",
+    "stars": 51045
+  },
+  {
+    "name": "tldraw/tldraw",
+    "stars": 50965
+  },
+  {
+    "name": "chenglou/pretext",
+    "stars": 50826
+  },
+  {
+    "name": "upscayl/upscayl",
+    "stars": 50704
+  },
+  {
+    "name": "moeru-ai/airi",
+    "stars": 50471
+  },
+  {
+    "name": "TanStack/query",
+    "stars": 50453
+  },
+  {
+    "name": "calcom/cal.diy",
+    "stars": 49132
+  },
+  {
+    "name": "slidevjs/slidev",
+    "stars": 49112
+  },
+  {
+    "name": "KeygraphHQ/shannon",
+    "stars": 49073
+  },
+  {
+    "name": "type-challenges/type-challenges",
+    "stars": 48544
+  },
+  {
+    "name": "pixijs/pixijs",
+    "stars": 48415
+  },
+  {
+    "name": "abhigyanpatwari/GitNexus",
+    "stars": 47932
+  },
+  {
+    "name": "prisma/orm",
+    "stars": 47694
+  },
+  {
+    "name": "slab/quill",
+    "stars": 47374
+  },
+  {
+    "name": "typescript-cheatsheets/react",
+    "stars": 47100
+  },
+  {
+    "name": "siyuan-note/siyuan",
+    "stars": 46818
+  },
+  {
+    "name": "DIYgod/RSSHub",
+    "stars": 46569
+  },
+  {
+    "name": "RocketChat/Rocket.Chat",
+    "stars": 46285
+  },
+  {
+    "name": "fastapi/full-stack-fastapi-template",
+    "stars": 46032
+  },
+  {
+    "name": "LibreChat-AI/LibreChat",
+    "stars": 45914
+  },
+  {
+    "name": "jestjs/jest",
+    "stars": 45487
+  }
+]

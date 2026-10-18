@@ -1,0 +1,3366 @@
+{
+  "schema_version": 1,
+  "repo_path": "files-to-prompt",
+  "head_sha": "ae06f2039f3a1dc1c9f3b4657fb51459490768f2",
+  "scan_time": "2026-10-18T12:17:49.870038Z",
+  "config_used": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "content_hash": "101aa407e10c714ad9733352c5717baee44f138c45f98da383967fc0d404ada3",
+      "format": "markdown"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "section_4a1757fcc2d5ec20a7a6b79003d09f7609a794d3ad6fd49303ba5c5db9494fea",
+      "doc_path": "README.md",
+      "heading": "files-to-prompt",
+      "heading_level": 1,
+      "heading_path": [
+        "files-to-prompt"
+      ],
+      "start_line": 1,
+      "end_line": 11,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_b576a03ebb003945311a62a5e99ea1ba241699f7c5624f552f25adec92df88cd",
+      "doc_path": "README.md",
+      "heading": "Installation",
+      "heading_level": 2,
+      "heading_path": [
+        "files-to-prompt",
+        "Installation"
+      ],
+      "start_line": 12,
+      "end_line": 19,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+      "doc_path": "README.md",
+      "heading": "Usage",
+      "heading_level": 2,
+      "heading_path": [
+        "files-to-prompt",
+        "Usage"
+      ],
+      "start_line": 20,
+      "end_line": 29,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "doc_path": "README.md",
+      "heading": "Options",
+      "heading_level": 3,
+      "heading_path": [
+        "files-to-prompt",
+        "Usage",
+        "Options"
+      ],
+      "start_line": 30,
+      "end_line": 66,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_e1103362e6bc5f474a9c3390feaf4a2da8ee5d68b758407d2d135c2d3fa55e59",
+      "doc_path": "README.md",
+      "heading": "Example",
+      "heading_level": 3,
+      "heading_path": [
+        "files-to-prompt",
+        "Usage",
+        "Example"
+      ],
+      "start_line": 67,
+      "end_line": 124,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_e64c184557eca7e153244eae09cdeb20599e8969f1e2976551ca28d51611da4f",
+      "doc_path": "README.md",
+      "heading": "Claude XML Output",
+      "heading_level": 3,
+      "heading_path": [
+        "files-to-prompt",
+        "Usage",
+        "Claude XML Output"
+      ],
+      "start_line": 125,
+      "end_line": 147,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_ecf644118c877d47d5b56829b000c29404ff2a3adae8b8f614e441a054af97e0",
+      "doc_path": "README.md",
+      "heading": "Development",
+      "heading_level": 2,
+      "heading_path": [
+        "files-to-prompt",
+        "Development"
+      ],
+      "start_line": 148,
+      "end_line": 168,
+      "context": "current",
+      "historical_spans": []
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim_6d71c2876cc5763536c0a2fa179af12a0e197fc8c5e67b93b808395fc16e0ae5",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+      "value": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 25,
+      "column": 1,
+      "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 25,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "a67499de27416375d5167302d5f6216f651d38f3e12ebb88817cdaa17ca5fc61"
+    },
+    {
+      "claim_id": "claim_7a8f2946ae28d55894144e8d8d0e62933f04197c3a26a988f3c603d49d591827",
+      "kind": "file_path",
+      "raw_text": "-e/--extension <extension>",
+      "value": "-e/--extension <extension>",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 32,
+      "column": 3,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 32,
+          "column": 3,
+          "raw_text": "-e/--extension <extension>",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "79552bdb9e263e00b030a3189e271d885f9e1994b9db74171bccee991068e3fa"
+    },
+    {
+      "claim_id": "claim_df1d85fb744dfd15ee7d97826b6010d47adecf90799b020162c81521a238a7d1",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+      "value": "files-to-prompt path/to/directory -e txt -e md",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 35,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 35,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "37302cac7cc082cb071fdaed5d5363b2c6276ddab72927a6ebd7f2a046f1b2d0"
+    },
+    {
+      "claim_id": "claim_c01e1e3181d41b77e0c2f60f0dd53a4de7b7660417087614254f8f3fee402b86",
+      "kind": "cli_flag",
+      "raw_text": "--include-hidden",
+      "value": "--include-hidden",
+      "qualifier": "Options",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 38,
+      "column": 3,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 38,
+          "column": 3,
+          "raw_text": "--include-hidden",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "7f34c4a579f68a6b798812dbf927fc1f69d659c34ec9ac0e733fcce660d213b1"
+    },
+    {
+      "claim_id": "claim_50e921b4d2434c7bec226893882ced044253f487f6b7d7b0a8a8b91faaacd001",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory --include-hidden",
+      "value": "files-to-prompt path/to/directory --include-hidden",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 41,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 41,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --include-hidden",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "9bd34b246ba42bf7363001a568affee72031ba0748922fba0591be98c04d351d"
+    },
+    {
+      "claim_id": "claim_721dc4935ff7e5d37103046943de6a40e125f05b59722b85aa7bdb6ab564e221",
+      "kind": "cli_flag",
+      "raw_text": "--ignore-gitignore",
+      "value": "--ignore-gitignore",
+      "qualifier": "Options",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 44,
+      "column": 3,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 44,
+          "column": 3,
+          "raw_text": "--ignore-gitignore",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "21f4c55743c346a7ed49e27c88be8007bbc1f2ff4dec81a937bcdbd8fd4470bc"
+    },
+    {
+      "claim_id": "claim_d65c9351633ad7e6840a2387ce4459b4553812ab5484fddbe33042f301ced601",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+      "value": "files-to-prompt path/to/directory --ignore-gitignore",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 47,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 47,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "5496a5a375bebcc0d3a56467a320c125bc5edcdaf638df6a1351de0516c74ba0"
+    },
+    {
+      "claim_id": "claim_5fd2b5a410cd4a87c1a5c679158f23839982aa015f8b9eb5bf22f8c0fe442239",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+      "value": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 52,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 52,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "394b6639252f63162aee6da6c33600b006fcc5152ea049fee0f959d0b8b4fcf7"
+    },
+    {
+      "claim_id": "claim_503bb9179d486dcca620c8ee18c7aef911d530105e6207d2ec0564433b1b4d6d",
+      "kind": "file_path",
+      "raw_text": "c/--cxml",
+      "value": "c/--cxml",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 55,
+      "column": 3,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 55,
+          "column": 3,
+          "raw_text": "c/--cxml",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "6300096f09fb449cc3e51d702b35fca919139a4f7f1b913fee9885623b083371"
+    },
+    {
+      "claim_id": "claim_229b7c55b323dfd798d97605b02d4b6fca00bb0acfbe361ac7699ba086be64f9",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory --cxml",
+      "value": "files-to-prompt path/to/directory --cxml",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 58,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 58,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --cxml",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "f2d41252c0bd54f2d32fa4372b82b1eb4545ca7fbfb373a4923529abd79245ae"
+    },
+    {
+      "claim_id": "claim_597dc77148c0affd0a29fea047245b84a222ca5c8dd72ddc4a494e5e7d10219a",
+      "kind": "file_path",
+      "raw_text": "-o/--output <file>",
+      "value": "-o/--output <file>",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 61,
+      "column": 3,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 61,
+          "column": 3,
+          "raw_text": "-o/--output <file>",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "47536df88b2e29add6954772e4f170c6e6fcefc9af1b8baafee55f25980f2c1f"
+    },
+    {
+      "claim_id": "claim_ab8b081e6eaacba1f1ef275359708ce221baf8fae1c6aa57bdaf4d1e3535e044",
+      "kind": "file_path",
+      "raw_text": "files-to-prompt path/to/directory -o output.txt",
+      "value": "files-to-prompt path/to/directory -o output.txt",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 64,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 64,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory -o output.txt",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "90a6c271951d630cebf29d050bc20c73092854ffce3d78f2cfd04cc7d12819af"
+    },
+    {
+      "claim_id": "claim_3b9ae3dea62749de14b858c19faf220777191878dff8115454c4e17700e1ab4c",
+      "kind": "file_path",
+      "raw_text": ".hidden_file.txt",
+      "value": ".hidden_file.txt",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 98,
+      "column": 90,
+      "section_id": "section_e1103362e6bc5f474a9c3390feaf4a2da8ee5d68b758407d2d135c2d3fa55e59",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 98,
+          "column": 90,
+          "raw_text": ".hidden_file.txt",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "a4cbe1bad92caa0d17c6590b5e8a1c59085604ab1e4ce6e292420e720d740d50"
+    },
+    {
+      "claim_id": "claim_013f723664480ff8a151cd13474fdc702f90a0c69c879b056e1666fe44a8d257",
+      "kind": "symbol",
+      "raw_text": "temp.log",
+      "value": "temp.log",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 108,
+      "column": 85,
+      "section_id": "section_e1103362e6bc5f474a9c3390feaf4a2da8ee5d68b758407d2d135c2d3fa55e59",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.72,
+      "locations": [
+        {
+          "line": 108,
+          "column": 85,
+          "raw_text": "temp.log",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "65c29f39a49e1028810b0a7659dd4558d32d8a6002c7e7009dccfac8083dfa83"
+    },
+    {
+      "claim_id": "claim_260944b126b0935939801f6e2accb33b4908aaa7288c9fc7be8a288c35b0d68a",
+      "kind": "cli_flag",
+      "raw_text": "--cxml",
+      "value": "--cxml",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 129,
+      "column": 55,
+      "section_id": "section_e64c184557eca7e153244eae09cdeb20599e8969f1e2976551ca28d51611da4f",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 129,
+          "column": 55,
+          "raw_text": "--cxml",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "769a012ffd61d9f25dcea87c716279efc265e21c7aec674f70a10ff3952e59f4"
+    },
+    {
+      "claim_id": "claim_f64f6f4b243d53793613a50a19dbcf628f8b78863d836d7a403e63ab73617272",
+      "kind": "file_path",
+      "raw_text": "source venv/bin/activate",
+      "value": "source venv/bin/activate",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 155,
+      "column": 1,
+      "section_id": "section_ecf644118c877d47d5b56829b000c29404ff2a3adae8b8f614e441a054af97e0",
+      "extraction": "code_block",
+      "extraction_confidence": 0.88,
+      "locations": [
+        {
+          "line": 155,
+          "column": 1,
+          "raw_text": "source venv/bin/activate",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "1409874eb1e2c07c0df435557b79ef4d2355ba619e3c426dc439d82eb8adf9e3"
+    },
+    {
+      "claim_id": "claim_7079700927d64420ffd7107554ddb8d6362d50b7c2dbde0afc006e3fbfda0041",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+      "value": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 25,
+      "column": 1,
+      "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 25,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "b91df3f99ea0c9dc27709cf80b793a08fca3e61e38c7bc7131e599903362b9b3"
+    },
+    {
+      "claim_id": "claim_646797654c911c4106409d84711154d851f24eca47bbcad7f4a757758d7adca9",
+      "kind": "cli_command",
+      "raw_text": "path/to/file_or_directory",
+      "value": "path/to/file_or_directory",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 25,
+      "column": 1,
+      "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 25,
+          "column": 1,
+          "raw_text": "path/to/file_or_directory",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "97c56c027a61cdcb7b9175bc17dd6ff107ad6c8cf3682ceb30e267eae6110060"
+    },
+    {
+      "claim_id": "claim_908880e6aa4aa54ec29582156812c044f435a1cf0f7d1a2848bb2141498e36bc",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+      "value": "files-to-prompt path/to/directory -e txt -e md",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 35,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 35,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "0fcc45fe5d7a0870f9f8af785f3fdf59bed6b2e6d0a8f06e3901be7cd155c5cb"
+    },
+    {
+      "claim_id": "claim_e990ad5a443c0ec80fd630510e4665a5d2d28fe3634481a812dc9fb4b67895cc",
+      "kind": "cli_command",
+      "raw_text": "path/to/directory",
+      "value": "path/to/directory",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 35,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 35,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        },
+        {
+          "line": 41,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        },
+        {
+          "line": 47,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        },
+        {
+          "line": 52,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        },
+        {
+          "line": 58,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        },
+        {
+          "line": 64,
+          "column": 1,
+          "raw_text": "path/to/directory",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "683688fc3f331118c2e93ad8fa34ad72f4074bcc1a671e4c2e2d4ddc01661c43"
+    },
+    {
+      "claim_id": "claim_c44863ae1331ca16a768815c306b44830aa2c0d8f2f800d1b0a09f3635e473fd",
+      "kind": "cli_flag",
+      "raw_text": "-e",
+      "value": "-e",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 35,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 35,
+          "column": 1,
+          "raw_text": "-e",
+          "extraction": "code_block"
+        },
+        {
+          "line": 35,
+          "column": 1,
+          "raw_text": "-e",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "78d7c9d96bdf06f4bcb3c0d8422f16d3e43edece7f329387e19f50ed8185737a"
+    },
+    {
+      "claim_id": "claim_c3aec61cb7505d4d0e97dc3c7780b3ce86a46ae46a737c299a21bf9166442879",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory --include-hidden",
+      "value": "files-to-prompt path/to/directory --include-hidden",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 41,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 41,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --include-hidden",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "0efd64fee0755625d8af6c4a724df0ef4cd0f1dd8b2aeecfe1bdd5488451417f"
+    },
+    {
+      "claim_id": "claim_c01e1e3181d41b77e0c2f60f0dd53a4de7b7660417087614254f8f3fee402b86",
+      "kind": "cli_flag",
+      "raw_text": "--include-hidden",
+      "value": "--include-hidden",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 41,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 41,
+          "column": 1,
+          "raw_text": "--include-hidden",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "5f80098904af1cbb8119177f43c9581ded5bd19b5fa2a86d9e668f6aa845936c"
+    },
+    {
+      "claim_id": "claim_51912edfc6eb19f7adf901c9a4921beda478bbbd9c5b30d41f91df557cd948ce",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+      "value": "files-to-prompt path/to/directory --ignore-gitignore",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 47,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 47,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "d0ac514b7a12d59802949111db7baa055d5a80c16675bb4d5f89ef4982c622f2"
+    },
+    {
+      "claim_id": "claim_721dc4935ff7e5d37103046943de6a40e125f05b59722b85aa7bdb6ab564e221",
+      "kind": "cli_flag",
+      "raw_text": "--ignore-gitignore",
+      "value": "--ignore-gitignore",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 47,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 47,
+          "column": 1,
+          "raw_text": "--ignore-gitignore",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "66967bdb2d5e5fff2b2c1ab7e8bbd288bdff53426398a0377c27f79493f9b9b0"
+    },
+    {
+      "claim_id": "claim_18837174b974482ac6d52b793bfe1a641237831583a2c2c9882188d3b1771767",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+      "value": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 52,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 52,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "1e73b9bdfa0e9c39f8e461916e659817df6ef75ffdb8ce1fd093c561f49c51a7"
+    },
+    {
+      "claim_id": "claim_50d98e82531893456380f1f0498ab7d61a221f76df31c2894bc608780b421c27",
+      "kind": "cli_flag",
+      "raw_text": "--ignore",
+      "value": "--ignore",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 52,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 52,
+          "column": 1,
+          "raw_text": "--ignore",
+          "extraction": "code_block"
+        },
+        {
+          "line": 52,
+          "column": 1,
+          "raw_text": "--ignore",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "71dbdd7ab9cad27d357e5fc153303555f1a5b17ffc6183e570c47934ee167f92"
+    },
+    {
+      "claim_id": "claim_12163a80a4eaae321f0d1d7c79da374ff67c93f3e30b8a50ded16b36664b7e6b",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory --cxml",
+      "value": "files-to-prompt path/to/directory --cxml",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 58,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 58,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory --cxml",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "ac06fd9b2814a371f3889fff37f78cf6ab2f22b5fe3efb747a4ed9b8fbee89d8"
+    },
+    {
+      "claim_id": "claim_4a9f08a6a8ed18f3d5cc0f01c0e9baa5dbf67d363eb16a23575a6efbefbadbc4",
+      "kind": "cli_flag",
+      "raw_text": "--cxml",
+      "value": "--cxml",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 58,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 58,
+          "column": 1,
+          "raw_text": "--cxml",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "bd32801333d330946919616405037e5bc14259c96f7a23d3914432e8240f8773"
+    },
+    {
+      "claim_id": "claim_2fa2a0b9d6ac7a6ac3ba70a0012d3276775623920c3ce155fe5620e1996f9957",
+      "kind": "code_command",
+      "raw_text": "files-to-prompt path/to/directory -o output.txt",
+      "value": "files-to-prompt path/to/directory -o output.txt",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 64,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 64,
+          "column": 1,
+          "raw_text": "files-to-prompt path/to/directory -o output.txt",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "29c763dab5ab5d8acfefd81fb4ef7389d4997834c9be3994466b40a836a8f8ea"
+    },
+    {
+      "claim_id": "claim_2da37a05579ecade4fe4eecc47a0f02343772e55b09c8fb432fdb76334e832cb",
+      "kind": "cli_flag",
+      "raw_text": "-o",
+      "value": "-o",
+      "qualifier": "path/to/directory",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 64,
+      "column": 1,
+      "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 64,
+          "column": 1,
+          "raw_text": "-o",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "30d4125e0b75d54202a3d134ae6a5aba6cce9d6d33c0114e086f71aa827b1ee6"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol_id": "symbol_6498a788b86b37f7e16c52113b17adb48168e5d990b6f792b9cf9bc495afed94",
+      "kind": "ci_job",
+      "name": "test",
+      "qualified_name": "test",
+      "aliases": [],
+      "default": null,
+      "file": ".github/workflows/publish.yml",
+      "line": 11,
+      "language": "yml",
+      "framework": "github-actions",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": "test",
+      "authoritative": false,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_c6537937f48897adcb4070563694c335858cc8084c2aeb04e6c119f929267f4f",
+      "kind": "ci_job",
+      "name": "deploy",
+      "qualified_name": "deploy",
+      "aliases": [],
+      "default": null,
+      "file": ".github/workflows/publish.yml",
+      "line": 30,
+      "language": "yml",
+      "framework": "github-actions",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": "deploy",
+      "authoritative": false,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_574be0e6a8f32cd5e21c3377fdd30229dc0fc57a73f3d75628ed9471bba65ff1",
+      "kind": "ci_job",
+      "name": "test",
+      "qualified_name": "test",
+      "aliases": [],
+      "default": null,
+      "file": ".github/workflows/test.yml",
+      "line": 9,
+      "language": "yml",
+      "framework": "github-actions",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": "test",
+      "authoritative": false,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_e065a9d7018b5a26c42069b40b6d1336da15137ed86f3516a12c39c434eb25e8",
+      "kind": "function",
+      "name": "should_ignore",
+      "qualified_name": "cli.should_ignore",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 9,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_e07117e5bc4e5257cbc7e50df7339fb71baa9a2641bdb150a76c0c7bacb2ff86",
+      "kind": "function",
+      "name": "read_gitignore",
+      "qualified_name": "cli.read_gitignore",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 18,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_b0b300aa7b376a3931149a2377417c2e4e95d73a62dfec1610b3dc79f05e6412",
+      "kind": "function",
+      "name": "print_path",
+      "qualified_name": "cli.print_path",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 28,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_4c7405dc87f39235abb952a8dd462267f3c8c2a4f0a4de04beebc6a3f24ff678",
+      "kind": "function",
+      "name": "print_default",
+      "qualified_name": "cli.print_default",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 35,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_5b866bfed6432b1af0f49309d5cef88f7851c372bedf513408cf015c48a50966",
+      "kind": "function",
+      "name": "print_as_xml",
+      "qualified_name": "cli.print_as_xml",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 43,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_f0efa9e5614470d817efb2bd86b8206ab0dd993edfa2f0e2ff0145c49f511f50",
+      "kind": "function",
+      "name": "process_path",
+      "qualified_name": "cli.process_path",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 54,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_742ffd486cbf04bbd9da5535e10fb80eab58f829d9d9d16ad7721176f3bcaea8",
+      "kind": "cli_flag",
+      "name": "--extension",
+      "qualified_name": "cli.cli.--extension",
+      "aliases": [
+        "-e"
+      ],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 114,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_affd9904b06350506c6fb68cfc7841de1888a55419567f001be13079b253d2d3",
+      "kind": "cli_flag",
+      "name": "--include-hidden",
+      "qualified_name": "cli.cli.--include-hidden",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 115,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_496b969fee45dfcb26a98b51e91be447b696c1c1ff0e635e6bc636de90cb62c0",
+      "kind": "cli_flag",
+      "name": "--ignore-gitignore",
+      "qualified_name": "cli.cli.--ignore-gitignore",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 120,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_7ca416c207fae9703049e8a65092384e55900f4a95936c8cb5227c8228d763e1",
+      "kind": "cli_flag",
+      "name": "--ignore",
+      "qualified_name": "cli.cli.--ignore",
+      "aliases": [],
+      "default": "[]",
+      "file": "files_to_prompt/cli.py",
+      "line": 125,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_a3e497fae8fcf358eb927b29621b9ade1df9cdaddb8190d580e865a8701af656",
+      "kind": "cli_flag",
+      "name": "--output",
+      "qualified_name": "cli.cli.--output",
+      "aliases": [
+        "-o"
+      ],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 132,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_5aca670824cfc2b5436d9effdce55f1d4fb51740da6cd6682c20942a54df1b61",
+      "kind": "cli_flag",
+      "name": "--cxml",
+      "qualified_name": "cli.cli.--cxml",
+      "aliases": [
+        "-c"
+      ],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 139,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_4a0e875e43e41cde8c5333acf9156981a063b4b8abaabb155f89a8d446120615",
+      "kind": "cli_command",
+      "name": "cli",
+      "qualified_name": "cli.cli",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 147,
+      "language": "python",
+      "framework": "click",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_b57b89bdbeb8de436e349251ffde2a0400363fcfc734911401fc3fe257a32316",
+      "kind": "function",
+      "name": "cli",
+      "qualified_name": "cli.cli",
+      "aliases": [],
+      "default": null,
+      "file": "files_to_prompt/cli.py",
+      "line": 147,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [
+        "click.command()",
+        "click.argument(\"paths\", nargs=-1, type=click.Path(exists=True))",
+        "click.option(\"extensions\", \"-e\", \"--extension\", multiple=True)",
+        "click.option(\n    \"--include-hidden\",\n    is_flag=True,\n    help=\"Include files and folders starting with .\",\n)",
+        "click.option(\n    \"--ignore-gitignore\",\n    is_flag=True,\n    help=\"Ignore .gitignore files and include all files\",\n)",
+        "click.option(\n    \"ignore_patterns\",\n    \"--ignore\",\n    multiple=True,\n    default=[],\n    help=\"List of patterns to ignore\",\n)",
+        "click.option(\n    \"output_file\",\n    \"-o\",\n    \"--output\",\n    type=click.Path(writable=True),\n    help=\"Output to a file instead of stdout\",\n)",
+        "click.option(\n    \"claude_xml\",\n    \"-c\",\n    \"--cxml\",\n    is_flag=True,\n    help=\"Output in XML-ish format suitable for Claude's long context window.\",\n)",
+        "click.version_option()"
+      ],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_ccee148f2141c76b6e2e65358526ad464f6e747b1c02ebdcac16cfb10a26c102",
+      "kind": "function",
+      "name": "test_basic_functionality",
+      "qualified_name": "test_files_to_prompt.test_basic_functionality",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 9,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_c90a1b559816ad2e4dc89ac3b7de34f76a0cbe8d316f299a42f9099030145d3f",
+      "kind": "function",
+      "name": "test_include_hidden",
+      "qualified_name": "test_files_to_prompt.test_include_hidden",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 26,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_cdee3ed95c04ed7a0230823b5f6b32f4718f9b48468a5435037d25dc2511bfd5",
+      "kind": "function",
+      "name": "test_ignore_gitignore",
+      "qualified_name": "test_files_to_prompt.test_ignore_gitignore",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 43,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_ae566cc2538a10f68c04b3c609fcf792a17cbe9f0cdfefe1855e4eee59d9f727",
+      "kind": "function",
+      "name": "test_multiple_paths",
+      "qualified_name": "test_files_to_prompt.test_multiple_paths",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 66,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_12490cac614a314c56452286bbca631c4832d1eb3dafeabf35c50f2dc6e7b4ff",
+      "kind": "function",
+      "name": "test_ignore_patterns",
+      "qualified_name": "test_files_to_prompt.test_ignore_patterns",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 88,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_ec9b74ac75e6016235b4d894d1c6ba147dd7d41928fec09b622b512d2e59e805",
+      "kind": "function",
+      "name": "test_specific_extensions",
+      "qualified_name": "test_files_to_prompt.test_specific_extensions",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 111,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_d28d5f2fe29d5a6e8c456977a64fc6e037f28dd0dc4ef2a678f8268d8d18f346",
+      "kind": "function",
+      "name": "test_mixed_paths_with_options",
+      "qualified_name": "test_files_to_prompt.test_mixed_paths_with_options",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 136,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_003a344482165656dc3f94c6e2a85bfa4cbadcd4db8ed77a7a70436b0afd5c99",
+      "kind": "function",
+      "name": "test_binary_file_warning",
+      "qualified_name": "test_files_to_prompt.test_binary_file_warning",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 195,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_d6d093a2db00716c5e5bd660017aa5530f322dac53c902f981674754c208e57f",
+      "kind": "function",
+      "name": "test_xml_format_dir",
+      "qualified_name": "test_files_to_prompt.test_xml_format_dir",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 222,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [
+        "pytest.mark.parametrize(\n    \"args\", ([\"test_dir\"], [\"test_dir/file1.txt\", \"test_dir/file2.txt\"])\n)"
+      ],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_76aa72e9c2b783cbbb4452538dd06f0201e54d4c250e8695d69790e6c290bda1",
+      "kind": "function",
+      "name": "test_output_option",
+      "qualified_name": "test_files_to_prompt.test_output_option",
+      "aliases": [],
+      "default": null,
+      "file": "tests/test_files_to_prompt.py",
+      "line": 253,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [
+        "pytest.mark.parametrize(\"arg\", (\"-o\", \"--output\"))"
+      ],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    }
+  ],
+  "findings": [
+    {
+      "claim": {
+        "claim_id": "claim_6d71c2876cc5763536c0a2fa179af12a0e197fc8c5e67b93b808395fc16e0ae5",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+        "value": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 25,
+        "column": 1,
+        "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 25,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "a67499de27416375d5167302d5f6216f651d38f3e12ebb88817cdaa17ca5fc61"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 25,
+          "text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...] does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_7a8f2946ae28d55894144e8d8d0e62933f04197c3a26a988f3c603d49d591827",
+        "kind": "file_path",
+        "raw_text": "-e/--extension <extension>",
+        "value": "-e/--extension <extension>",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 32,
+        "column": 3,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 32,
+            "column": 3,
+            "raw_text": "-e/--extension <extension>",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "79552bdb9e263e00b030a3189e271d885f9e1994b9db74171bccee991068e3fa"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 32,
+          "text": "-e/--extension <extension>",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path -e/--extension <extension> does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "- `-e/--extension <extension>`: Only include files with the specified extension. Can be used multiple times."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_df1d85fb744dfd15ee7d97826b6010d47adecf90799b020162c81521a238a7d1",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+        "value": "files-to-prompt path/to/directory -e txt -e md",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 35,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 35,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "37302cac7cc082cb071fdaed5d5363b2c6276ddab72927a6ebd7f2a046f1b2d0"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 35,
+          "text": "files-to-prompt path/to/directory -e txt -e md",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory -e txt -e md does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -e txt -e md"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_c01e1e3181d41b77e0c2f60f0dd53a4de7b7660417087614254f8f3fee402b86",
+        "kind": "cli_flag",
+        "raw_text": "--include-hidden",
+        "value": "--include-hidden",
+        "qualifier": "Options",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 38,
+        "column": 3,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 38,
+            "column": 3,
+            "raw_text": "--include-hidden",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "7f34c4a579f68a6b798812dbf927fc1f69d659c34ec9ac0e733fcce660d213b1"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_affd9904b06350506c6fb68cfc7841de1888a55419567f001be13079b253d2d3",
+        "kind": "cli_flag",
+        "name": "--include-hidden",
+        "qualified_name": "cli.cli.--include-hidden",
+        "aliases": [],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 115,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 115,
+          "text": "cli.cli.--include-hidden",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --include-hidden matches cli.cli.--include-hidden at files_to_prompt/cli.py:115. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "- `--include-hidden`: Include files and folders starting with `.` (hidden files and directories)."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_50e921b4d2434c7bec226893882ced044253f487f6b7d7b0a8a8b91faaacd001",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory --include-hidden",
+        "value": "files-to-prompt path/to/directory --include-hidden",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 41,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 41,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --include-hidden",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "9bd34b246ba42bf7363001a568affee72031ba0748922fba0591be98c04d351d"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 41,
+          "text": "files-to-prompt path/to/directory --include-hidden",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory --include-hidden does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --include-hidden"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_721dc4935ff7e5d37103046943de6a40e125f05b59722b85aa7bdb6ab564e221",
+        "kind": "cli_flag",
+        "raw_text": "--ignore-gitignore",
+        "value": "--ignore-gitignore",
+        "qualifier": "Options",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 44,
+        "column": 3,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 44,
+            "column": 3,
+            "raw_text": "--ignore-gitignore",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "21f4c55743c346a7ed49e27c88be8007bbc1f2ff4dec81a937bcdbd8fd4470bc"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_496b969fee45dfcb26a98b51e91be447b696c1c1ff0e635e6bc636de90cb62c0",
+        "kind": "cli_flag",
+        "name": "--ignore-gitignore",
+        "qualified_name": "cli.cli.--ignore-gitignore",
+        "aliases": [],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 120,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 120,
+          "text": "cli.cli.--ignore-gitignore",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --ignore-gitignore matches cli.cli.--ignore-gitignore at files_to_prompt/cli.py:120. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "- `--ignore-gitignore`: Ignore `.gitignore` files and include all files."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_d65c9351633ad7e6840a2387ce4459b4553812ab5484fddbe33042f301ced601",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+        "value": "files-to-prompt path/to/directory --ignore-gitignore",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 47,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 47,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "5496a5a375bebcc0d3a56467a320c125bc5edcdaf638df6a1351de0516c74ba0"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 47,
+          "text": "files-to-prompt path/to/directory --ignore-gitignore",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory --ignore-gitignore does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore-gitignore"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_5fd2b5a410cd4a87c1a5c679158f23839982aa015f8b9eb5bf22f8c0fe442239",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+        "value": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 52,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 52,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "394b6639252f63162aee6da6c33600b006fcc5152ea049fee0f959d0b8b4fcf7"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 52,
+          "text": "files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\"",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\" does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\""
+    },
+    {
+      "claim": {
+        "claim_id": "claim_503bb9179d486dcca620c8ee18c7aef911d530105e6207d2ec0564433b1b4d6d",
+        "kind": "file_path",
+        "raw_text": "c/--cxml",
+        "value": "c/--cxml",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 55,
+        "column": 3,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 55,
+            "column": 3,
+            "raw_text": "c/--cxml",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "6300096f09fb449cc3e51d702b35fca919139a4f7f1b913fee9885623b083371"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 55,
+          "text": "c/--cxml",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path c/--cxml does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "- `c/--cxml`: Output in Claude XML format."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_229b7c55b323dfd798d97605b02d4b6fca00bb0acfbe361ac7699ba086be64f9",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory --cxml",
+        "value": "files-to-prompt path/to/directory --cxml",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 58,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 58,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --cxml",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "f2d41252c0bd54f2d32fa4372b82b1eb4545ca7fbfb373a4923529abd79245ae"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 58,
+          "text": "files-to-prompt path/to/directory --cxml",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory --cxml does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --cxml"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_597dc77148c0affd0a29fea047245b84a222ca5c8dd72ddc4a494e5e7d10219a",
+        "kind": "file_path",
+        "raw_text": "-o/--output <file>",
+        "value": "-o/--output <file>",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 61,
+        "column": 3,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 61,
+            "column": 3,
+            "raw_text": "-o/--output <file>",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "47536df88b2e29add6954772e4f170c6e6fcefc9af1b8baafee55f25980f2c1f"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 61,
+          "text": "-o/--output <file>",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path -o/--output <file> does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "- `-o/--output <file>`: Write the output to a file instead of printing it to the console."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_ab8b081e6eaacba1f1ef275359708ce221baf8fae1c6aa57bdaf4d1e3535e044",
+        "kind": "file_path",
+        "raw_text": "files-to-prompt path/to/directory -o output.txt",
+        "value": "files-to-prompt path/to/directory -o output.txt",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 64,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 64,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory -o output.txt",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "90a6c271951d630cebf29d050bc20c73092854ffce3d78f2cfd04cc7d12819af"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 64,
+          "text": "files-to-prompt path/to/directory -o output.txt",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path files-to-prompt path/to/directory -o output.txt does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -o output.txt"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_3b9ae3dea62749de14b858c19faf220777191878dff8115454c4e17700e1ab4c",
+        "kind": "file_path",
+        "raw_text": ".hidden_file.txt",
+        "value": ".hidden_file.txt",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 98,
+        "column": 90,
+        "section_id": "section_e1103362e6bc5f474a9c3390feaf4a2da8ee5d68b758407d2d135c2d3fa55e59",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 98,
+            "column": 90,
+            "raw_text": ".hidden_file.txt",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "a4cbe1bad92caa0d17c6590b5e8a1c59085604ab1e4ce6e292420e720d740d50"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 98,
+          "text": ".hidden_file.txt",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path .hidden_file.txt does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "If you run `files-to-prompt my_directory --include-hidden`, the output will also include `.hidden_file.txt`:"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_013f723664480ff8a151cd13474fdc702f90a0c69c879b056e1666fe44a8d257",
+        "kind": "symbol",
+        "raw_text": "temp.log",
+        "value": "temp.log",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 108,
+        "column": 85,
+        "section_id": "section_e1103362e6bc5f474a9c3390feaf4a2da8ee5d68b758407d2d135c2d3fa55e59",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.72,
+        "locations": [
+          {
+            "line": 108,
+            "column": 85,
+            "raw_text": "temp.log",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "65c29f39a49e1028810b0a7659dd4558d32d8a6002c7e7009dccfac8083dfa83"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 108,
+          "text": "temp.log",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "No indexed symbol named temp.log was found. Closest indexed candidates: test_multiple_paths (tests/test_files_to_prompt.py:66), test_xml_format_dir (tests/test_files_to_prompt.py:222), test_mixed_paths_with_options (tests/test_files_to_prompt.py:136)."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "If you run `files-to-prompt my_directory --ignore \"*.log\"`, the output will exclude `temp.log`:"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_260944b126b0935939801f6e2accb33b4908aaa7288c9fc7be8a288c35b0d68a",
+        "kind": "cli_flag",
+        "raw_text": "--cxml",
+        "value": "--cxml",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 129,
+        "column": 55,
+        "section_id": "section_e64c184557eca7e153244eae09cdeb20599e8969f1e2976551ca28d51611da4f",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 129,
+            "column": 55,
+            "raw_text": "--cxml",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "769a012ffd61d9f25dcea87c716279efc265e21c7aec674f70a10ff3952e59f4"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_5aca670824cfc2b5436d9effdce55f1d4fb51740da6cd6682c20942a54df1b61",
+        "kind": "cli_flag",
+        "name": "--cxml",
+        "qualified_name": "cli.cli.--cxml",
+        "aliases": [
+          "-c"
+        ],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 139,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 139,
+          "text": "cli.cli.--cxml",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_flag --cxml matches cli.cli.--cxml at files_to_prompt/cli.py:139."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "To structure the output in this way, use the optional `--cxml` flag, which will produce output like this:"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_f64f6f4b243d53793613a50a19dbcf628f8b78863d836d7a403e63ab73617272",
+        "kind": "file_path",
+        "raw_text": "source venv/bin/activate",
+        "value": "source venv/bin/activate",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 155,
+        "column": 1,
+        "section_id": "section_ecf644118c877d47d5b56829b000c29404ff2a3adae8b8f614e441a054af97e0",
+        "extraction": "code_block",
+        "extraction_confidence": 0.88,
+        "locations": [
+          {
+            "line": 155,
+            "column": 1,
+            "raw_text": "source venv/bin/activate",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "1409874eb1e2c07c0df435557b79ef4d2355ba619e3c426dc439d82eb8adf9e3"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 155,
+          "text": "source venv/bin/activate",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Path source venv/bin/activate does not exist relative to the repository or documentation."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "source venv/bin/activate"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_646797654c911c4106409d84711154d851f24eca47bbcad7f4a757758d7adca9",
+        "kind": "cli_command",
+        "raw_text": "path/to/file_or_directory",
+        "value": "path/to/file_or_directory",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 25,
+        "column": 1,
+        "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 25,
+            "column": 1,
+            "raw_text": "path/to/file_or_directory",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "97c56c027a61cdcb7b9175bc17dd6ff107ad6c8cf3682ceb30e267eae6110060"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 25,
+          "text": "path/to/file_or_directory",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "No indexed cli_command named path/to/file_or_directory was found. No close indexed candidates were found."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_e990ad5a443c0ec80fd630510e4665a5d2d28fe3634481a812dc9fb4b67895cc",
+        "kind": "cli_command",
+        "raw_text": "path/to/directory",
+        "value": "path/to/directory",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 35,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 35,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          },
+          {
+            "line": 41,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          },
+          {
+            "line": 47,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          },
+          {
+            "line": 52,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          },
+          {
+            "line": 58,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          },
+          {
+            "line": 64,
+            "column": 1,
+            "raw_text": "path/to/directory",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "683688fc3f331118c2e93ad8fa34ad72f4074bcc1a671e4c2e2d4ddc01661c43"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 35,
+          "text": "path/to/directory",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "No indexed cli_command named path/to/directory was found. No close indexed candidates were found."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -e txt -e md"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_c44863ae1331ca16a768815c306b44830aa2c0d8f2f800d1b0a09f3635e473fd",
+        "kind": "cli_flag",
+        "raw_text": "-e",
+        "value": "-e",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 35,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 35,
+            "column": 1,
+            "raw_text": "-e",
+            "extraction": "code_block"
+          },
+          {
+            "line": 35,
+            "column": 1,
+            "raw_text": "-e",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "78d7c9d96bdf06f4bcb3c0d8422f16d3e43edece7f329387e19f50ed8185737a"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_742ffd486cbf04bbd9da5535e10fb80eab58f829d9d9d16ad7721176f3bcaea8",
+        "kind": "cli_flag",
+        "name": "--extension",
+        "qualified_name": "cli.cli.--extension",
+        "aliases": [
+          "-e"
+        ],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 114,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 114,
+          "text": "cli.cli.--extension",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag -e matches cli.cli.--extension at files_to_prompt/cli.py:114. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -e txt -e md"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_c01e1e3181d41b77e0c2f60f0dd53a4de7b7660417087614254f8f3fee402b86",
+        "kind": "cli_flag",
+        "raw_text": "--include-hidden",
+        "value": "--include-hidden",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 41,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 41,
+            "column": 1,
+            "raw_text": "--include-hidden",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "5f80098904af1cbb8119177f43c9581ded5bd19b5fa2a86d9e668f6aa845936c"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_affd9904b06350506c6fb68cfc7841de1888a55419567f001be13079b253d2d3",
+        "kind": "cli_flag",
+        "name": "--include-hidden",
+        "qualified_name": "cli.cli.--include-hidden",
+        "aliases": [],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 115,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 115,
+          "text": "cli.cli.--include-hidden",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --include-hidden matches cli.cli.--include-hidden at files_to_prompt/cli.py:115. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --include-hidden"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_721dc4935ff7e5d37103046943de6a40e125f05b59722b85aa7bdb6ab564e221",
+        "kind": "cli_flag",
+        "raw_text": "--ignore-gitignore",
+        "value": "--ignore-gitignore",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 47,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 47,
+            "column": 1,
+            "raw_text": "--ignore-gitignore",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "66967bdb2d5e5fff2b2c1ab7e8bbd288bdff53426398a0377c27f79493f9b9b0"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_496b969fee45dfcb26a98b51e91be447b696c1c1ff0e635e6bc636de90cb62c0",
+        "kind": "cli_flag",
+        "name": "--ignore-gitignore",
+        "qualified_name": "cli.cli.--ignore-gitignore",
+        "aliases": [],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 120,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 120,
+          "text": "cli.cli.--ignore-gitignore",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --ignore-gitignore matches cli.cli.--ignore-gitignore at files_to_prompt/cli.py:120. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore-gitignore"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_50d98e82531893456380f1f0498ab7d61a221f76df31c2894bc608780b421c27",
+        "kind": "cli_flag",
+        "raw_text": "--ignore",
+        "value": "--ignore",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 52,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 52,
+            "column": 1,
+            "raw_text": "--ignore",
+            "extraction": "code_block"
+          },
+          {
+            "line": 52,
+            "column": 1,
+            "raw_text": "--ignore",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "71dbdd7ab9cad27d357e5fc153303555f1a5b17ffc6183e570c47934ee167f92"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_7ca416c207fae9703049e8a65092384e55900f4a95936c8cb5227c8228d763e1",
+        "kind": "cli_flag",
+        "name": "--ignore",
+        "qualified_name": "cli.cli.--ignore",
+        "aliases": [],
+        "default": "[]",
+        "file": "files_to_prompt/cli.py",
+        "line": 125,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 125,
+          "text": "cli.cli.--ignore",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --ignore matches cli.cli.--ignore at files_to_prompt/cli.py:125. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\""
+    },
+    {
+      "claim": {
+        "claim_id": "claim_4a9f08a6a8ed18f3d5cc0f01c0e9baa5dbf67d363eb16a23575a6efbefbadbc4",
+        "kind": "cli_flag",
+        "raw_text": "--cxml",
+        "value": "--cxml",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 58,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 58,
+            "column": 1,
+            "raw_text": "--cxml",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "bd32801333d330946919616405037e5bc14259c96f7a23d3914432e8240f8773"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_5aca670824cfc2b5436d9effdce55f1d4fb51740da6cd6682c20942a54df1b61",
+        "kind": "cli_flag",
+        "name": "--cxml",
+        "qualified_name": "cli.cli.--cxml",
+        "aliases": [
+          "-c"
+        ],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 139,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 139,
+          "text": "cli.cli.--cxml",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag --cxml matches cli.cli.--cxml at files_to_prompt/cli.py:139. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --cxml"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_2da37a05579ecade4fe4eecc47a0f02343772e55b09c8fb432fdb76334e832cb",
+        "kind": "cli_flag",
+        "raw_text": "-o",
+        "value": "-o",
+        "qualifier": "path/to/directory",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 64,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 64,
+            "column": 1,
+            "raw_text": "-o",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "30d4125e0b75d54202a3d134ae6a5aba6cce9d6d33c0114e086f71aa827b1ee6"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_a3e497fae8fcf358eb927b29621b9ade1df9cdaddb8190d580e865a8701af656",
+        "kind": "cli_flag",
+        "name": "--output",
+        "qualified_name": "cli.cli.--output",
+        "aliases": [
+          "-o"
+        ],
+        "default": null,
+        "file": "files_to_prompt/cli.py",
+        "line": 132,
+        "language": "python",
+        "framework": "click",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "files_to_prompt/cli.py",
+          "line": 132,
+          "text": "cli.cli.--output",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.5,
+      "reasons": [
+        "cli_flag -o matches cli.cli.--output at files_to_prompt/cli.py:132. The match is outside the requested command scope or is private."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -o output.txt"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_7079700927d64420ffd7107554ddb8d6362d50b7c2dbde0afc006e3fbfda0041",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+        "value": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 25,
+        "column": 1,
+        "section_id": "section_f0ae1d3216cab61b3f3c668b37de76d15fb38cc81424bbbdbfe4aab5068d8f67",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 25,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "b91df3f99ea0c9dc27709cf80b793a08fca3e61e38c7bc7131e599903362b9b3"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 25,
+          "text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "files-to-prompt path/to/file_or_directory [path/to/another/file_or_directory ...]"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_908880e6aa4aa54ec29582156812c044f435a1cf0f7d1a2848bb2141498e36bc",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+        "value": "files-to-prompt path/to/directory -e txt -e md",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 35,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 35,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory -e txt -e md",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "0fcc45fe5d7a0870f9f8af785f3fdf59bed6b2e6d0a8f06e3901be7cd155c5cb"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 35,
+          "text": "files-to-prompt path/to/directory -e txt -e md",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -e txt -e md"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_c3aec61cb7505d4d0e97dc3c7780b3ce86a46ae46a737c299a21bf9166442879",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory --include-hidden",
+        "value": "files-to-prompt path/to/directory --include-hidden",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 41,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 41,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --include-hidden",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "0efd64fee0755625d8af6c4a724df0ef4cd0f1dd8b2aeecfe1bdd5488451417f"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 41,
+          "text": "files-to-prompt path/to/directory --include-hidden",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --include-hidden"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_51912edfc6eb19f7adf901c9a4921beda478bbbd9c5b30d41f91df557cd948ce",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+        "value": "files-to-prompt path/to/directory --ignore-gitignore",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 47,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 47,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --ignore-gitignore",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "d0ac514b7a12d59802949111db7baa055d5a80c16675bb4d5f89ef4982c622f2"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 47,
+          "text": "files-to-prompt path/to/directory --ignore-gitignore",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore-gitignore"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_18837174b974482ac6d52b793bfe1a641237831583a2c2c9882188d3b1771767",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+        "value": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 52,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 52,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "1e73b9bdfa0e9c39f8e461916e659817df6ef75ffdb8ce1fd093c561f49c51a7"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 52,
+          "text": "files-to-prompt path/to/directory --ignore *.log --ignore temp*",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --ignore \"*.log\" --ignore \"temp*\""
+    },
+    {
+      "claim": {
+        "claim_id": "claim_12163a80a4eaae321f0d1d7c79da374ff67c93f3e30b8a50ded16b36664b7e6b",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory --cxml",
+        "value": "files-to-prompt path/to/directory --cxml",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 58,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 58,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory --cxml",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "ac06fd9b2814a371f3889fff37f78cf6ab2f22b5fe3efb747a4ed9b8fbee89d8"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 58,
+          "text": "files-to-prompt path/to/directory --cxml",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory --cxml"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_2fa2a0b9d6ac7a6ac3ba70a0012d3276775623920c3ce155fe5620e1996f9957",
+        "kind": "code_command",
+        "raw_text": "files-to-prompt path/to/directory -o output.txt",
+        "value": "files-to-prompt path/to/directory -o output.txt",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 64,
+        "column": 1,
+        "section_id": "section_57cf8f895e401e6879a4cca301ae3bcf09ef212e64c75bef4d5d5e74d63f05b3",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 64,
+            "column": 1,
+            "raw_text": "files-to-prompt path/to/directory -o output.txt",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "29c763dab5ab5d8acfefd81fb4ef7389d4997834c9be3994466b40a836a8f8ea"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 64,
+          "text": "files-to-prompt path/to/directory -o output.txt",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.15,
+      "reasons": [
+        "Command files-to-prompt is not identified as a project command; third-party commands are skipped."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "files-to-prompt",
+      "doc_text": "  files-to-prompt path/to/directory -o output.txt"
+    }
+  ],
+  "timings": {
+    "docs": 1.6050527999759652,
+    "index": 0.2835131000028923,
+    "match": 0.464462400006596,
+    "history": 18.274575599993113
+  },
+  "warnings": [
+    "Git history lookup failed or timed out; no introducing commit was attached.",
+    "Public demo history uses a 365-day window or a 2000-commit fallback for inactive projects; lookups are capped and blobs download on demand.",
+    "Historical snapshot, intentionally pinned before the upstream fix: README.md:55 says c/--cxml; files_to_prompt/cli.py declares -c/--cxml. Fixed upstream by f7cf729babc92604b9cd06c3d9cad32daff0f276. Other findings may reflect scanner limitations, not real defects."
+  ],
+  "suppressed": [],
+  "historical_ignored": 0,
+  "llm_usage": {},
+  "packages": [
+    {
+      "name": "files-to-prompt",
+      "root": ".",
+      "language": "python",
+      "commands": []
+    }
+  ],
+  "docs_repo_path": null,
+  "remote_url": "https://github.com/simonw/files-to-prompt",
+  "baselined": 0,
+  "package_version": "0.1.0"
+}

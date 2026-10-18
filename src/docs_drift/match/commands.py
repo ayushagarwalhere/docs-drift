@@ -10,6 +10,7 @@ from pathlib import Path
 
 from docs_drift.index.base import CodeIndex
 from docs_drift.models import Claim, Evidence, Finding, SymbolKind, Verdict
+from docs_drift.safe_files import metadata_text
 
 MIN_WRAPPER_TOKENS = 3
 MIN_SUBCOMMAND_TOKENS = 3
@@ -19,8 +20,7 @@ def _project_bins(repo: Path) -> set[str]:
     names: set[str] = set()
     pyproject = repo / "pyproject.toml"
     try:
-        with pyproject.open("rb") as stream:
-            data = tomllib.load(stream)
+        data = tomllib.loads(metadata_text(pyproject))
         scripts = data.get("project", {}).get("scripts", {})
         if isinstance(scripts, dict):
             names.update(str(name) for name in scripts)
@@ -28,7 +28,7 @@ def _project_bins(repo: Path) -> set[str]:
         pass
     package = repo / "package.json"
     try:
-        data = json.loads(package.read_text(encoding="utf-8", errors="replace"))
+        data = json.loads(metadata_text(package))
         bin_value = data.get("bin", {})
         if isinstance(bin_value, str) and isinstance(data.get("name"), str):
             names.add(data["name"])
@@ -41,7 +41,7 @@ def _project_bins(repo: Path) -> set[str]:
         pass
     setup_cfg = ConfigParser()
     try:
-        setup_cfg.read(repo / "setup.cfg", encoding="utf-8")
+        setup_cfg.read_string(metadata_text(repo / "setup.cfg"))
         if setup_cfg.has_option("options.entry_points", "console_scripts"):
             names.update(
                 line.split("=", 1)[0].strip()

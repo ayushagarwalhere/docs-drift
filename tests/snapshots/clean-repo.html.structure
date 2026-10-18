@@ -1,0 +1,7 @@
+<header>
+<main>
+<nav class="tabs" aria-label="Report views">
+<section id="findings-view" class="workspace">
+<aside class="graphbox">
+<section id="insights-view" class="insights" hidden>
+<footer>

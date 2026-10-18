@@ -33,5 +33,5 @@ hooks:
 check: setup lint format-check typecheck test guard hooks
 
 demo:
-    # TODO: Wire a fixture repository here once scanning is implemented.
-    uv run docs-drift --help
+    # Build the fixture repositories first (see README).
+    uv run docs-drift scan --repo tests/fixtures/repos/py-cli --no-color

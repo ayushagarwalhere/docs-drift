@@ -1,0 +1,16 @@
+**/.git
+.venv
+.uv-cache
+.npm-cache
+.docs-drift
+.pytest*
+.mypy_cache
+.ruff_cache
+**/__pycache__
+**/node_modules
+**/.env*
+tests
+examples
+editors
+dist
+build

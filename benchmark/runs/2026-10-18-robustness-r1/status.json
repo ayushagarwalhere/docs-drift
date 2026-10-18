@@ -1,0 +1,216 @@
+{
+  "rohitg00/ai-engineering-from-scratch": {
+    "status": "acquisition_failed",
+    "failure": "JobError: The repository or ref could not be fetched; it may be private, missing or redirected."
+  },
+  "d2l-ai/d2l-zh": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\d2l-ai--d2l-zh\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\d2l-ai--d2l-zh.json",
+      "--no-history"
+    ]
+  },
+  "scikit-learn/scikit-learn": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\scikit-learn--scikit-learn\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\scikit-learn--scikit-learn.json",
+      "--no-history"
+    ]
+  },
+  "EbookFoundation/free-programming-books": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\EbookFoundation--free-programming-books\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\EbookFoundation--free-programming-books.json",
+      "--no-history"
+    ]
+  },
+  "opendatalab/MinerU": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\opendatalab--MinerU\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\opendatalab--MinerU.json",
+      "--no-history"
+    ]
+  },
+  "abi/screenshot-to-code": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\abi--screenshot-to-code\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\abi--screenshot-to-code.json",
+      "--no-history"
+    ]
+  },
+  "django/django": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\django--django\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\django--django.json",
+      "--no-history"
+    ]
+  },
+  "mvanhorn/last30days-skill": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\mvanhorn--last30days-skill\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\mvanhorn--last30days-skill.json",
+      "--no-history"
+    ]
+  },
+  "impress/impress.js": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\impress--impress.js\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\impress--impress.js.json",
+      "--no-history"
+    ]
+  },
+  "gorhill/uBlock": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\gorhill--uBlock\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\gorhill--uBlock.json",
+      "--no-history"
+    ]
+  },
+  "google/zx": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\google--zx\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\google--zx.json",
+      "--no-history"
+    ]
+  },
+  "DavidHDev/react-bits": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\DavidHDev--react-bits\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\DavidHDev--react-bits.json",
+      "--no-history"
+    ]
+  },
+  "affaan-m/ECC": {
+    "status": "timeout",
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\affaan-m--ECC\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\affaan-m--ECC.json",
+      "--no-history"
+    ]
+  },
+  "byoungd/up": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\byoungd--up\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\byoungd--up.json",
+      "--no-history"
+    ]
+  },
+  "trekhleb/javascript-algorithms": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\trekhleb--javascript-algorithms\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\trekhleb--javascript-algorithms.json",
+      "--no-history"
+    ]
+  },
+  "vercel/next.js": {
+    "status": "acquisition_failed",
+    "failure": "JobError: The repository or ref could not be fetched; it may be private, missing or redirected."
+  },
+  "KeygraphHQ/shannon": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\KeygraphHQ--shannon\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\KeygraphHQ--shannon.json",
+      "--no-history"
+    ]
+  },
+  "cypress-io/cypress": {
+    "status": "timeout",
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\cypress-io--cypress\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r1\\cypress-io--cypress.json",
+      "--no-history"
+    ]
+  }
+}

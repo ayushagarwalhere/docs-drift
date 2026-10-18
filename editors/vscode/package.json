@@ -1,0 +1,13 @@
+{
+  "name": "docs-drift", "displayName": "Documentation Drift", "version": "0.1.0",
+  "description": "Documentation drift diagnostics backed by the local docs-drift language server.",
+  "publisher": "ayushagarwalhere",
+  "license": "MIT",
+  "repository": {"type": "git", "url": "https://github.com/ayushagarwalhere/docs-drift.git", "directory": "editors/vscode"},
+  "engines": {"vscode": "^1.85.0"}, "main": "./extension.js",
+  "activationEvents": ["onLanguage:markdown", "onLanguage:mdx", "onLanguage:restructuredtext"],
+  "dependencies": {"vscode-languageclient": "^9.0.1"},
+  "contributes": {"configuration": {"title": "Docs Drift", "properties": {
+    "docsDrift.executable": {"type": "string", "default": "docs-drift", "description": "Path to the docs-drift executable with the lsp extra installed."}
+  }}}
+}

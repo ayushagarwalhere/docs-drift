@@ -131,7 +131,7 @@ The heading trail includes the current heading, e.g. `['Usage', 'Server options'
 migration, deprecated, legacy, and past-version sections and suppresses their
 claims before matching. Models do not classify headings or decide verdicts.
 
-`ids.py` provides pure `make_section_id`, `make_claim_id`, and `make_symbol_id`
+`src/docs_drift/ids.py` provides pure `make_section_id`, `make_claim_id`, and `make_symbol_id`
 helpers. IDs are required model inputs, not random values or hidden defaults.
 The pipeline already owns heading context, so `Claim` needs no extra heading-path
 or occurrence fields. Helpers hash compact UTF-8 JSON arrays with SHA-256, a
@@ -294,7 +294,7 @@ validated only when the executable or target is tied to the project by
 manifest metadata or static declarations. Third-party commands are skipped.
 
 Finding confidence is a fixed rules policy documented in
-[`CONFIDENCE.md`](CONFIDENCE.md). It is kept distinct from extraction
+[`confidence.md`](confidence.md). It is kept distinct from extraction
 confidence. The CI baseline stores stable claim IDs, reports only new drift
 when explicitly selected, and is refreshed by `docs-drift baseline update`;
 updating it prunes resolved findings.
@@ -309,7 +309,7 @@ keyword anchors to at most six snippets of at most 60 lines. Secret/path filteri
 happens before request construction. There is no persistent graph database dependency
 for this local link traversal.
 
-The default model ID and price table are centralized in `llm/pricing.py`.
+The default model ID and price table are centralized in `src/docs_drift/llm/pricing.py`.
 `llm.client` routes through OpenRouter using the optional HTTPX extra and
 `OPENROUTER_API_KEY`. Strict JSON Schema output and local Pydantic validation are
 both required. Frozen verifier and rewrite instructions are versioned resources;

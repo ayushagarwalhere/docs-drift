@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from docs_drift.index import register
+from docs_drift.index.python_source import read_python
 from docs_drift.index.python_symbols import _literal, _module_name, _symbol
 from docs_drift.index.routes_common import normalize_route
 from docs_drift.models import Symbol, SymbolKind
@@ -22,8 +23,7 @@ class PythonRouteIndexer:
         result = []
         for path in files:
             try:
-                source = path.read_text(encoding="utf-8", errors="replace")
-                tree = ast.parse(source, filename=str(path))
+                source, tree = read_python(path)
             except (OSError, SyntaxError, ValueError):
                 continue
             module = _module_name(repo, path)

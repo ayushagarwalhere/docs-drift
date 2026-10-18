@@ -5,12 +5,16 @@ import json
 from collections.abc import Sequence
 from pathlib import PurePath, PurePosixPath, PureWindowsPath
 
+from docs_drift.limits import CONTROL_START, DELETE_CHARACTER, MAX_PATH_CHARS
+
 
 def normalize_repo_path(value: object) -> str:
     """Normalize separators without touching disk or guessing a repository root."""
     if not isinstance(value, (str, PurePath)):
         raise ValueError("Use a repository-relative path as text or a pathlib path.")
     text = str(value).replace("\\", "/")
+    if len(text) > MAX_PATH_CHARS or any(ord(c) < CONTROL_START or ord(c) == DELETE_CHARACTER for c in text):
+        raise ValueError(f"Use a repository path under {MAX_PATH_CHARS} characters without control characters.")
     path = PurePosixPath(text)
     if not text or path.is_absolute() or PureWindowsPath(text).drive or ".." in path.parts or str(path) == ".":
         raise ValueError("Use a nonempty repository-relative path without a drive or '..'.")

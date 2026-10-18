@@ -12,14 +12,14 @@ We use a justfile rather than duplicating recipes in a Makefile. `just` is a dev
 dependency (`rust-just` on PyPI), and recipes use native PowerShell on Windows.
 `setup` installs the pre-commit hook. Other recipes are `test`, `lint`, `fmt`,
 `typecheck`, and `demo`. `check` verifies formatting without rewriting files;
-run `fmt` explicitly to fix it. `demo` currently displays CLI help and will use
-a fixture repository when scanning exists.
+run `fmt` explicitly to fix it. `demo` displays CLI help. Use the fixture commands
+below to inspect a scan.
 
 Without just, run `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`,
 `uv run pytest --cov=docs_drift --cov=scripts --cov-report=term-missing`, and
 `uv run pre-commit run --all-files`. CI tests Ubuntu and Windows on Python 3.11
 and 3.13, with full Git history and all extras installed. Coverage must remain
-at least 80%; report a failure instead of lowering the threshold.
+at least 85% overall and 90% for extraction and matching; report a failure instead of lowering the thresholds.
 
 The guard reads staged Git blobs, so cleaning a working file does not hide a
 staged secret. It blocks files over 1,000,000 bytes, `.env` and `.env.*` files
@@ -40,7 +40,7 @@ to improve a score. The optional LLM cannot override a code-based verdict.
 
 Fixture tests build fresh Git repositories in temporary directories. For manual
 inspection use `uv run python tests/fixtures/build_fixtures.py`; the default output
-under `tests/fixtures/repos/` is ignored. Never run the generated programs or
+under the generated `tests/fixtures/repos/` directory is ignored. Never run the generated programs or
 commit their `.git` folders. `uv run python scripts/measure.py` validates the
 hand-written key; read `tests/fixtures/ANSWER_KEY.md` before changing any fixture.
 

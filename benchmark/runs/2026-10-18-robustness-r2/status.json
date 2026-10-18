@@ -1,0 +1,449 @@
+{
+  "rohitg00/ai-engineering-from-scratch": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\rohitg00--ai-engineering-from-scratch\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\rohitg00--ai-engineering-from-scratch.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "d2l-ai/d2l-zh": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\d2l-ai--d2l-zh\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\d2l-ai--d2l-zh.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "scikit-learn/scikit-learn": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\scikit-learn--scikit-learn\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\scikit-learn--scikit-learn.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "EbookFoundation/free-programming-books": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\EbookFoundation--free-programming-books\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\EbookFoundation--free-programming-books.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "opendatalab/MinerU": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\opendatalab--MinerU\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\opendatalab--MinerU.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "abi/screenshot-to-code": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\abi--screenshot-to-code\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\abi--screenshot-to-code.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "django/django": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\django--django\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\django--django.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "mvanhorn/last30days-skill": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\mvanhorn--last30days-skill\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\mvanhorn--last30days-skill.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "impress/impress.js": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\impress--impress.js\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\impress--impress.js.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "gorhill/uBlock": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\gorhill--uBlock\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\gorhill--uBlock.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "google/zx": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\google--zx\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\google--zx.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "DavidHDev/react-bits": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\DavidHDev--react-bits\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\DavidHDev--react-bits.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "affaan-m/ECC": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\affaan-m--ECC\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\affaan-m--ECC.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "byoungd/up": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\byoungd--up\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\byoungd--up.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "trekhleb/javascript-algorithms": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\trekhleb--javascript-algorithms\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\trekhleb--javascript-algorithms.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "vercel/next.js": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\vercel--next.js\\repository",
+      "--no-history",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\vercel--next.js.json"
+    ],
+    "timeout_seconds": 1800,
+    "attempt_seconds": 1482.3833151000435,
+    "previous_attempt": {
+      "status": "timeout",
+      "command": [
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+        "-m",
+        "benchmark.probe",
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\vercel--next.js\\repository",
+        "--out",
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\vercel--next.js.json",
+        "--no-history"
+      ],
+      "timeout_seconds": 600
+    }
+  },
+  "KeygraphHQ/shannon": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\KeygraphHQ--shannon\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\KeygraphHQ--shannon.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "cypress-io/cypress": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\cypress-io--cypress\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\cypress-io--cypress.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "CherryHQ/cherry-studio": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\CherryHQ--cherry-studio\\repository",
+      "--no-history",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\CherryHQ--cherry-studio.json"
+    ],
+    "timeout_seconds": 1800,
+    "attempt_seconds": 393.2841630000039,
+    "previous_attempt": {
+      "status": "timeout",
+      "command": [
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+        "-m",
+        "benchmark.probe",
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\CherryHQ--cherry-studio\\repository",
+        "--out",
+        "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\CherryHQ--cherry-studio.json",
+        "--no-history"
+      ],
+      "timeout_seconds": 600
+    }
+  },
+  "tldraw/tldraw": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\tldraw--tldraw\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\tldraw--tldraw.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "n8n-io/n8n": {
+    "status": "timeout",
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\n8n-io--n8n\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\n8n-io--n8n.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "shadcn-ui/ui": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\shadcn-ui--ui\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\shadcn-ui--ui.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "socketio/socket.io": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\socketio--socket.io\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\socketio--socket.io.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "go-gorm/gorm": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\go-gorm--gorm\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\go-gorm--gorm.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "junegunn/fzf": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\junegunn--fzf\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\junegunn--fzf.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "netdata/netdata": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\netdata--netdata\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\netdata--netdata.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "milvus-io/milvus": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\milvus-io--milvus\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\milvus-io--milvus.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "netbirdio/netbird": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\netbirdio--netbird\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\netbirdio--netbird.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "iawia002/lux": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\iawia002--lux\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\iawia002--lux.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  },
+  "mudler/LocalAI": {
+    "status": "done",
+    "exit_code": 0,
+    "command": [
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.venv\\Scripts\\python.exe",
+      "-m",
+      "benchmark.probe",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\mudler--LocalAI\\repository",
+      "--out",
+      "C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\benchmark\\runs\\2026-10-18-robustness-r2\\mudler--LocalAI.json",
+      "--no-history"
+    ],
+    "timeout_seconds": 600
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "page": "landing",
+    "url": "http://127.0.0.1:8000/",
+    "lighthouse_version": "13.5.0",
+    "fetch_time": "2026-10-18T12:34:30.526Z",
+    "accessibility": 100,
+    "failed_audits": []
+  },
+  {
+    "page": "result",
+    "url": "http://127.0.0.1:8000/scan/example-py-cli",
+    "lighthouse_version": "13.5.0",
+    "fetch_time": "2026-10-18T12:34:57.950Z",
+    "accessibility": 100,
+    "failed_audits": []
+  }
+]

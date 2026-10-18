@@ -162,11 +162,15 @@ def _command_edit(repo: Path, finding: Finding, line: str) -> tuple[TextEdit | N
     return edit, note
 
 
-def plan_rule_fixes(result: ScanResult) -> FixPlan:  # noqa: PLR0912 - explicit independent edit safety gates.
+def plan_rule_fixes(result: ScanResult, *, contents: dict[str, str] | None = None) -> FixPlan:  # noqa: PLR0912
     plan = FixPlan(hashes={doc.path: doc.content_hash for doc in result.docs})
     texts: dict[str, list[str]] = {}
     for doc in result.docs:
-        raw = safe_path(result.repo_path, doc.path).read_bytes()
+        raw = (
+            contents[doc.path].encode("utf-8")
+            if contents and doc.path in contents
+            else safe_path(result.docs_repo_path or result.repo_path, doc.path).read_bytes()
+        )
         if hashlib.sha256(raw).hexdigest() != doc.content_hash:
             raise StaleDocumentError(f"{doc.path} changed since scan; scan again.")
         try:

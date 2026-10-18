@@ -1,0 +1,6 @@
+# Check all product documentation, including the working tree snapshot used by scripts/dogfood.py.
+docs = ["README.md", "CONTRIBUTING.md", "docs/**/*.md", "editors/**/README.md", "examples/**/*.md"]
+exclude = [".git/**", ".docs-drift/**", ".venv/**", "node_modules/**", "tests/fixtures/**", "docs/schema/**"]
+min_confidence = 0.6
+[history]
+max_commits = 2000

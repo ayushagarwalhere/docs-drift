@@ -1,0 +1,1267 @@
+{
+  "schema_version": 1,
+  "repo_path": "py-cli-demo",
+  "head_sha": "3fb52f15482ad07d8de83c72fc4ad3ab46dd9548",
+  "scan_time": "2026-10-18T12:17:37.317525Z",
+  "config_used": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "content_hash": "3316a5c3dcde86fdc71f0de1ba2e77454354ed7d4dcf639aa47cedc2162feab9",
+      "format": "markdown"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "doc_path": "README.md",
+      "heading": "py-cli",
+      "heading_level": 1,
+      "heading_path": [
+        "py-cli"
+      ],
+      "start_line": 1,
+      "end_line": 10,
+      "context": "current",
+      "historical_spans": []
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim_72525e8a5ba9710e2e22c07f82e841e2dbaab5da7d34a56bfbca975a227ccb0b",
+      "kind": "cli_command",
+      "raw_text": "serve",
+      "value": "serve",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 3,
+      "column": 15,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.8,
+      "locations": [
+        {
+          "line": 3,
+          "column": 15,
+          "raw_text": "serve",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "72d5bb9585619439996e42559956d3b8cb709725b7ac660c7811cce895178f24"
+    },
+    {
+      "claim_id": "claim_8ed4cec49e3a4c86e8ad548b85452e088ae736718c1e6952b86b5a914bbf0447",
+      "kind": "cli_flag",
+      "raw_text": "--port",
+      "value": "--port",
+      "qualifier": "serve",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 4,
+      "column": 19,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 4,
+          "column": 19,
+          "raw_text": "--port",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "1ecb12b79ea589080cede10fd90598dfd2f239bc7de2d50744a59ebbffc78d22"
+    },
+    {
+      "claim_id": "claim_dd0782dde6f1cdb48fa2d33ca485be5a45b91f1987cc791d2e01004f16a3d6ca",
+      "kind": "cli_flag",
+      "raw_text": "--host",
+      "value": "--host",
+      "qualifier": "serve",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 5,
+      "column": 19,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 5,
+          "column": 19,
+          "raw_text": "--host",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "f972fd1df1dc0bd8842019fdfdfc35e508a675057ab5c90d78e5e33abbb6693c"
+    },
+    {
+      "claim_id": "claim_47eeff5744595c6eb689bd4c442fb20a2af0035286a725a35fae61ebbb3ccd2b",
+      "kind": "cli_flag",
+      "raw_text": "--workers",
+      "value": "--workers",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 6,
+      "column": 7,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 6,
+          "column": 7,
+          "raw_text": "--workers",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "acbb8e0fa89f433763cfe879d96c3c9f72c7d28e560541fb6091a0889bcb1a0a"
+    },
+    {
+      "claim_id": "claim_5f2199daeec9e79f6ef17af18d53109eb79f967fe9b7512433afe6780161c526",
+      "kind": "env_var",
+      "raw_text": "APP_DEBUG",
+      "value": "APP_DEBUG",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 7,
+      "column": 7,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.95,
+      "locations": [
+        {
+          "line": 7,
+          "column": 7,
+          "raw_text": "APP_DEBUG",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "66917398ee27c17d8e6751f3dfc8f2f7e4ea49852209a256d162b57a66ca18ab"
+    },
+    {
+      "claim_id": "claim_3e4a78859ff7e5aa9a087b4ac2fbe545e5615d96016374321ac2175a11e957f6",
+      "kind": "cli_command",
+      "raw_text": "migrate",
+      "value": "migrate",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 8,
+      "column": 11,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.8,
+      "locations": [
+        {
+          "line": 8,
+          "column": 11,
+          "raw_text": "migrate",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "834074339b2d46fabf87e7e5a64da1f21e5d8c0b79cb3393137dc84918641788"
+    },
+    {
+      "claim_id": "claim_9191832fb5fd440e0c6473790ccc5f658b6bb32163005e9cf84d6925199cbbec",
+      "kind": "make_target",
+      "raw_text": "make test",
+      "value": "test",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 10,
+      "column": 5,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 10,
+          "column": 5,
+          "raw_text": "make test",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "764f3bd8b9b1519486c80dd313e5b49b91463ab1995554e7b6ce73922e207a06"
+    },
+    {
+      "claim_id": "claim_7aee9594e82a9f081ea1474997448ab4196be0a27cc6f2cc54a73a918d46a488",
+      "kind": "default_value",
+      "raw_text": "(default 8000)",
+      "value": "--port",
+      "qualifier": "cli_flag",
+      "expected_default": "8000",
+      "doc_path": "README.md",
+      "line": 4,
+      "column": 28,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "prose_pattern",
+      "extraction_confidence": 0.55,
+      "locations": [
+        {
+          "line": 4,
+          "column": 28,
+          "raw_text": "(default 8000)",
+          "extraction": "prose_pattern"
+        }
+      ],
+      "extraction_sources": [
+        "prose_pattern"
+      ],
+      "group_key": "8b9c5d8e378ba4247c4a102849cfb73bf437fc3535536467236fc7838309e5c4"
+    },
+    {
+      "claim_id": "claim_6e52d632a8898cceaf094d0ece49c88ce5657fc2cb03e4b190aff2cc3146b3f3",
+      "kind": "default_value",
+      "raw_text": "(default 127.0.0.1)",
+      "value": "--host",
+      "qualifier": "cli_flag",
+      "expected_default": "127.0.0.1",
+      "doc_path": "README.md",
+      "line": 5,
+      "column": 28,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "prose_pattern",
+      "extraction_confidence": 0.55,
+      "locations": [
+        {
+          "line": 5,
+          "column": 28,
+          "raw_text": "(default 127.0.0.1)",
+          "extraction": "prose_pattern"
+        }
+      ],
+      "extraction_sources": [
+        "prose_pattern"
+      ],
+      "group_key": "c8ea7e0762aab84248045ebdd5c25d9deb962d6017d894fd80759b44ff131dd6"
+    },
+    {
+      "claim_id": "claim_0ddc043944f8c1b30f1c40e0aa64cdc5d8f10259074ba7769279304b72a52160",
+      "kind": "default_value",
+      "raw_text": "default is `4`",
+      "value": "--workers",
+      "qualifier": "cli_flag",
+      "expected_default": "4",
+      "doc_path": "README.md",
+      "line": 6,
+      "column": 19,
+      "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+      "extraction": "prose_pattern",
+      "extraction_confidence": 0.55,
+      "locations": [
+        {
+          "line": 6,
+          "column": 19,
+          "raw_text": "default is `4`",
+          "extraction": "prose_pattern"
+        }
+      ],
+      "extraction_sources": [
+        "prose_pattern"
+      ],
+      "group_key": "79ddd206ba56690096f61d53bdd1a47f71d3226d545739edea8581f7ba997773"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol_id": "symbol_3d0b5b3ba9044ac3fbff1e1459399e15635ce176e92517afb2b243dc55d4a463",
+      "kind": "make_target",
+      "name": "test",
+      "qualified_name": "test",
+      "aliases": [],
+      "default": null,
+      "file": "Makefile",
+      "line": 1,
+      "language": "make",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_f46984ed055ff7b810b6bd47684db9f280e5c3b3d4c7ae72814c81b144493a60",
+      "kind": "function",
+      "name": "main",
+      "qualified_name": "cli.main",
+      "aliases": [],
+      "default": null,
+      "file": "cli.py",
+      "line": 4,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_27a6dcff770a5fe755888fc3f70445d6ede2a44a0bcc0c5f6bd68d8a03b561b4",
+      "kind": "cli_command",
+      "name": "serve",
+      "qualified_name": "cli.serve",
+      "aliases": [],
+      "default": null,
+      "file": "cli.py",
+      "line": 7,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_b1aff1c29930fa208e11ddcc45d6650ad414d3d157b3528b8b0f696973d46765",
+      "kind": "cli_flag",
+      "name": "--listen",
+      "qualified_name": "cli.serve.--listen",
+      "aliases": [],
+      "default": "8000",
+      "file": "cli.py",
+      "line": 8,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_20488fa73d5cffe8005a388c57bc41a467fdeb50a55a9c1e347da8fddae98d2f",
+      "kind": "cli_flag",
+      "name": "--host",
+      "qualified_name": "cli.serve.--host",
+      "aliases": [],
+      "default": "127.0.0.1",
+      "file": "cli.py",
+      "line": 9,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+      "kind": "cli_flag",
+      "name": "--workers",
+      "qualified_name": "cli.serve.--workers",
+      "aliases": [],
+      "default": "8",
+      "file": "cli.py",
+      "line": 10,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_34705d4897c16f937d1a0193e24a8ed69a18933b6663d0be5ebec8e2f71e27bd",
+      "kind": "cli_command",
+      "name": "db-upgrade",
+      "qualified_name": "cli.db-upgrade",
+      "aliases": [],
+      "default": null,
+      "file": "cli.py",
+      "line": 11,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_72c12062f3b6a0340f97b890f08d459d6487e6e4a295e6a0ab790bcc2c21f256",
+      "kind": "env_var",
+      "name": "APP_LOG_LEVEL",
+      "qualified_name": "cli.APP_LOG_LEVEL",
+      "aliases": [],
+      "default": "INFO",
+      "file": "cli.py",
+      "line": 12,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    }
+  ],
+  "findings": [
+    {
+      "claim": {
+        "claim_id": "claim_72525e8a5ba9710e2e22c07f82e841e2dbaab5da7d34a56bfbca975a227ccb0b",
+        "kind": "cli_command",
+        "raw_text": "serve",
+        "value": "serve",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 3,
+        "column": 15,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.8,
+        "locations": [
+          {
+            "line": 3,
+            "column": 15,
+            "raw_text": "serve",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "72d5bb9585619439996e42559956d3b8cb709725b7ac660c7811cce895178f24"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_27a6dcff770a5fe755888fc3f70445d6ede2a44a0bcc0c5f6bd68d8a03b561b4",
+        "kind": "cli_command",
+        "name": "serve",
+        "qualified_name": "cli.serve",
+        "aliases": [],
+        "default": null,
+        "file": "cli.py",
+        "line": 7,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "cli.py",
+          "line": 7,
+          "text": "cli.serve",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_command serve matches cli.serve at cli.py:7."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "The CLI has a `serve` subcommand."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_8ed4cec49e3a4c86e8ad548b85452e088ae736718c1e6952b86b5a914bbf0447",
+        "kind": "cli_flag",
+        "raw_text": "--port",
+        "value": "--port",
+        "qualifier": "serve",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 4,
+        "column": 19,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 4,
+            "column": 19,
+            "raw_text": "--port",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "1ecb12b79ea589080cede10fd90598dfd2f239bc7de2d50744a59ebbffc78d22"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_b1aff1c29930fa208e11ddcc45d6650ad414d3d157b3528b8b0f696973d46765",
+        "kind": "cli_flag",
+        "name": "--listen",
+        "qualified_name": "cli.serve.--listen",
+        "aliases": [],
+        "default": "8000",
+        "file": "cli.py",
+        "line": 8,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "--listen",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 4,
+          "text": "--port",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 1,
+          "text": "-    serve.add_argument(\"--port\", type=int, default=8000)\n+    serve.add_argument(\"--listen\", type=int, default=8000)",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "450a93d2afb517459abbb7ca15b4a87692553a21",
+        "short_sha": "450a93d",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-02T09:00:00Z",
+        "summary": "Rename port to listen"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed cli_flag named --port was found. Closest indexed candidates: --host (cli.py:9), --workers (cli.py:10), --listen (cli.py:8).",
+        "Git history confirms this name changed to --listen.",
+        "Git history changed this name in 450a93d."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- `serve` accepts `--port` (default 8000)."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_dd0782dde6f1cdb48fa2d33ca485be5a45b91f1987cc791d2e01004f16a3d6ca",
+        "kind": "cli_flag",
+        "raw_text": "--host",
+        "value": "--host",
+        "qualifier": "serve",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 5,
+        "column": 19,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 5,
+            "column": 19,
+            "raw_text": "--host",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "f972fd1df1dc0bd8842019fdfdfc35e508a675057ab5c90d78e5e33abbb6693c"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_20488fa73d5cffe8005a388c57bc41a467fdeb50a55a9c1e347da8fddae98d2f",
+        "kind": "cli_flag",
+        "name": "--host",
+        "qualified_name": "cli.serve.--host",
+        "aliases": [],
+        "default": "127.0.0.1",
+        "file": "cli.py",
+        "line": 9,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "cli.py",
+          "line": 9,
+          "text": "cli.serve.--host",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_flag --host matches cli.serve.--host at cli.py:9."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- `serve` accepts `--host` (default 127.0.0.1)."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_47eeff5744595c6eb689bd4c442fb20a2af0035286a725a35fae61ebbb3ccd2b",
+        "kind": "cli_flag",
+        "raw_text": "--workers",
+        "value": "--workers",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 6,
+        "column": 7,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 6,
+            "column": 7,
+            "raw_text": "--workers",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "acbb8e0fa89f433763cfe879d96c3c9f72c7d28e560541fb6091a0889bcb1a0a"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+        "kind": "cli_flag",
+        "name": "--workers",
+        "qualified_name": "cli.serve.--workers",
+        "aliases": [],
+        "default": "8",
+        "file": "cli.py",
+        "line": 10,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "cli.py",
+          "line": 10,
+          "text": "cli.serve.--workers",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_flag --workers matches cli.serve.--workers at cli.py:10."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- The `--workers` default is `4`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_5f2199daeec9e79f6ef17af18d53109eb79f967fe9b7512433afe6780161c526",
+        "kind": "env_var",
+        "raw_text": "APP_DEBUG",
+        "value": "APP_DEBUG",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 7,
+        "column": 7,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.95,
+        "locations": [
+          {
+            "line": 7,
+            "column": 7,
+            "raw_text": "APP_DEBUG",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "66917398ee27c17d8e6751f3dfc8f2f7e4ea49852209a256d162b57a66ca18ab"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_72c12062f3b6a0340f97b890f08d459d6487e6e4a295e6a0ab790bcc2c21f256",
+        "kind": "env_var",
+        "name": "APP_LOG_LEVEL",
+        "qualified_name": "cli.APP_LOG_LEVEL",
+        "aliases": [],
+        "default": "INFO",
+        "file": "cli.py",
+        "line": 12,
+        "language": "python",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "missing",
+      "suggestion": "APP_LOG_LEVEL",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 7,
+          "text": "APP_DEBUG",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 1,
+          "text": "-    debug = os.environ.get(\"APP_DEBUG\", \"0\")\n-    return parser.parse_args(), debug\n+    log_level = os.environ.get(\"APP_LOG_LEVEL\", \"INFO\")\n+    return parser.parse_args(), log_level",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "f686fb7b16409911edc904a10bd26afcf3682487",
+        "short_sha": "f686fb7",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-04T09:00:00Z",
+        "summary": "Replace debug environment variable with log level"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed env_var named APP_DEBUG was found. Closest indexed candidates: APP_LOG_LEVEL (cli.py:12).",
+        "Git history changed this name in f686fb7."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- Set `APP_DEBUG` to enable debug logging."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_3e4a78859ff7e5aa9a087b4ac2fbe545e5615d96016374321ac2175a11e957f6",
+        "kind": "cli_command",
+        "raw_text": "migrate",
+        "value": "migrate",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 8,
+        "column": 11,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.8,
+        "locations": [
+          {
+            "line": 8,
+            "column": 11,
+            "raw_text": "migrate",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "834074339b2d46fabf87e7e5a64da1f21e5d8c0b79cb3393137dc84918641788"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_34705d4897c16f937d1a0193e24a8ed69a18933b6663d0be5ebec8e2f71e27bd",
+        "kind": "cli_command",
+        "name": "db-upgrade",
+        "qualified_name": "cli.db-upgrade",
+        "aliases": [],
+        "default": null,
+        "file": "cli.py",
+        "line": 11,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "db-upgrade",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 8,
+          "text": "migrate",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 1,
+          "text": "-    commands.add_parser(\"migrate\")\n+    commands.add_parser(\"db-upgrade\")",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "3fb52f15482ad07d8de83c72fc4ad3ab46dd9548",
+        "short_sha": "3fb52f1",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-05T09:00:00Z",
+        "summary": "Rename the database upgrade subcommand"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed cli_command named migrate was found. Closest indexed candidates: db-upgrade (cli.py:11).",
+        "Git history confirms this name changed to db-upgrade.",
+        "Git history changed this name in 3fb52f1."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- Use the `migrate` subcommand to upgrade the database."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_9191832fb5fd440e0c6473790ccc5f658b6bb32163005e9cf84d6925199cbbec",
+        "kind": "make_target",
+        "raw_text": "make test",
+        "value": "test",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 10,
+        "column": 5,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 10,
+            "column": 5,
+            "raw_text": "make test",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "764f3bd8b9b1519486c80dd313e5b49b91463ab1995554e7b6ce73922e207a06"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_3d0b5b3ba9044ac3fbff1e1459399e15635ce176e92517afb2b243dc55d4a463",
+        "kind": "make_target",
+        "name": "test",
+        "qualified_name": "test",
+        "aliases": [],
+        "default": null,
+        "file": "Makefile",
+        "line": 1,
+        "language": "make",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "Makefile",
+          "line": 1,
+          "text": "test",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "make_target test matches test at Makefile:1."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "Run `make test` to check the project."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_7aee9594e82a9f081ea1474997448ab4196be0a27cc6f2cc54a73a918d46a488",
+        "kind": "default_value",
+        "raw_text": "(default 8000)",
+        "value": "--port",
+        "qualifier": "cli_flag",
+        "expected_default": "8000",
+        "doc_path": "README.md",
+        "line": 4,
+        "column": 28,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "prose_pattern",
+        "extraction_confidence": 0.55,
+        "locations": [
+          {
+            "line": 4,
+            "column": 28,
+            "raw_text": "(default 8000)",
+            "extraction": "prose_pattern"
+          }
+        ],
+        "extraction_sources": [
+          "prose_pattern"
+        ],
+        "group_key": "8b9c5d8e378ba4247c4a102849cfb73bf437fc3535536467236fc7838309e5c4"
+      },
+      "matched_symbol": null,
+      "verdict": "unverifiable",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 4,
+          "text": "(default 8000)",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "450a93d2afb517459abbb7ca15b4a87692553a21",
+        "short_sha": "450a93d",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-02T09:00:00Z",
+        "summary": "Rename port to listen"
+      },
+      "confidence": 0.3,
+      "reasons": [
+        "No authoritative indexed default was available for this subject."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- `serve` accepts `--port` (default 8000)."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_6e52d632a8898cceaf094d0ece49c88ce5657fc2cb03e4b190aff2cc3146b3f3",
+        "kind": "default_value",
+        "raw_text": "(default 127.0.0.1)",
+        "value": "--host",
+        "qualifier": "cli_flag",
+        "expected_default": "127.0.0.1",
+        "doc_path": "README.md",
+        "line": 5,
+        "column": 28,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "prose_pattern",
+        "extraction_confidence": 0.55,
+        "locations": [
+          {
+            "line": 5,
+            "column": 28,
+            "raw_text": "(default 127.0.0.1)",
+            "extraction": "prose_pattern"
+          }
+        ],
+        "extraction_sources": [
+          "prose_pattern"
+        ],
+        "group_key": "c8ea7e0762aab84248045ebdd5c25d9deb962d6017d894fd80759b44ff131dd6"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_20488fa73d5cffe8005a388c57bc41a467fdeb50a55a9c1e347da8fddae98d2f",
+        "kind": "cli_flag",
+        "name": "--host",
+        "qualified_name": "cli.serve.--host",
+        "aliases": [],
+        "default": "127.0.0.1",
+        "file": "cli.py",
+        "line": 9,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 5,
+          "text": "(default 127.0.0.1)",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 9,
+          "text": "cli.serve.--host default=127.0.0.1",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "Documented default '127.0.0.1' matches code."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- `serve` accepts `--host` (default 127.0.0.1)."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_0ddc043944f8c1b30f1c40e0aa64cdc5d8f10259074ba7769279304b72a52160",
+        "kind": "default_value",
+        "raw_text": "default is `4`",
+        "value": "--workers",
+        "qualifier": "cli_flag",
+        "expected_default": "4",
+        "doc_path": "README.md",
+        "line": 6,
+        "column": 19,
+        "section_id": "section_5fc49b2082ff4ad1d790c979601885b2ccef380f1a4298d374c8981abe363618",
+        "extraction": "prose_pattern",
+        "extraction_confidence": 0.55,
+        "locations": [
+          {
+            "line": 6,
+            "column": 19,
+            "raw_text": "default is `4`",
+            "extraction": "prose_pattern"
+          }
+        ],
+        "extraction_sources": [
+          "prose_pattern"
+        ],
+        "group_key": "79ddd206ba56690096f61d53bdd1a47f71d3226d545739edea8581f7ba997773"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+        "kind": "cli_flag",
+        "name": "--workers",
+        "qualified_name": "cli.serve.--workers",
+        "aliases": [],
+        "default": "8",
+        "file": "cli.py",
+        "line": 10,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "default_changed",
+      "suggestion": "8",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 6,
+          "text": "default is `4`",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 10,
+          "text": "cli.serve.--workers default=8",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 10,
+          "text": "-    serve.add_argument(\"--workers\", type=int, default=4)\n+    serve.add_argument(\"--workers\", type=int, default=8)",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "397bff7d54a7a3861ccf619af032c19c9a646d9d",
+        "short_sha": "397bff7",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-03T09:00:00Z",
+        "summary": "Increase the worker default"
+      },
+      "confidence": 0.95,
+      "reasons": [
+        "Documented default '4' differs from code default '8'."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "py-cli",
+      "doc_text": "- The `--workers` default is `4`."
+    }
+  ],
+  "timings": {
+    "docs": 0.25881719996687025,
+    "index": 0.1598179999855347,
+    "match": 0.06125590001465753,
+    "history": 0.40663330000825226
+  },
+  "warnings": [],
+  "suppressed": [],
+  "historical_ignored": 0,
+  "llm_usage": {},
+  "packages": [
+    {
+      "name": "py-cli",
+      "root": ".",
+      "language": "unknown",
+      "commands": []
+    }
+  ],
+  "docs_repo_path": null,
+  "remote_url": "https://github.com/docs-drift/py-cli-demo",
+  "baselined": 0,
+  "package_version": "0.1.0"
+}

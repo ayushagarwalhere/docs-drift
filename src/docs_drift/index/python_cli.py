@@ -6,6 +6,7 @@ from contextlib import suppress
 from pathlib import Path
 
 from docs_drift.index import register
+from docs_drift.index.python_source import read_python
 from docs_drift.index.python_symbols import _literal, _module_name, _symbol
 from docs_drift.models import Symbol, SymbolKind
 
@@ -34,8 +35,7 @@ class PythonCLIIndexer:
             if path.stat().st_size > MAX_SOURCE_BYTES:
                 continue
             try:
-                source = path.read_text(encoding="utf-8", errors="replace")
-                tree = ast.parse(source, filename=str(path))
+                source, tree = read_python(path)
             except (OSError, SyntaxError, ValueError):
                 continue
             result.extend(_argparse(repo, path, source, tree))
@@ -162,23 +162,78 @@ def _argparse(repo: Path, path: Path, source: str, tree: ast.Module) -> list[Sym
     return result
 
 
-def _decorator_cli(repo: Path, path: Path, source: str, tree: ast.Module) -> list[Symbol]:
+def _decorator_cli(  # noqa: PLR0912 - distinct static Click and Typer declaration forms.
+    repo: Path, path: Path, source: str, tree: ast.Module
+) -> list[Symbol]:
     module = _module_name(repo, path)
     result: list[Symbol] = []
+    typer_apps = {
+        target.id
+        for item in ast.walk(tree)
+        if isinstance(item, ast.Assign)
+        and isinstance(item.value, ast.Call)
+        and ast.unparse(item.value.func).endswith("Typer")
+        for target in item.targets
+        if isinstance(target, ast.Name)
+    }
+    for item in ast.walk(tree):
+        if (
+            isinstance(item, ast.Assign)
+            and isinstance(item.value, ast.Call)
+            and ast.unparse(item.value.func).endswith("Typer")
+        ):
+            completion = _keyword(item.value, "add_completion")
+            if completion is None or (isinstance(completion, ast.Constant) and completion.value is True):
+                for flag in ("--install-completion", "--show-completion"):
+                    result.append(
+                        _symbol(
+                            repo,
+                            path,
+                            SymbolKind.cli_flag,
+                            f"{module}.root.{flag}",
+                            item.lineno,
+                            name=flag,
+                            framework="typer",
+                            derived=True,
+                        )
+                    )
+        if isinstance(item, ast.Call) and isinstance(item.func, ast.Attribute) and item.func.attr == "add_typer":
+            name = _literal(_keyword(item, "name"), source)
+            if isinstance(item.func.value, ast.Name) and item.func.value.id in typer_apps and name:
+                result.append(
+                    _symbol(
+                        repo,
+                        path,
+                        SymbolKind.cli_command,
+                        f"{module}.{name}",
+                        item.lineno,
+                        name=name,
+                        framework="typer",
+                    )
+                )
     for node in ast.walk(tree):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
         command = None
         framework = None
+        callback = False
         for decorator in node.decorator_list:
             name = ast.unparse(decorator.func if isinstance(decorator, ast.Call) else decorator)
-            if name.startswith("click.") or name.endswith(".command") or name.endswith(".group"):
+            if name.split(".")[0] in typer_apps and name.endswith((".command", ".callback")):
+                framework = "typer"
+                callback = name.endswith(".callback")
+            elif name.startswith("click.") or name.endswith(".command") or name.endswith(".group"):
                 framework = "click"
             elif name.startswith("typer.") or name.endswith(".command"):
                 framework = "typer" if "typer" in name else framework
-            if framework and isinstance(decorator, ast.Call) and decorator.args:
+            if (
+                framework
+                and name.endswith((".command", ".group"))
+                and isinstance(decorator, ast.Call)
+                and decorator.args
+            ):
                 command = _literal(decorator.args[0], source)
-        if framework:
+        if framework and not callback:
             command_name = command or node.name.replace("_", "-")
             result.append(
                 _symbol(
@@ -191,11 +246,28 @@ def _decorator_cli(repo: Path, path: Path, source: str, tree: ast.Module) -> lis
                     framework=framework,
                 )
             )
+        if framework == "click":
+            result.extend(_click_options(repo, path, source, node, module, command or node.name))
         if framework != "typer":
             continue
-        for argument, default in zip(node.args.args[::-1], (node.args.defaults or [])[::-1], strict=False):
+        arguments = [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs]
+        positional_defaults = [None] * (len(node.args.posonlyargs) + len(node.args.args) - len(node.args.defaults))
+        defaults = [*positional_defaults, *node.args.defaults, *node.args.kw_defaults]
+        for argument, default in zip(arguments, defaults, strict=True):
             annotation = argument.annotation
             call = annotation if isinstance(annotation, ast.Call) else None
+            if isinstance(annotation, ast.Subscript) and ast.unparse(annotation.value).endswith("Annotated"):
+                metadata = annotation.slice.elts if isinstance(annotation.slice, ast.Tuple) else []
+                call = next(
+                    (
+                        item
+                        for item in metadata
+                        if isinstance(item, ast.Call) and ast.unparse(item.func).endswith(("Option", "Argument"))
+                    ),
+                    None,
+                )
+            if call is None and isinstance(default, ast.Call):
+                call = default
             if call is None or not ast.unparse(call.func).endswith(("Option", "Argument")):
                 continue
             names = [
@@ -208,12 +280,52 @@ def _decorator_cli(repo: Path, path: Path, source: str, tree: ast.Module) -> lis
                     repo,
                     path,
                     kind,
-                    f"{module}.{command or node.name}.{flag}".strip("."),
+                    f"{module}.{'root' if callback else command or node.name}.{flag}".strip("."),
                     node.lineno,
                     name=flag,
                     aliases=names[1:],
                     default=_literal(default, source),
                     framework="typer",
+                )
+            )
+    return result
+
+
+def _click_options(  # noqa: PLR0913, PLR0917 - static declaration context.
+    repo: Path, path: Path, source: str, node: ast.FunctionDef | ast.AsyncFunctionDef, module: str, command: str
+) -> list[Symbol]:
+    result = []
+    for decorator in node.decorator_list:
+        if not isinstance(decorator, ast.Call) or not _call_name(decorator).endswith(".option"):
+            continue
+        flags = [v for a in decorator.args if (v := _literal(a, source)) and v.startswith("-")]
+        if not flags:
+            continue
+        name = next((v for v in flags if v.startswith("--")), flags[0])
+        result.append(
+            _symbol(
+                repo,
+                path,
+                SymbolKind.cli_flag,
+                f"{module}.{command}.{name}",
+                decorator.lineno,
+                name=name,
+                aliases=[v for v in flags if v != name],
+                default=_literal(_keyword(decorator, "default"), source),
+                framework="click",
+            )
+        )
+        envvar = _literal(_keyword(decorator, "envvar"), source)
+        if envvar:
+            result.append(
+                _symbol(
+                    repo,
+                    path,
+                    SymbolKind.env_var,
+                    f"{module}.{envvar}",
+                    decorator.lineno,
+                    name=envvar,
+                    framework="click",
                 )
             )
     return result

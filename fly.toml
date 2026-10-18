@@ -1,0 +1,38 @@
+# Replace app and origin only after approving/creating the Fly app.
+app = "docs-drift-REPLACE-ME"
+primary_region = "sin"
+kill_signal = "SIGTERM"
+kill_timeout = "15s"
+
+[build]
+  dockerfile = "Dockerfile.web"
+
+[env]
+  PORT = "8080"
+  DOCS_DRIFT_DATA_DIR = "/data"
+  DOCS_DRIFT_ALLOWED_ORIGIN = "https://docs-drift-REPLACE-ME.fly.dev"
+  DOCS_DRIFT_MAX_CONCURRENT = "2"
+  DOCS_DRIFT_RATE_LIMIT = "5"
+  FORWARDED_ALLOW_IPS = "*"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "30s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "2gb"
+
+# Ephemeral /data is sufficient: examples ship in the image. For durable permalinks,
+# create an optional 1 GB volume after approval, then enable a /data mount.

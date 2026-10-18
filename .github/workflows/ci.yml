@@ -19,32 +19,36 @@ jobs:
       UV_ALL_EXTRAS: "true"
       UV_LOCKED: "true"
       DOCS_DRIFT_LLM_MODE: "replay"
+      DOCS_DRIFT_DIST: "dist"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           python-version: ${{ matrix.python }}
           enable-cache: true
       - run: uv sync --locked --all-extras
       - run: uv run ruff check
       - run: uv run ruff format --check
-      - run: uv run mypy src
-      - run: uv run pytest --cov=docs_drift --cov=scripts --cov-report=term-missing
+      - run: uv run mypy src scripts tests benchmark
+      - run: uv run deptry .
+      - run: uv run pip-audit --skip-editable
+      - run: uv build
+      - run: uv run pytest --cov=docs_drift --cov=scripts --cov-report=term-missing --cov-report=json:.docs-drift/coverage.json
+      - run: uv run python -m scripts.check_coverage
       - run: uv run pre-commit run --all-files
 
   dogfood:
     name: dogfood
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           python-version: "3.11"
           enable-cache: true
       - run: uv sync --locked --all-extras
-      # TODO: Replace with docs-drift check on this repository's README.
-      - run: uv run docs-drift --help
+      - run: uv run docs-drift check --repo . --quiet

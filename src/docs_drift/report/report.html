@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ result.repo_path.name }} · Documentation health</title>
+<style>{% include 'partials/report.css' %}</style></head><body>
+{% include 'partials/body.html' %}
+<script id="report-data" type="application/json">{{ payload|safe }}</script>
+{% if options.share_id %}<script src="/static/cytoscape.min.js"></script>{% elif cytoscape %}<script>{{ cytoscape|safe }}</script>{% endif %}
+<script>{% include 'partials/script.js' %}</script></body></html>

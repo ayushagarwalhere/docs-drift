@@ -1,4 +1,128 @@
-# Optional model assessment and fixes
+# Security review: public demo, scanner and CI
+
+Reviewed 18 October 2026. This is a focused source review with adversarial tests,
+not a penetration-test certification. No public host has been deployed yet.
+
+## Findings ranked by severity
+
+1. **High — source file boundary and parser exhaustion. Fixed.** The source walker
+   now excludes real `.env` files, external symlinks, invalid/control-character
+   paths, files over 1 MB and deeply nested configuration. Documentation parsing
+   bounds input/line length and Markdown nesting. The hosted worker checks all
+   checked-out files before indexing and has total/clone time, CPU, memory and
+   download limits. Safe `.env.example` templates remain available to the CLI;
+   the public checkout excludes all `.env*` paths. Source/JSON text is never run.
+   Long adversarial fuzz cases also exposed quadratic default-phrase matching
+   across repeated opening parentheses. The pattern now stops at nested
+   parentheses; the failing 6,000-character input is an explicit regression case.
+   Markdown also rejects lines with over 128 opening link/parenthesis delimiters
+   before invoking markdown-it, since dense malformed inline markup can exceed
+   the per-call CPU budget even within the general line-size limit.
+   Packaging metadata readers now apply the same bounded, non-symlink policy;
+   they previously read root manifests directly outside the guarded source walk.
+   Public jobs bypass all repository-supplied index caches, preventing forged
+   cached symbols from overriding parsed evidence. Local cache paths resolving
+   outside the repository are neither read nor written. Both have regression tests.
+2. **Medium — Git timeout could stall on an inherited pipe. Fixed.** A real
+   partial-clone scan exposed a lazy fetch retaining stdout after its parent
+   timed out. History output is now file-backed, limited to 8 MB, with a 12-second
+   per-call deadline; public workers are disposable and killed on the overall
+   deadline. History traversal is explicitly bounded before pickaxe filtering,
+   rather than only limiting the number of matching commits.
+   Live Windows HTTP scans also revealed read-only Git packfiles left behind by
+   ignore-errors cleanup. Scoped cleanup now retries only contained paths with
+   writable permissions, has a regression test, and clears owned orphan UUID
+   workspaces at startup. Real scan directories were verified empty afterward.
+3. **Medium — secret-bearing report/debug text. Fixed.** Every report serializer
+   receives a redacted copy; debug tracebacks are scrubbed. Public results also
+   remove clone paths and author identities. Reports in all seven formats and
+   last-error.log have regression tests. Pattern masking cannot recognize all
+   credentials; never submit sensitive repositories or use real secrets in docs.
+4. **Medium — Markdown can notify users or load tracking images. Fixed.** Untrusted
+   inline text escapes mentions, image/link delimiters, HTML and backticks.
+   Evidence is fenced using a delimiter longer than any repository backticks.
+   HTML templates autoescape; embedded graph JSON escapes `<`, `>` and `&`.
+5. **Medium — public-service abuse boundaries. Implemented before exposure.** Strict
+   GitHub-only URL/ref validation, disabled redirects/credentials/hooks/protocols,
+   bounded jobs/storage/graph/body, exact Origin/CORS checks, and rate limiting
+   form the new endpoint's boundary. No arbitrary clone endpoint was released.
+6. **Low — mutable CI action references. Fixed.** Workflow action versions are
+   commit-SHA pinned. Dependabot and pip-audit are enabled. PyPI publishing uses
+   OIDC; deployment secrets are confined to a main-push-only production job.
+
+Separately, manual example review found missing Click option indexing, which
+created false positives. Click flags/aliases/environment declarations are now
+indexed statically and regression tested. This is a correctness fix, not a
+security vulnerability.
+
+## Threat model
+
+| Threat | Impact | Mitigation | Test/evidence |
+| --- | --- | --- | --- |
+| Huge or nested docs/source/JSON | CPU/RAM exhaustion | 1 MB public files, 8192-character lines, depth 64 config preflight, Markdown maxNesting 20, disposable worker, Linux 512 MB address limit | `test_public_security.py`; worker preflight |
+| Regex backtracking | Slow scan | Bounded parser input; secret regex repeats bounded; literal identifiers re.escape'd for history; Hypothesis fuzz with 100 ms CPU budget per extractor call | `test_extractor_fuzz`, existing long secret input tests |
+| Escaping symlinks/unsafe filenames | Host file disclosure | Root containment, no symlink checkout, 240-character/control-character guards; submodules not checked out | `test_symlink_escape_and_env_exclusion`, `test_sparse_checkout_never_selects_symlinks_env_or_submodules` |
+| Git option/config injection | Command execution | Argument lists, conservative refs (reject leading dash), canonical URLs; no shell, global/system Git config/credential helpers disabled; no hooks, LFS smudge, submodules, external diff or textconv | `test_url_normalization_and_ref_injection`; source subprocess review |
+| SSRF/redirects/cache aliases | Internal network requests/poisoning | Exact ASCII github.com HTTPS grammar, no credentials/ports/IPs/queries; no HTTP redirects; lowercase owner/repo and resolved SHA cache keys | `test_ssrf_table`, worker cache protocol test |
+| Concurrent clones/disk growth | Resource exhaustion | Semaphore 2, queue 32, clone 200 MB/20k paths/60s, scan 120s, memory/disk result limits and 24h TTL | timeout/rate/store tests; real clone measurements |
+| Large graph/report | Browser/server memory pressure | Graph at most 1000 nodes; web graph 200; 40 web findings, shortened excerpts; full result download capped at 10 MB | API graph tests and measured page weight |
+| XSS/SARIF/PR text | Script execution/viewer tracking | Jinja escaping, JSON data escapes, vendored JS, CSP hashes, Markdown mention/image escaping, SARIF messages are JSON text, safe HTTP GitHub links | web XSS test plus report security tests |
+| Model prompt injection | False verdict or data disclosure | Public model path disabled; optional CLI uses delimited data/no tools/schema and exact evidence validation | existing synthetic injection/replay tests |
+| Credential/log leakage | Account compromise | No `.env` reads; worker env allowlist excludes keys/proxies/SSH agent; redacted serializers/logs/model requests, no access logs/IP logging | seven-format redaction + log/env tests |
+| Fork PR/write token exposure | CI compromise | CI contents:read; no pull_request_target; production job requires successful main push in same repo; checkout credentials not persisted in deployment/release/monitor | reviewed `.github/workflows` |
+| Supply chain/publishing | Malicious release | Locked Python deps, SHA actions, Dependabot, pip-audit, protected OIDC publishing environment | local pip-audit: no known vulnerabilities |
+
+All scanner/indexer subprocess calls were reviewed: they invoke Git with argument
+lists for metadata/text, never documentation commands. A search found no
+`shell=True` or `os.system` in `src`. The custom GitHub Action implementation is
+not present in this checkout, so its masking/fork behavior cannot be certified;
+only the workflows supplied here were reviewed. Do not claim Action key masking
+has been tested before that Action exists.
+
+## Residual risks and launch checks
+
+- Regex review/fuzzing is sampled, not a mathematical guarantee for every pattern.
+  Some extractors contain broad searches; public size/time limits are defense in
+  depth. Fuzzing currently covers Markdown/inline/default extraction; additional
+  framework-specific grammars remain useful future coverage.
+- No application sandbox is a substitute for a patched Git/parser/runtime and
+  a container/VM memory/disk limit. Linux process limits need verification in the
+  production image; the local Docker daemon was unavailable. Windows lacks the
+  Unix address-space limit and relies on process deadlines during development.
+- Partial clones can fetch historic blobs during history queries. Date-window
+  fetch bounds and result limits do not guarantee exact network bytes over the
+  whole scan; a watchdog enforces the repository disk cap through history as
+  well as cloning, but sampling is not a filesystem quota. Use a constrained
+  host disk/container and monitor usage. Two jobs can briefly consume roughly
+  400 MB plus caches/output. A dedicated disk quota would be stronger isolation.
+- Rate limiting is per process and IP, not an identity or distributed DDoS
+  defense. Configure trusted proxy addresses correctly. The single-process
+  deployment is intentional; an internet attacker with many IPs can still fill
+  the bounded queue. Health/examples remain available when cloning is paused.
+- GitHub HTTPS is the sole clone destination; DNS/TLS trust still depends on the
+  host resolver/CA store. Git redirects are disabled, including legitimate repo
+  renames. Use the canonical repository URL.
+- Static missing findings are hypotheses, especially at low confidence; the
+  manual example notes identify exactly which statements were verified. The
+  historical example is already fixed upstream. No broader claim of repository
+  correctness or safety is implied.
+- CI workflow definitions have not run on GitHub yet. No GitHub Action package,
+  PyPI trusted publisher, hosting credential or production environment was created.
+  The owner must enable private vulnerability reporting and environment policies.
+
+## What leaves your machine
+
+Rule-only CLI scans make local Git calls. Public web scans send a public GitHub
+URL/ref to the server, which contacts GitHub using anonymous HTTPS Git and renders
+source evidence to anyone holding the random permalink for up to 24 hours. Public
+repository text and metadata may be cached on the server. Baked examples are
+committed assets and do not expire. Public workers receive no model/API token and
+make no model requests. Structured logs contain public repo URL, resolved SHA,
+duration, verdict counts and a failure category; they omit IPs/source/tracebacks.
+
+See the root [SECURITY.md](security-policy.md) for private reporting instructions.
+
+## Optional model assessment and fixes
 
 Rule-only scans are local. Scanned files are untrusted text/AST: the scanner never
 imports their modules, executes documentation commands, starts their services,
@@ -71,7 +195,7 @@ closed; missing telemetry is charged at the reservation estimate. Reservations c
 stop calls earlier than actual billing would require. A local estimated budget is
 not a replacement for an account spending cap. Tokens, cache reads/writes, cost,
 latency, and replay labels remain visible in the report. Rates and the default model
-live in `llm/pricing.py`.
+live in `src/docs_drift/llm/pricing.py`.
 
 A total timeout can cancel an in-flight request before provider usage arrives.
 Token/cost totals then describe completed responses and conservative charges for

@@ -1,0 +1,35 @@
+fastapi-svc  ·  <sha>  ·  1 docs scanned  ·  5 claims checked  ·  <time>
+
+README.md
+  RENAMED README.md:3
+    - Read one user with `GET /users/{id}`.
+    → GET /v2/users/{param}
+    Introduced by 2d94162 · Move user lookup to v2 · <age>
+    claim_d82f88afc8811481b617475b8003d11181002ea4c1434b5d05f261eff9c67be8
+  MISSING README.md:4
+    - Sign in with `POST /login`.
+                    ^^^^^^^^^^^
+    → No indexed endpoint named POST /login was found. No close indexed candidates were found.
+    Introduced by a6da426 · Remove the login endpoint · <age>
+    claim_461bc200b34b24893c2055e275451505bbe975edc58bda933ef788fd4427b5f1
+  RENAMED README.md:5
+    - Configure the settings field `request_timeout`.
+                                    ^^^^^^^^^^^^^^^
+    → timeout_seconds
+    Introduced by b7d9a6d · Rename timeout setting and increase its default · <age>
+    claim_98c0a25a8cf75233caffa287fc5e0f09ec18ccc3fea6c54cd3aa6bf05347f997
+  DEFAULT README.md:6
+    - The request timeout defaults to `30` seconds.
+    → timeout_seconds (default 60)
+    Introduced by b7d9a6d · Rename timeout setting and increase its default · <age>
+    claim_9a1555c68ded34143eede3ce983b01cb973da0580f9435015bd5a0417ebb79cd
+  RENAMED README.md:7
+    - Create the application with `create_app`.
+                                   ^^^^^^^^^^
+    → build_app
+    Introduced by 5b559ed · Rename the application factory · <age>
+    claim_b4d539ee5f8e1635fd16f959378cf10ce18a8eed6731cca590dcb10255ab5546
+
+OK 0 · MISSING 1 · RENAMED 3 · DEFAULT 1 · INVALID CMD 0 · UNVERIFIABLE 0
+Health 0/100 · suppressed 0 · baselined 0
+Run docs-drift fix to see patches, or docs-drift explain <id> for evidence.

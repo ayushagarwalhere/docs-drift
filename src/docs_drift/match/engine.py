@@ -91,6 +91,13 @@ def _same_scope(claim: Claim, symbols: list[Symbol]) -> tuple[list[Symbol], bool
 
 
 def _symbol_matches(claim: Claim, index: CodeIndex) -> tuple[list[Symbol], bool]:
+    key = (claim.kind, claim.value, claim.qualifier)
+    if key not in index.match_cache:
+        index.match_cache[key] = _uncached_symbol_matches(claim, index)
+    return index.match_cache[key]
+
+
+def _uncached_symbol_matches(claim: Claim, index: CodeIndex) -> tuple[list[Symbol], bool]:
     kinds = _KINDS.get(claim.kind, ())
     candidates = [item for kind in kinds for item in index.by_kind.get(kind, [])]
     if claim.kind == ClaimKind.endpoint:
@@ -103,11 +110,16 @@ def _symbol_matches(claim: Claim, index: CodeIndex) -> tuple[list[Symbol], bool]
         ]
     else:
         normalized = normalize_name(claim.value)
-        matches = [
-            item
-            for item in candidates
-            if normalized in {normalize_name(item.name), *(normalize_name(alias) for alias in item.aliases)}
-        ]
+        # The index already stores normalized names and aliases. Qualified names
+        # are included in by_name too, so retain the original name-only test.
+        found = {
+            item.symbol_id
+            for kind in kinds
+            for item in (*index.by_name.get((kind, normalized), []), *index.by_alias.get((kind, normalized), []))
+            if normalized == normalize_name(item.name)
+            or any(normalized == normalize_name(alias) for alias in item.aliases)
+        }
+        matches = [item for item in candidates if item.symbol_id in found]
     if claim.kind == ClaimKind.cli_flag:
         matches, weak = _same_scope(claim, matches)
         if weak:
@@ -148,18 +160,19 @@ def _file_match(claim: Claim, repo: Path, index: CodeIndex) -> tuple[list[Eviden
     raw = raw.removeprefix("./")
     doc_relative = (Path(claim.doc_path).parent / raw).as_posix()
     roots = (raw, doc_relative)
-    indexed_paths = set(index.source_paths) | {symbol.file for symbol in index.symbols} | set(index.by_file)
-    directories = {
-        parent.as_posix() for value in indexed_paths for parent in Path(value).parents if parent.as_posix() != "."
-    }
     for relative in roots:
-        if relative in indexed_paths or relative in directories:
+        if relative in index.path_lookup:
             return [Evidence(file=relative, line=1, text=f"Path exists: {relative}")], None
-    folded = {path.casefold(): path for path in indexed_paths}
-    folded.update({path.casefold(): path for path in directories})
+    folded = index.folded_paths
     case_candidate = folded.get(raw.casefold()) or folded.get(doc_relative.casefold())
     if case_candidate:
         return [], case_candidate
+    for relative in roots:
+        target = repo / relative
+        if not target.is_symlink() and target.resolve().is_relative_to(repo) and target.exists():
+            normalized = target.resolve().relative_to(repo).as_posix()
+            if normalized and normalized != ".":
+                return [Evidence(file=normalized, line=1, text=f"Path exists: {relative}")], None
     return [], None
 
 

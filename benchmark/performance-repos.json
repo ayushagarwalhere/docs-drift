@@ -1,0 +1,17 @@
+[
+  {
+    "name": "fastapi/fastapi",
+    "repo_url": "https://github.com/fastapi/fastapi",
+    "sha": "0ab3e037a6bd406ae8462841864b5c6337c8b329",
+    "ecosystem": "performance",
+    "default_branch": "master",
+    "stars": 103206,
+    "pushed_at": "2026-10-18T12:58:59Z",
+    "github_size_kib": 55397,
+    "local_path": ".docs-drift/repositories/fastapi--fastapi/repository",
+    "acquisition_status": "done",
+    "clone_seconds": 70.93459109996911,
+    "checkout_bytes": 37529114,
+    "history": "depth <= 2000; blob:limit=100000; sparse docs/source"
+  }
+]

@@ -1,0 +1,8 @@
+FROM python:3.13-slim-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/* && useradd --create-home --uid 10001 scanner
+COPY dist/*.whl /tmp/wheels/
+RUN pip install --no-cache-dir /tmp/wheels/*.whl && rm -rf /tmp/wheels
+USER scanner
+WORKDIR /repo
+ENTRYPOINT ["docs-drift"]

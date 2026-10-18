@@ -1,0 +1,191 @@
+name: Release
+on:
+  push:
+    tags: ['v*', '!v0']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      rc: ${{ steps.version.outputs.rc }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: '3.13'
+      - id: version
+        name: Validate tag and stable-release candidate evidence
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from scripts.release import tag_version
+          tag = os.environ['RELEASE_TAG']
+          version = tag_version(tag)
+          if 'rc' not in version:
+              raw = subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/workflows/release.yml/runs?head_sha={os.environ["GITHUB_SHA"]}&status=success&event=push'])
+              runs = json.loads(raw)['workflow_runs']
+              candidates = subprocess.check_output(['git','tag','--points-at','HEAD'],text=True).splitlines()
+              candidates = [t for t in candidates if t.startswith(tag + '-rc.')]
+              verified = False
+              for run in runs:
+                  if run['head_branch'] not in candidates:
+                      continue
+                  raw_jobs = subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{run["id"]}/jobs?per_page=100'])
+                  jobs = json.loads(raw_jobs)['jobs']
+                  installs = [j for j in jobs if j['name'].startswith('install (')]
+                  required = [j for j in jobs if j['name'] in ('publish', 'docker', 'github-release')]
+                  verified = (len(installs) == 27 and len(required) == 3 and
+                              all(j['conclusion'] == 'success' for j in installs + required))
+                  if verified:
+                      break
+              if not verified:
+                  raise SystemExit('Stable release requires a successful RC Release workflow at this exact commit.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'version={version}\nrc={str("rc" in version).lower()}\n')
+          PY
+      - run: uv build
+      - name: Inspect package contents and README metadata
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python scripts/release.py check --tag "$RELEASE_TAG"
+      - run: uvx --from twine twine check --strict dist/*
+      - name: Test the wheel outside the source tree
+        env:
+          DOCS_DRIFT_DIST: ${{ github.workspace }}/dist
+        run: |
+          uv venv "$RUNNER_TEMP/wheel-env" --python 3.13
+          WHEEL=$(find "$GITHUB_WORKSPACE/dist" -name '*.whl')
+          uv pip install --python "$RUNNER_TEMP/wheel-env/bin/python" "$WHEEL[dev,docs,web,graph,llm,watch,lsp]"
+          python scripts/release.py stage-tests --out "$RUNNER_TEMP/wheel-tests"
+          cd "$RUNNER_TEMP/wheel-tests"
+          "$RUNNER_TEMP/wheel-env/bin/python" -c "import docs_drift; assert 'site-packages' in docs_drift.__file__, docs_drift.__file__"
+          "$RUNNER_TEMP/wheel-env/bin/python" -m pytest --basetemp "$RUNNER_TEMP/wheel-pytest" -q
+          "$RUNNER_TEMP/wheel-env/bin/python" -m scripts.demo_setup --output "$RUNNER_TEMP/release-demo"
+          cp "$RUNNER_TEMP/release-demo/report.html" "$GITHUB_WORKSPACE/dist/example-report.html"
+      - name: Extract release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python scripts/release.py notes --tag "$RELEASE_TAG" --out dist/release-notes.md
+      - name: Package VS Code client (never publish to Marketplace)
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          cd editors/vscode
+          npm ci
+          BASE="${RELEASE_TAG#v}"
+          BASE="${BASE%%-rc.*}"
+          npm version "$BASE" --no-git-tag-version --allow-same-version
+          if [[ "$RELEASE_TAG" == *-rc.* ]]; then FLAG=--pre-release; else FLAG=; fi
+          npx --yes @vscode/vsce@3.7.1 package $FLAG --out "../../dist/docs-drift-$RELEASE_TAG.vsix"
+      - name: Hash immutable release attachments
+        run: cd dist && sha256sum *.whl *.tar.gz *.vsix example-report.html > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-files
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: vars.DOCS_DRIFT_RELEASE_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.build.outputs.rc == 'true' && 'testpypi' || 'pypi' }}
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-files
+          path: release-files/
+      - name: Select distribution files only
+        run: mkdir dist && cp release-files/*.whl release-files/*.tar.gz dist/
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          repository-url: ${{ needs.build.outputs.rc == 'true' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
+
+  install:
+    needs: [build, publish]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.11', '3.12', '3.13']
+        method: [pipx, uv, pip]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install the indexed package and scan a trusted fixture
+        env:
+          METHOD: ${{ matrix.method }}
+          VERSION: ${{ needs.build.outputs.version }}
+          INDEX: ${{ needs.build.outputs.rc == 'true' && 'testpypi' || 'pypi' }}
+          PYTHON_VERSION: ${{ matrix.python }}
+        shell: bash
+        run: uv run --no-project --python "$PYTHON_VERSION" --with pipx python scripts/verify_install.py --method "$METHOD" --index "$INDEX" --version "$VERSION"
+
+  docker:
+    needs: [build, install]
+    runs-on: ubuntu-latest
+    environment: ghcr
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-files
+          path: dist/
+      - name: Build and publish the same wheel to GHCR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RC: ${{ needs.build.outputs.rc }}
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker build -f Dockerfile.release -t "$IMAGE:$RELEASE_TAG" .
+          docker run --rm "$IMAGE:$RELEASE_TAG" --version
+          docker push "$IMAGE:$RELEASE_TAG"
+          if [[ "$RC" == false ]]; then docker tag "$IMAGE:$RELEASE_TAG" "$IMAGE:latest"; docker push "$IMAGE:latest"; fi
+
+  github-release:
+    needs: [build, install, docker]
+    runs-on: ubuntu-latest
+    environment: github-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-files
+          path: dist/
+      - name: Create release and attach the checked artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RC: ${{ needs.build.outputs.rc }}
+        run: |
+          FLAG=
+          if [[ "$RC" == true ]]; then FLAG=--prerelease; fi
+          gh release create "$RELEASE_TAG" $FLAG --verify-tag --title "docs-drift $RELEASE_TAG" --notes-file dist/release-notes.md dist/*.whl dist/*.tar.gz dist/*.vsix dist/example-report.html dist/SHA256SUMS

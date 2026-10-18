@@ -5,11 +5,15 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import tempfile
+import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from docs_drift.config import HistoryConfig
+from docs_drift.history_cache import QueryCache
+from docs_drift.limits import MAX_GIT_OUTPUT
 from docs_drift.models import CommitRef, Finding
 
 _META = re.compile(r"^@@@([0-9a-f]{40,64})\x1f([0-9a-f]{4,64})\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f(.*)$")
@@ -54,19 +58,50 @@ class HistoryMatch:
 
 
 def _run(repo: Path, args: list[str]) -> subprocess.CompletedProcess[str] | None:
+    partial = args[:1] == ["__bounded_history__"]
+    if partial:
+        args = args[1:]
     env = {key: value for key, value in os.environ.items() if not key.upper().startswith("GIT_")}
     env["GIT_OPTIONAL_LOCKS"] = "0"
+    env.update(
+        GIT_CONFIG_GLOBAL=os.devnull,
+        GIT_CONFIG_SYSTEM=os.devnull,
+        GIT_CONFIG_NOSYSTEM="1",
+        GIT_TERMINAL_PROMPT="0",
+        GIT_LFS_SKIP_SMUDGE="1",
+    )
     try:
-        return subprocess.run(
-            ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", f"core.hooksPath={os.devnull}", *args],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            check=True,
-            timeout=_COMMAND_TIMEOUT_SECONDS,
-            env=env,
-        )
+        # File-backed output avoids waiting forever on a pipe inherited by a lazy
+        # partial-clone fetch after the parent git process times out.
+        with tempfile.TemporaryFile() as output:
+            process = subprocess.Popen(
+                ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", f"core.hooksPath={os.devnull}", *args],
+                stdout=output,
+                stderr=subprocess.DEVNULL,
+                env=env,
+            )
+            try:
+                deadline = time.monotonic() + _COMMAND_TIMEOUT_SECONDS
+                while process.poll() is None:
+                    if time.monotonic() >= deadline or output.seek(0, 2) > MAX_GIT_OUTPUT:
+                        raise subprocess.TimeoutExpired(process.args, _COMMAND_TIMEOUT_SECONDS)
+                    time.sleep(0.02)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=2)
+                if partial:
+                    output.seek(0)
+                    prefix = output.read(MAX_GIT_OUTPUT).decode("utf-8", "replace")
+                    prefix = prefix.rpartition("\n@@@")[0]
+                    return subprocess.CompletedProcess(process.args, 0, "@@TRUNCATED_HISTORY@@\n" + prefix, "")
+                return None
+            if process.returncode:
+                return None
+            output.seek(0)
+            data = output.read(8_000_001)
+            if len(data) > MAX_GIT_OUTPUT:
+                return None
+            return subprocess.CompletedProcess(process.args, process.returncode, data.decode("utf-8", "replace"), "")
     except (OSError, subprocess.SubprocessError):
         return None
 
@@ -108,11 +143,42 @@ class GitHistory:
         self.config = config or HistoryConfig()
         self._shallow: bool | None = None
         self._blame: dict[tuple[str, int], CommitRef | None] = {}
+        self._revision_range: str | None = None
         self.warnings: list[str] = []
+        self._queries = QueryCache(self.repo, _run)
+        self._prepared: list[tuple[re.Match[str], str]] | None = None
+
+    def prepare(self) -> None:
+        """Read one bounded newest-first patch stream, avoiding a Git process per claim."""
+        if self.shallow() is None or self.config.max_commits == 0:
+            self._prepared = []
+            return
+        listing = self._queries.query(["rev-list", f"--max-count={self.config.max_commits + 1}", "HEAD"])
+        revisions = listing.stdout.splitlines() if listing else []
+        self._revision_range = f"{revisions[-1]}..HEAD" if len(revisions) > self.config.max_commits else "HEAD"
+        result = self._queries.query(
+            [
+                "__bounded_history__",
+                "log",
+                "--no-ext-diff",
+                "--no-textconv",
+                f"--max-count={self.config.max_commits}",
+                "-p",
+                "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                self._revision_range,
+                "--",
+                *_SOURCE_GLOBS,
+            ]
+        )
+        self._prepared = _chunks(result.stdout) if result else []
+        if result is None or result.stdout.startswith("@@TRUNCATED_HISTORY@@"):
+            self.warnings.append(
+                "History patch stream exceeded the 8 MB/12 second budget; older attribution is unavailable."
+            )
 
     def shallow(self) -> bool | None:
         if self._shallow is None:
-            result = _run(self.repo, ["rev-parse", "--is-shallow-repository"])
+            result = self._queries.query(["rev-parse", "--is-shallow-repository"])
             if result is None:
                 self._shallow = None
                 warning = (
@@ -127,31 +193,56 @@ class GitHistory:
                     self.warnings.append("Git history is shallow and may be truncated; use checkout fetch-depth: 0.")
         return self._shallow
 
-    def search(self, old_name: str, new_names: tuple[str, ...] = ()) -> HistoryMatch:
+    def search(self, old_name: str, new_names: tuple[str, ...] = ()) -> HistoryMatch:  # noqa: PLR0912 - evidence guards.
         """Find the newest commit that removes an old token from source text."""
         if self.shallow() is None:
             return HistoryMatch(None, warning=self.warnings[0])
         if self.config.max_commits == 0:
             return HistoryMatch(None)
-        result = _run(
-            self.repo,
-            [
-                "log",
-                "--no-ext-diff",
-                f"--max-count={self.config.max_commits}",
-                "-p",
-                "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
-                *(["-G", f"[\"']{re.escape(old_name)}[\"']"] if old_name.startswith("/") else ["-S", old_name]),
-                "--",
-                *_SOURCE_GLOBS,
-            ],
+        if self._revision_range is None:
+            listing = self._queries.query(["rev-list", f"--max-count={self.config.max_commits + 1}", "HEAD"])
+            revisions = listing.stdout.splitlines() if listing else []
+            self._revision_range = f"{revisions[-1]}..HEAD" if len(revisions) > self.config.max_commits else "HEAD"
+        result = (
+            self._queries.query(
+                [
+                    "log",
+                    "--no-ext-diff",
+                    "--no-textconv",
+                    f"--max-count={self.config.max_commits}",
+                    "-p",
+                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                    *(["-G", f"[\"']{re.escape(old_name)}[\"']"] if old_name.startswith("/") else ["-S", old_name]),
+                    self._revision_range,
+                    "--",
+                    *_SOURCE_GLOBS,
+                ],
+            )
+            if self._prepared is None
+            else None
         )
-        if result is None:
+        if result is None and self._prepared is None:
             warning = "Git history lookup failed or timed out; no introducing commit was attached."
             self.warnings.append(warning)
             return HistoryMatch(None, warning=warning)
         old_pattern = re.compile(rf"(?<![\w]){re.escape(old_name)}(?![\w])")
-        for meta, patch in _chunks(result.stdout):
+        chunks = self._prepared if self._prepared is not None else _chunks(result.stdout if result else "")
+        for meta, patch in chunks:
+            if old_name not in patch:
+                continue
+            if not old_name.startswith("/"):
+                removed_occurrences = sum(
+                    line[1:].count(old_name)
+                    for line in patch.splitlines()
+                    if line.startswith("-") and not line.startswith("---")
+                )
+                added_occurrences = sum(
+                    line[1:].count(old_name)
+                    for line in patch.splitlines()
+                    if line.startswith("+") and not line.startswith("+++")
+                )
+                if removed_occurrences == added_occurrences:
+                    continue
             commit = _commit(meta, self.config.show_emails)
             file_name = ""
             hunk: list[str] = []
@@ -179,7 +270,10 @@ class GitHistory:
         old_name: str, new_names: tuple[str, ...], commit: CommitRef, file_name: str, lines: list[str]
     ) -> HistoryEvidence | None:
         added = [line for line in lines if line.startswith("+") and not line.startswith("+++")]
+        added_text = "\n".join(added)
         for candidate in new_names:
+            if candidate == old_name or candidate not in added_text:
+                continue
             candidate_pattern = re.compile(rf"(?<![\w]){re.escape(candidate)}(?![\w])")
             if any(candidate_pattern.search(line) for line in added):
                 excerpt = "\n".join([line for line in lines if line.startswith(("-", "+"))][:8])
@@ -189,13 +283,62 @@ class GitHistory:
     def introduced_for(self, finding: Finding) -> HistoryMatch:
         return self.search(finding.claim.value)
 
+    def default_change(self, finding: Finding) -> tuple[CommitRef | None, str]:
+        """Find a declaration changing the documented default to its current value."""
+        symbol = finding.matched_symbol
+        expected = finding.claim.expected_default
+        if symbol is None or expected is None or symbol.default is None or self.shallow() is None:
+            return None, ""
+        result = (
+            self._queries.query(
+                [
+                    "log",
+                    "--no-ext-diff",
+                    f"--max-count={self.config.max_commits}",
+                    "-p",
+                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                    "-G",
+                    re.escape(symbol.name),
+                    "--",
+                    symbol.file,
+                ],
+            )
+            if self._prepared is None
+            else None
+        )
+        if result is None and self._prepared is None:
+            return None, ""
+        old = re.compile(rf"(?<![\w]){re.escape(expected.strip(chr(96) + chr(34) + chr(39)))}(?![\w])")
+        new = re.compile(rf"(?<![\w]){re.escape(symbol.default.strip(chr(96) + chr(34) + chr(39)))}(?![\w])")
+        chunks = self._prepared if self._prepared is not None else _chunks(result.stdout if result else "")
+        for metadata, patch in chunks:
+            selected_patch = patch
+            if self._prepared is not None:
+                selected_patch = "\n".join(
+                    block
+                    for block in re.split(r"(?m)(?=^diff --git )", patch)
+                    if re.search(rf"(?m)^\+\+\+ b/{re.escape(symbol.file)}$", block)
+                )
+            if symbol.name not in selected_patch:
+                continue
+            # Check each hunk independently, avoiding unrelated defaults in the same commit.
+            for hunk in re.split(r"(?m)^@@.*@@.*$", selected_patch):
+                removed = [line for line in hunk.splitlines() if line.startswith("-") and not line.startswith("---")]
+                added = [line for line in hunk.splitlines() if line.startswith("+") and not line.startswith("+++")]
+                if any(symbol.name in line and old.search(line) for line in removed) and any(
+                    symbol.name in line and new.search(line) for line in added
+                ):
+                    return _commit(metadata, self.config.show_emails), "\n".join([*removed, *added])
+        return None, ""
+
     def last_touched(self, doc_path: str, line: int) -> CommitRef | None:
+        """Blame the committed snapshot, independent of checkout newline conversion or uncommitted edits."""
         key = doc_path, line
         if key in self._blame:
             return self._blame[key]
         if self.shallow() is None:
             return None
-        result = _run(self.repo, ["blame", "--line-porcelain", f"-L{line},{line}", "--", doc_path])
+        result = self._queries.query(["blame", "--line-porcelain", f"-L{line},{line}", "HEAD", "--", doc_path])
         if result is None:
             self._blame[key] = None
             return None
@@ -214,7 +357,7 @@ class GitHistory:
         author = values.get("author", "Unknown author")
         email = values.get("author-mail", "").strip("<>")
         timestamp = values.get("author-time", "0")
-        date = datetime.fromtimestamp(int(timestamp), tz=datetime.now().astimezone().tzinfo)
+        date = datetime.fromtimestamp(int(timestamp), tz=UTC)
         commit = CommitRef(
             sha=sha,
             short_sha=sha[:7],

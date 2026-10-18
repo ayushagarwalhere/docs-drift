@@ -1,0 +1,17 @@
+<header>
+<main>
+<nav class="tabs" aria-label="Report views">
+<section id="findings-view" class="workspace">
+<article class="card" tabindex="0" data-id="claim_d82f88afc8811481b617475b8003d11181002ea4c1434b5d05f261eff9c67be8" data-verdict="renamed">
+<details>
+<article class="card" tabindex="0" data-id="claim_461bc200b34b24893c2055e275451505bbe975edc58bda933ef788fd4427b5f1" data-verdict="missing">
+<details>
+<article class="card" tabindex="0" data-id="claim_98c0a25a8cf75233caffa287fc5e0f09ec18ccc3fea6c54cd3aa6bf05347f997" data-verdict="renamed">
+<details>
+<article class="card" tabindex="0" data-id="claim_9a1555c68ded34143eede3ce983b01cb973da0580f9435015bd5a0417ebb79cd" data-verdict="default_changed">
+<details>
+<article class="card" tabindex="0" data-id="claim_b4d539ee5f8e1635fd16f959378cf10ce18a8eed6731cca590dcb10255ab5546" data-verdict="renamed">
+<details>
+<aside class="graphbox">
+<section id="insights-view" class="insights" hidden>
+<footer>

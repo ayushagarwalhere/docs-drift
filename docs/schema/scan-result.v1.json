@@ -1,0 +1,1024 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^claim_[0-9a-f]{64}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ClaimKind"
+        },
+        "raw_text": {
+          "minLength": 1,
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Qualifier"
+        },
+        "expected_default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Default"
+        },
+        "doc_path": {
+          "title": "Doc Path",
+          "type": "string"
+        },
+        "line": {
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "column": {
+          "minimum": 1,
+          "title": "Column",
+          "type": "integer"
+        },
+        "section_id": {
+          "pattern": "^section_[0-9a-f]{64}$",
+          "title": "Section Id",
+          "type": "string"
+        },
+        "extraction": {
+          "$ref": "#/$defs/Extraction"
+        },
+        "extraction_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Extraction Confidence",
+          "type": "number"
+        },
+        "locations": {
+          "items": {
+            "$ref": "#/$defs/ClaimLocation"
+          },
+          "title": "Locations",
+          "type": "array"
+        },
+        "extraction_sources": {
+          "items": {
+            "$ref": "#/$defs/Extraction"
+          },
+          "title": "Extraction Sources",
+          "type": "array"
+        },
+        "group_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group Key"
+        }
+      },
+      "required": [
+        "claim_id",
+        "kind",
+        "raw_text",
+        "value",
+        "doc_path",
+        "line",
+        "column",
+        "section_id",
+        "extraction",
+        "extraction_confidence"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimKind": {
+      "enum": [
+        "cli_flag",
+        "cli_command",
+        "env_var",
+        "endpoint",
+        "config_key",
+        "symbol",
+        "file_path",
+        "package_script",
+        "make_target",
+        "default_value",
+        "code_command",
+        "prose"
+      ],
+      "title": "ClaimKind",
+      "type": "string"
+    },
+    "ClaimLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "column": {
+          "minimum": 1,
+          "title": "Column",
+          "type": "integer"
+        },
+        "raw_text": {
+          "minLength": 1,
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "extraction": {
+          "$ref": "#/$defs/Extraction"
+        }
+      },
+      "required": [
+        "line",
+        "column",
+        "raw_text",
+        "extraction"
+      ],
+      "title": "ClaimLocation",
+      "type": "object"
+    },
+    "CommitRef": {
+      "additionalProperties": false,
+      "properties": {
+        "sha": {
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$",
+          "title": "Sha",
+          "type": "string"
+        },
+        "short_sha": {
+          "pattern": "^[0-9a-f]{4,64}$",
+          "title": "Short Sha",
+          "type": "string"
+        },
+        "author_name": {
+          "minLength": 1,
+          "title": "Author Name",
+          "type": "string"
+        },
+        "author_email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Author Email"
+        },
+        "date": {
+          "format": "date-time",
+          "title": "Date",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sha",
+        "short_sha",
+        "author_name",
+        "date",
+        "summary"
+      ],
+      "title": "CommitRef",
+      "type": "object"
+    },
+    "Config": {
+      "description": "Schema shared by .docs-drift.toml and [tool.docs-drift].",
+      "properties": {
+        "docs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Docs",
+          "type": "array"
+        },
+        "exclude": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exclude",
+          "type": "array"
+        },
+        "languages": {
+          "anyOf": [
+            {
+              "const": "auto",
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "auto",
+          "title": "Languages"
+        },
+        "ignore": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ignore",
+          "type": "array"
+        },
+        "min_confidence": {
+          "default": 0.6,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Min Confidence",
+          "type": "number"
+        },
+        "llm": {
+          "$ref": "#/$defs/LLMConfig"
+        },
+        "history": {
+          "$ref": "#/$defs/HistoryConfig"
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "DecidedBy": {
+      "enum": [
+        "rules",
+        "llm"
+      ],
+      "title": "DecidedBy",
+      "type": "string"
+    },
+    "DocFile": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/$defs/DocFormat"
+        }
+      },
+      "required": [
+        "path",
+        "content_hash",
+        "format"
+      ],
+      "title": "DocFile",
+      "type": "object"
+    },
+    "DocFormat": {
+      "enum": [
+        "markdown",
+        "mdx",
+        "rst",
+        "text"
+      ],
+      "title": "DocFormat",
+      "type": "string"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "line": {
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "end_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        }
+      },
+      "required": [
+        "file",
+        "line",
+        "text"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Extraction": {
+      "enum": [
+        "inline_code",
+        "code_block",
+        "table",
+        "prose_pattern",
+        "link"
+      ],
+      "title": "Extraction",
+      "type": "string"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/Claim"
+        },
+        "matched_symbol": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Symbol"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verdict": {
+          "$ref": "#/$defs/Verdict"
+        },
+        "suggestion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggestion"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "introduced_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CommitRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "reasons": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "decided_by": {
+          "$ref": "#/$defs/DecidedBy",
+          "default": "rules"
+        },
+        "replayed": {
+          "default": false,
+          "title": "Replayed",
+          "type": "boolean"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Package"
+        },
+        "doc_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doc Text"
+        }
+      },
+      "required": [
+        "claim",
+        "verdict",
+        "evidence",
+        "confidence",
+        "reasons"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "HistoryConfig": {
+      "description": "Limits for static git history inspection.",
+      "properties": {
+        "max_commits": {
+          "default": 2000,
+          "minimum": 0,
+          "title": "Max Commits",
+          "type": "integer"
+        },
+        "show_emails": {
+          "default": false,
+          "title": "Show Emails",
+          "type": "boolean"
+        }
+      },
+      "title": "HistoryConfig",
+      "type": "object"
+    },
+    "LLMConfig": {
+      "description": "Optional prose assessment settings.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "max_claims": {
+          "default": 40,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Max Claims",
+          "type": "integer"
+        },
+        "concurrency": {
+          "default": 4,
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Concurrency",
+          "type": "integer"
+        },
+        "timeout": {
+          "default": 60,
+          "exclusiveMinimum": 0,
+          "maximum": 600,
+          "title": "Timeout",
+          "type": "number"
+        },
+        "budget": {
+          "default": 0.5,
+          "minimum": 0,
+          "title": "Budget",
+          "type": "number"
+        },
+        "redact_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Redact Paths",
+          "type": "array"
+        }
+      },
+      "title": "LLMConfig",
+      "type": "object"
+    },
+    "Package": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "root": {
+          "title": "Root",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Commands",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "root",
+        "language"
+      ],
+      "title": "Package",
+      "type": "object"
+    },
+    "Section": {
+      "additionalProperties": false,
+      "properties": {
+        "section_id": {
+          "pattern": "^section_[0-9a-f]{64}$",
+          "title": "Section Id",
+          "type": "string"
+        },
+        "doc_path": {
+          "title": "Doc Path",
+          "type": "string"
+        },
+        "heading": {
+          "title": "Heading",
+          "type": "string"
+        },
+        "heading_level": {
+          "minimum": 0,
+          "title": "Heading Level",
+          "type": "integer"
+        },
+        "heading_path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Heading Path",
+          "type": "array"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        },
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "context": {
+          "$ref": "#/$defs/SectionContext",
+          "default": "current"
+        },
+        "historical_spans": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "minimum": 1,
+                "type": "integer"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Historical Spans",
+          "type": "array"
+        }
+      },
+      "required": [
+        "section_id",
+        "doc_path",
+        "heading",
+        "heading_level",
+        "heading_path",
+        "start_line",
+        "end_line"
+      ],
+      "title": "Section",
+      "type": "object"
+    },
+    "SectionContext": {
+      "enum": [
+        "current",
+        "historical"
+      ],
+      "title": "SectionContext",
+      "type": "string"
+    },
+    "SuppressedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/Claim"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim",
+        "reason"
+      ],
+      "title": "SuppressedClaim",
+      "type": "object"
+    },
+    "Symbol": {
+      "additionalProperties": false,
+      "properties": {
+        "symbol_id": {
+          "pattern": "^symbol_[0-9a-f]{64}$",
+          "title": "Symbol Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/SymbolKind"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "qualified_name": {
+          "minLength": 1,
+          "title": "Qualified Name",
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "line": {
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "language": {
+          "minLength": 1,
+          "title": "Language",
+          "type": "string"
+        },
+        "framework": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Framework"
+        },
+        "parent_id": {
+          "anyOf": [
+            {
+              "pattern": "^symbol_[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Id"
+        },
+        "exported": {
+          "default": false,
+          "title": "Exported",
+          "type": "boolean"
+        },
+        "decorators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decorators",
+          "type": "array"
+        },
+        "derived": {
+          "default": false,
+          "title": "Derived",
+          "type": "boolean"
+        },
+        "setting_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Setting Group"
+        },
+        "authoritative": {
+          "default": true,
+          "title": "Authoritative",
+          "type": "boolean"
+        },
+        "raw_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Path"
+        },
+        "handler": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Handler"
+        },
+        "partial_prefix": {
+          "default": false,
+          "title": "Partial Prefix",
+          "type": "boolean"
+        },
+        "ts_type": {
+          "default": false,
+          "title": "Ts Type",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "symbol_id",
+        "kind",
+        "name",
+        "qualified_name",
+        "file",
+        "line",
+        "language"
+      ],
+      "title": "Symbol",
+      "type": "object"
+    },
+    "SymbolKind": {
+      "enum": [
+        "cli_flag",
+        "cli_command",
+        "env_var",
+        "route",
+        "config_key",
+        "function",
+        "class",
+        "method",
+        "file",
+        "package_script",
+        "make_target",
+        "ci_job",
+        "cli_argument"
+      ],
+      "title": "SymbolKind",
+      "type": "string"
+    },
+    "Verdict": {
+      "enum": [
+        "ok",
+        "missing",
+        "renamed",
+        "default_changed",
+        "invalid_command",
+        "unverifiable"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "package_version": {
+      "title": "Package Version",
+      "type": "string"
+    },
+    "repo_path": {
+      "format": "path",
+      "title": "Repo Path",
+      "type": "string"
+    },
+    "head_sha": {
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$",
+      "title": "Head Sha",
+      "type": "string"
+    },
+    "scan_time": {
+      "format": "date-time",
+      "title": "Scan Time",
+      "type": "string"
+    },
+    "config_used": {
+      "$ref": "#/$defs/Config"
+    },
+    "docs": {
+      "items": {
+        "$ref": "#/$defs/DocFile"
+      },
+      "title": "Docs",
+      "type": "array"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/Section"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "symbols": {
+      "items": {
+        "$ref": "#/$defs/Symbol"
+      },
+      "title": "Symbols",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "timings": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Timings",
+      "type": "object"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "suppressed": {
+      "items": {
+        "$ref": "#/$defs/SuppressedClaim"
+      },
+      "title": "Suppressed",
+      "type": "array"
+    },
+    "historical_ignored": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Historical Ignored",
+      "type": "integer"
+    },
+    "llm_usage": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Llm Usage",
+      "type": "object"
+    },
+    "packages": {
+      "items": {
+        "$ref": "#/$defs/Package"
+      },
+      "title": "Packages",
+      "type": "array"
+    },
+    "docs_repo_path": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Docs Repo Path"
+    },
+    "remote_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Remote Url"
+    },
+    "baselined": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Baselined",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "repo_path",
+    "head_sha",
+    "scan_time",
+    "config_used"
+  ],
+  "title": "ScanResult",
+  "type": "object"
+}

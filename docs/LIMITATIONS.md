@@ -1,21 +1,46 @@
-# Indexing limitations
+# Limitations
 
-Optional model checks inspect only code-anchored prose under a fixed candidate
-cap and bounded snippet windows. A valid quotation does not establish that a model's
-behavioural interpretation is correct. Unknown context remains unverifiable,
-rule decisions stay authoritative, and model findings remain separately labelled.
-Checked-in replay responses are synthetic test doubles, not live-model benchmarks.
+Accuracy on public repositories is **not yet measured by a human**. Static name
+matching can report intentional examples, third-party commands, dynamic plugin
+registrations and scope/index omissions as missing. Read confidence and evidence;
+do not file an issue based on an unreviewed result.
 
-Automatic fix proposals require unique literal spans and certain replacements.
-Missing names without replacements and unsupported removed-flag declarations stay
-manual suggestions. Model rewrites are limited to a sentence and checked statically;
-they still require review. Unified patch export supports UTF-8 documents; exact-span
-write helpers additionally preserve UTF-16 BOM/encoding when supplied valid spans.
+All supported frameworks have partial coverage. Django/DRF, yargs, Next.js/NestJS
+routes and Go/Rust configuration are not implemented. Function existence does not
+prove signatures or behavior. RST support is basic; MDX strips known wrappers
+without executing components. Cross-package fallback can be ambiguous.
 
-Unsupported or incomplete surfaces are reported as unverifiable; absence from a partial index is not proof of drift.
+The scanner bounds file/path/line sizes and nesting. Unsupported files become
+warnings. YAML/JSON preflight is conservative and may reject complex valid data.
+Shallow history, an 8 MB/12 second patch stream budget, Git errors and unsupported
+syntax can prevent attribution; a missing commit is never invented. The history
+cap counts traversed commits, not just matching commits.
 
-- **Dynamic registration and plugins.** A CLI assembled from plugin discovery or loops, such as `for plugin in plugins: app.add_command(plugin.command)`, cannot be resolved statically. Its undocumented flags may be unverifiable.
-- **Cross-module router composition.** Prefixes built from runtime settings or complex imported router graphs may be only partially resolved. A route claim may remain unverifiable until prefixes are literal.
-- **Generated framework declarations.** Spring Boot and deeply dynamic oclif/yargs declarations are not fully indexed. Their command and route claims remain unverifiable rather than being called missing.
-- **Frameworks not implemented yet.** Django/DRF, Next.js, NestJS, OpenAPI, Docker Compose, Helm, Rust and Go surfaces are absent or partial. Their claims must stay unverifiable. Dependency-based unsupported-framework discovery is not wired into the CLI yet.
-- **Large indexes and dependency edges.** The cache is incremental per file, but import edges are currently empty and indexing is sequential. Prefix results are not yet recomputed from cached cross-file edges, and there is no process pool for repositories with more than 200 files.
+The recall audit samples doc lines as a proxy for semantic claims and excludes
+unverifiable/low-confidence predictions. Its weighted estimate is not exhaustive
+recall. Fixture scores are not real-world precision.
+
+Native VS Code UI capture, Linux production-container execution, public hosting,
+published package/Action URLs and human accuracy labels remain explicit release
+checks. Robustness warning groups and measured performance are recorded in
+[results](RESULTS.md); failures must remain visible.
+
+The public-repo sweep uses sparse checkouts. Binary files and Go/Rust paths may
+be absent locally, so missing-file findings can reflect acquisition rather than
+documentation drift. Syntax errors, minified sources, oversized files and
+ambiguous default subjects produce explicit warnings; these are incomplete
+coverage, not evidence that the documentation is wrong.
+
+TSX currently uses the TypeScript grammar. Valid JSX can therefore trigger syntax
+recovery warnings; recognizable text declarations are retained. Warning counts
+must not be described as counts of syntax defects in the scanned projects.
+Byte-identical output was verified on all fixtures and pinned Flask. This does
+not prove determinism for every repository: history that hits a wall-time budget
+can expose different amounts of attribution on different runs or hosts.
+
+Performance targets currently fail. The large Next.js run stayed below the
+traced Python allocation budget, which does not measure whole-process memory.
+Repeated package lookup and repository file reads dominate its profile. On this
+Windows environment, one timed-out sweep process also needed manual process-tree
+cleanup after the normal cleanup stalled. A requested timeout is not a proven
+hard wall-clock bound on every Windows host.

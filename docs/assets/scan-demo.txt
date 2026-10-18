@@ -1,0 +1,31 @@
+py-cli  ·  3fb52f15  ·  1 docs scanned  ·  10 claims checked  ·  0.56s
+
+README.md
+  RENAMED README.md:4
+    - `serve` accepts `--port` (default 8000).
+                       ^^^^^^
+    → --listen
+    Introduced by 450a93d · Rename port to listen · 16 days ago
+    claim_8ed4cec49e3a4c86e8ad548b85452e088ae736718c1e6952b86b5a914bbf0447
+  DEFAULT README.md:6
+    - The `--workers` default is `4`.
+           ^^^^^^^^^
+    → 8
+    Introduced by 397bff7 · Increase the worker default · 15 days ago
+    claim_0ddc043944f8c1b30f1c40e0aa64cdc5d8f10259074ba7769279304b72a52160
+  MISSING README.md:7
+    - Set `APP_DEBUG` to enable debug logging.
+           ^^^^^^^^^
+    → APP_LOG_LEVEL
+    Introduced by f686fb7 · Replace debug environment variable with log level · 14 days ago
+    claim_5f2199daeec9e79f6ef17af18d53109eb79f967fe9b7512433afe6780161c526
+  RENAMED README.md:8
+    - Use the `migrate` subcommand to upgrade the database.
+               ^^^^^^^
+    → db-upgrade
+    Introduced by 3fb52f1 · Rename the database upgrade subcommand · 13 days ago
+    claim_3e4a78859ff7e5aa9a087b4ac2fbe545e5615d96016374321ac2175a11e957f6
+
+OK 5 · MISSING 1 · RENAMED 2 · DEFAULT 1 · INVALID CMD 0 · UNVERIFIABLE 1
+Health 56/100 · suppressed 0 · baselined 0
+Run docs-drift fix to see patches, or docs-drift explain <id> for evidence.

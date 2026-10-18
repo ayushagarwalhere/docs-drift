@@ -1,0 +1,6 @@
+{
+  "terminal": "Actual scan subprocess stdout, replayed over eight seconds; scan-demo.txt retained.",
+  "graph": "Actual examples/py-cli.html in installed Edge, graph panel visible.",
+  "comment": "Actual examples/py-cli.md rendered locally; not a posted GitHub comment.",
+  "vscode": "Pending actual editor recording; no simulated squiggle GIF supplied."
+}

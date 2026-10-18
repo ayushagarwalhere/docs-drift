@@ -19,6 +19,7 @@ from markdown_it.token import Token
 from docs_drift.docs.sections import ParsedDoc, is_historical_span
 from docs_drift.ids import make_claim_id
 from docs_drift.models import Claim, ClaimKind, Extraction
+from docs_drift.safe_files import metadata_text
 
 _SHELL_LANGS = {"bash", "sh", "shell", "console", "zsh", "powershell", "ps1", "cmd"}
 _LANGS = _SHELL_LANGS | {
@@ -60,7 +61,7 @@ def project_command_names(repo: Path) -> tuple[set[str], set[str]]:  # noqa: PLR
     pyproject = repo / "pyproject.toml"
     if pyproject.is_file():
         try:
-            metadata = tomllib.loads(pyproject.read_text(encoding="utf-8", errors="replace"))
+            metadata = tomllib.loads(metadata_text(pyproject))
             scripts = metadata.get("project", {}).get("scripts", {})
             if isinstance(scripts, dict):
                 commands.update(str(name) for name in scripts)
@@ -74,7 +75,7 @@ def project_command_names(repo: Path) -> tuple[set[str], set[str]]:  # noqa: PLR
     package_json = repo / "package.json"
     if package_json.is_file():
         try:
-            metadata = json.loads(package_json.read_text(encoding="utf-8", errors="replace"))
+            metadata = json.loads(metadata_text(package_json))
             name = metadata.get("name")
             if isinstance(name, str) and name:
                 commands.add(name)
@@ -90,7 +91,7 @@ def project_command_names(repo: Path) -> tuple[set[str], set[str]]:  # noqa: PLR
     if setup_cfg.is_file():
         parser = configparser.ConfigParser()
         try:
-            parser.read(setup_cfg, encoding="utf-8")
+            parser.read_string(metadata_text(setup_cfg))
             for section in parser.sections():
                 if section.startswith("options.entry_points"):
                     for name, _ in parser.items(section):
@@ -552,9 +553,11 @@ def _import_claims(  # noqa: PLR0912
     return claims
 
 
-def extract_block_claims(parsed: ParsedDoc, repo: Path) -> BlockExtractionResult:
+def extract_block_claims(
+    parsed: ParsedDoc, repo: Path, *, command_context: tuple[set[str], set[str]] | None = None
+) -> BlockExtractionResult:
     """Extract claims using only fenced text and repository metadata."""
-    names, modules = project_command_names(repo)
+    names, modules = command_context if command_context is not None else project_command_names(repo)
     counts: ClaimCounter = Counter()
     claims = []
     for token in parsed.tokens:

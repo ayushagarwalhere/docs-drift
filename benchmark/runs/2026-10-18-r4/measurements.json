@@ -1,0 +1,566 @@
+{
+  "pre-commit/pre-commit": {
+    "repo": ".docs-drift/repositories/pre-commit--pre-commit/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "20b1e7cb12b836f010a56ad854a3eb8059afe5b2",
+    "seconds": 5.038193899963517,
+    "stages": {
+      "docs": 1.8174327000160702,
+      "index": 1.226524600002449,
+      "match": 0.6182796999928541,
+      "history": 0.7410342000075616
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 6,
+    "symbols": 1348,
+    "findings": {
+      "by_verdict": {
+        "ok": 2,
+        "missing": 3,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 1
+      },
+      "by_kind": {
+        "cli_flag": 0,
+        "cli_command": 0,
+        "env_var": 1,
+        "endpoint": 0,
+        "config_key": 0,
+        "symbol": 3,
+        "file_path": 2,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 6,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 0
+  },
+  "simonw/sqlite-utils": {
+    "repo": ".docs-drift/repositories/simonw--sqlite-utils/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "9c66bafa52ae23d40499c74b0db3b635bcddb876",
+    "seconds": 9.627685700019356,
+    "stages": {
+      "docs": 3.5457649000454694,
+      "index": 1.1870160000398755,
+      "match": 3.9338415999663994,
+      "history": 0.5936740000033751
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 766,
+    "symbols": 1404,
+    "findings": {
+      "by_verdict": {
+        "ok": 461,
+        "missing": 233,
+        "renamed": 2,
+        "default_changed": 0,
+        "invalid_command": 64,
+        "unverifiable": 6
+      },
+      "by_kind": {
+        "cli_flag": 341,
+        "cli_command": 99,
+        "env_var": 0,
+        "endpoint": 2,
+        "config_key": 0,
+        "symbol": 115,
+        "file_path": 13,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 5,
+        "code_command": 191,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 766,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 4
+  },
+  "fastapi/fastapi-cli": {
+    "repo": ".docs-drift/repositories/fastapi--fastapi-cli/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "093be9ca19f2ef44ba523aae0a98d6c9ea2e0888",
+    "seconds": 4.2751385000301525,
+    "stages": {
+      "docs": 2.0949325999827124,
+      "index": 1.105192499991972,
+      "match": 0.6941284999484196,
+      "history": 0.0019412999972701073
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 1,
+    "symbols": 305,
+    "findings": {
+      "by_verdict": {
+        "ok": 1,
+        "missing": 0,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 0
+      },
+      "by_kind": {
+        "cli_flag": 0,
+        "cli_command": 0,
+        "env_var": 1,
+        "endpoint": 0,
+        "config_key": 0,
+        "symbol": 0,
+        "file_path": 0,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 1,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 0
+  },
+  "fastapi/full-stack-fastapi-template": {
+    "repo": ".docs-drift/repositories/fastapi--full-stack-fastapi-template/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
+    "seconds": 7.668038200004958,
+    "stages": {
+      "docs": 3.972011800040491,
+      "index": 1.148452699999325,
+      "match": 0.7146411999710836,
+      "history": 1.17226160003338
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 110,
+    "symbols": 710,
+    "findings": {
+      "by_verdict": {
+        "ok": 65,
+        "missing": 24,
+        "renamed": 5,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 16
+      },
+      "by_kind": {
+        "cli_flag": 5,
+        "cli_command": 8,
+        "env_var": 36,
+        "endpoint": 2,
+        "config_key": 0,
+        "symbol": 1,
+        "file_path": 42,
+        "package_script": 7,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 9,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 110,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 74
+  },
+  "pallets/flask": {
+    "repo": ".docs-drift/repositories/pallets--flask/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "d086db856be187255b8ec61ef409357393020f32",
+    "seconds": 14.929833100002725,
+    "stages": {
+      "docs": 7.016978300001938,
+      "index": 2.032165599986911,
+      "match": 2.230440000013914,
+      "history": 3.245672299992293
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 299,
+    "symbols": 1304,
+    "findings": {
+      "by_verdict": {
+        "ok": 41,
+        "missing": 234,
+        "renamed": 4,
+        "default_changed": 0,
+        "invalid_command": 18,
+        "unverifiable": 2
+      },
+      "by_kind": {
+        "cli_flag": 53,
+        "cli_command": 6,
+        "env_var": 42,
+        "endpoint": 36,
+        "config_key": 0,
+        "symbol": 55,
+        "file_path": 80,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 2,
+        "code_command": 25,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 299,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 0
+  },
+  "django-oscar/django-oscar": {
+    "repo": ".docs-drift/repositories/django-oscar--django-oscar/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "16353384039253cc4e6e9d7684d5bd63522dffbc",
+    "seconds": 30.731740200018976,
+    "stages": {
+      "docs": 14.696731799980626,
+      "index": 5.389181400008965,
+      "match": 9.076595299993642,
+      "history": 0.6798952000099234
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 232,
+    "symbols": 6171,
+    "findings": {
+      "by_verdict": {
+        "ok": 5,
+        "missing": 217,
+        "renamed": 1,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 9
+      },
+      "by_kind": {
+        "cli_flag": 1,
+        "cli_command": 0,
+        "env_var": 103,
+        "endpoint": 14,
+        "config_key": 0,
+        "symbol": 61,
+        "file_path": 45,
+        "package_script": 0,
+        "make_target": 2,
+        "default_value": 6,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 232,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 1
+  },
+  "tj/commander.js": {
+    "repo": ".docs-drift/repositories/tj--commander.js/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "ba6d13ddb4243e5913367734f8c159089ffe7834",
+    "seconds": 6.844292499998119,
+    "stages": {
+      "docs": 3.563227200007532,
+      "index": 1.108019899984356,
+      "match": 0.7045695999986492,
+      "history": 0.5482605999568477
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 61,
+    "symbols": 619,
+    "findings": {
+      "by_verdict": {
+        "ok": 19,
+        "missing": 41,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 1
+      },
+      "by_kind": {
+        "cli_flag": 24,
+        "cli_command": 6,
+        "env_var": 3,
+        "endpoint": 0,
+        "config_key": 0,
+        "symbol": 23,
+        "file_path": 2,
+        "package_script": 2,
+        "make_target": 0,
+        "default_value": 1,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 61,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 1
+  },
+  "yargs/yargs": {
+    "repo": ".docs-drift/repositories/yargs--yargs/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "8021675da05763e13d9744aef953be65c0fd878f",
+    "seconds": 9.00303789996542,
+    "stages": {
+      "docs": 5.5382098000263795,
+      "index": 1.1094307000166737,
+      "match": 1.074078699981328,
+      "history": 0.9240829999907874
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 143,
+    "symbols": 965,
+    "findings": {
+      "by_verdict": {
+        "ok": 27,
+        "missing": 116,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 0
+      },
+      "by_kind": {
+        "cli_flag": 15,
+        "cli_command": 0,
+        "env_var": 2,
+        "endpoint": 0,
+        "config_key": 17,
+        "symbol": 101,
+        "file_path": 8,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 143,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 1
+  },
+  "expressjs/express": {
+    "repo": ".docs-drift/repositories/expressjs--express/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "0dee2c52c7c873498f8ed7d8ee4ddd0a04d3ada8",
+    "seconds": 7.672286399989389,
+    "stages": {
+      "docs": 3.932284399983473,
+      "index": 1.4183520000078715,
+      "match": 0.8630808000452816,
+      "history": 1.1523108000401407
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 3,
+    "symbols": 400,
+    "findings": {
+      "by_verdict": {
+        "ok": 1,
+        "missing": 1,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 1
+      },
+      "by_kind": {
+        "cli_flag": 0,
+        "cli_command": 1,
+        "env_var": 0,
+        "endpoint": 0,
+        "config_key": 0,
+        "symbol": 0,
+        "file_path": 1,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 1,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 3,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 1
+  },
+  "dubinc/dub": {
+    "repo": ".docs-drift/repositories/dubinc--dub/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "0d216ee41eafb21ade9c21d5ec2bf8609c21c145",
+    "seconds": 41.30136300000595,
+    "stages": {
+      "docs": 16.71240229997784,
+      "index": 15.563746300002094,
+      "match": 2.134912100038491,
+      "history": 6.4682470000116155
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 101,
+    "symbols": 7720,
+    "findings": {
+      "by_verdict": {
+        "ok": 12,
+        "missing": 52,
+        "renamed": 3,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 34
+      },
+      "by_kind": {
+        "cli_flag": 7,
+        "cli_command": 13,
+        "env_var": 1,
+        "endpoint": 6,
+        "config_key": 7,
+        "symbol": 6,
+        "file_path": 18,
+        "package_script": 18,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 25,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 101,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 2016
+  },
+  "encode/httpx": {
+    "repo": ".docs-drift/repositories/encode--httpx/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+    "seconds": 13.690128299989738,
+    "stages": {
+      "docs": 8.145881499978714,
+      "index": 1.3211562999640591,
+      "match": 1.8833684000419453,
+      "history": 1.6921025000046939
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 94,
+    "symbols": 1204,
+    "findings": {
+      "by_verdict": {
+        "ok": 16,
+        "missing": 78,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 0
+      },
+      "by_kind": {
+        "cli_flag": 2,
+        "cli_command": 0,
+        "env_var": 12,
+        "endpoint": 0,
+        "config_key": 11,
+        "symbol": 53,
+        "file_path": 16,
+        "package_script": 0,
+        "make_target": 0,
+        "default_value": 0,
+        "code_command": 0,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 94,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 0
+  },
+  "withastro/astro": {
+    "repo": ".docs-drift/repositories/withastro--astro/repository",
+    "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+    "source_unchanged_during_scan": true,
+    "head_sha": "70834bbea43695c563358ea055d32ecb5e0a78dd",
+    "seconds": 531.7667156999814,
+    "stages": {
+      "docs": 78.42194879997987,
+      "index": 38.829304500017315,
+      "match": 11.07327960000839,
+      "history": 399.6529504999635
+    },
+    "peak_tracemalloc_bytes": null,
+    "claims": 305,
+    "symbols": 5338,
+    "findings": {
+      "by_verdict": {
+        "ok": 101,
+        "missing": 145,
+        "renamed": 0,
+        "default_changed": 0,
+        "invalid_command": 0,
+        "unverifiable": 59
+      },
+      "by_kind": {
+        "cli_flag": 23,
+        "cli_command": 15,
+        "env_var": 7,
+        "endpoint": 2,
+        "config_key": 6,
+        "symbol": 28,
+        "file_path": 159,
+        "package_script": 37,
+        "make_target": 0,
+        "default_value": 1,
+        "code_command": 27,
+        "prose": 0
+      },
+      "by_decider": {
+        "rules": 305,
+        "llm": 0
+      }
+    },
+    "history_enabled": true,
+    "docs_only": false,
+    "warning_count": 110
+  }
+}

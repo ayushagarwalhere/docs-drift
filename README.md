@@ -1,319 +1,234 @@
 # docs-drift
 
-## Product brief
+## Judges start here
 
-`docs-drift` helps maintainers and new contributors discover when repository documentation no longer describes the code: a CLI flag is renamed, an environment variable disappears, an HTTP route moves, or a default changes while the README stays behind. It reads documentation to extract concrete claims, indexes source as text or AST without importing or executing it, and matches those claims to code evidence using deterministic rules. Each claim receives an `OK`, `missing`, `renamed`, `default changed`, `invalid command`, or `unverifiable` verdict with file, line, and supporting text; confirmed drift is enriched with the introducing commit and author when git history supports that attribution. A graph connects doc files, sections, claims, symbols, source files, commits, and authors so maintainers can also ask which docs mention code touched by a PR. An optional LLM may assess prose claims that rules cannot decide, but it can never override a code verdict or turn detected drift into `OK`.
+- **Public demo:** pending deployment approval; no public URL is claimed yet.
+- **Video:** pending owner recording and upload; target 1:53 with captions.
+- **Source:** [GitHub repository](https://github.com/ayushagarwalhere/docs-drift).
+- **Evidence:** [benchmark results](benchmark/RESULTS.md),
+  [measured limitations](docs/RESULTS.md), and [submission checklist](SUBMISSION.md).
 
-## Run the scaffold
+Three-command local quick start (Python 3.11+, Git and uv installed):
 
-From this repository root:
-
-```console
-uv sync
-uv run docs-drift --help
-uv run docs-drift --version
-uv run docs-drift --repo . --format json --no-color scan
+```sh
+git clone https://github.com/ayushagarwalhere/docs-drift.git
+cd docs-drift
+uv run --all-extras docs-drift scan --repo .
 ```
 
-The version is `0.1.0`, read from installed distribution metadata. Full scans
-compare extracted claims with the static code index and report evidence. The
-scanner parses docs and fenced snippets as text and never imports or executes
-code from the scanned repository:
+Release preparation: [owner's publish gates](RELEASING.md). Public installs and
+URLs must be verified after approval; local checks do not prove a published release.
 
-```console
-uv run docs-drift --repo . scan --claims-only
-uv run docs-drift --repo tests/fixtures/repos/py-cli scan --claims-only
-uv run docs-drift --repo . scan --all
-uv run docs-drift --repo . check --fail-on drift
-uv run docs-drift --repo . baseline update
+**Find the lines in your docs that your code no longer supports, and the commit that broke each one.**
+
+[![CI](https://img.shields.io/badge/CI-configured-blue)](.github/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/docs-drift.svg)](https://pypi.org/project/docs-drift/)
+[![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
+
+Alpha software: source installation works before the first package is published.
+The PyPI page becomes available after the owner approves publication; the hosted
+demo and video remain explicitly pending above. Real-world
+precision and recall are **pending human labeling**, not inferred from fixtures.
+
+![Actual fixture scan output, eight-second terminal replay](docs/assets/scan-demo.gif)
+
+![HTML evidence graph from the actual py-cli fixture](docs/assets/graph-view.png)
+
+## Why (illustrative fixture)
+
+**PERSONALISE: replace this paragraph with your own experience.** A new contributor
+copies the README's first command and it fails. In this synthetic example, the
+README still says `--port`, while the code now accepts `--listen`. docs-drift
+connects the stale statement, current source and the change that explains it.
+
+The fixture shown above is deliberately synthetic; it is not a public accuracy
+measurement. Static matching is partial, so inspect evidence before accepting a fix.
+
+For beginners contributing to documentation, an evidence-backed finding can be a
+concrete first contribution. Maintainers can use the same checks to keep docs
+aligned with a changing codebase; the suggested patches still need review.
+
+## Quick start
+
+From this source checkout, with Python 3.11+ and Git:
+
+```sh
+uv sync --locked --all-extras
+uv run docs-drift scan
 ```
 
-The claims table includes source location, kind, normalized value, qualifier,
-default, extraction source, and confidence. `--show-suppressed` lists inline
-suppression comments; `--verbose` prints stage timings. `check` supports
-confidence and finding-count thresholds, and `--baseline PATH` limits CI
-failures to new drift. `baseline update` refreshes the explicit baseline,
-`explain FINDING_ID` prints its evidence chain, and `ignore CLAIM_ID` adds a
-stable claim ID to `.docs-drift.toml`. `graph`, `init`, and `serve` are
-still stubs. Put global options before the command. Help and version work
-without loading repository configuration.
+After the first PyPI release, these are the intended package entry points:
 
-### Configuration
+```sh
+pipx install docs-drift
+docs-drift scan
+# Alternative after publication:
+uvx docs-drift scan
+```
 
-Select the first available source in this order: explicit `--config PATH`,
-`<repo>/.docs-drift.toml`, `[tool.docs-drift]` in `<repo>/pyproject.toml`, or defaults.
-Sources are not merged; omitted fields use schema defaults. An empty selected
-file therefore uses defaults. Explicit relative paths use the current working
-directory; implicit paths use `--repo`, which defaults to the current directory.
-A missing explicit file, malformed TOML, or invalid known field produces an
-error with a suggested next step. Unknown keys warn and are ignored, including
-keys inside `llm` and `history`.
+Or build the CLI container locally (Docker must be running):
 
-Example `.docs-drift.toml` (use `[tool.docs-drift]` and prefixed nested table names
-when placing the same settings in `pyproject.toml`):
+```sh
+docker build -t docs-drift:local . && docker run --rm -v "$PWD:/repo" docs-drift:local scan --repo /repo
+```
+
+Try it in your browser: the public demo URL is pending hosting approval. Locally,
+start `uv run python -m docs_drift.web` and open `http://127.0.0.1:8080`; set
+`DOCS_DRIFT_ALLOWED_ORIGIN` to that exact origin before submitting a scan.
+
+Useful commands, exercised against a trusted fixture in CI:
+
+```sh
+docs-drift scan --no-color
+docs-drift scan --format html --output scan.html
+docs-drift insights --format json
+docs-drift impact --base HEAD~1 --format json
+docs-drift fix
+docs-drift check  # documented exit: 1 on the stale py-cli fixture
+```
+
+`scan` reports findings and exits 0. `check` exits 1 for findings meeting its
+threshold, or 2 for usage/configuration errors. `fix` previews a patch; applying
+it requires an explicit write option and confirmation. No target code is run.
+
+## What it checks (illustrative fixtures)
+
+| Claim kind | Example documentation | Static evidence |
+| --- | --- | --- |
+| CLI flag / command | A synthetic README mentions `--port` | argparse/Click/Typer or Commander declarations |
+| Environment variable | A synthetic README mentions `APP_LOG_LEVEL` | literal environment reads or safe config templates |
+| Endpoint | A synthetic guide requests `GET /status` | literal FastAPI/Flask/Express routes |
+| Setting / default | A synthetic guide says `workers` defaults to 4 | a recognized literal declaration/default |
+| Code symbol | A synthetic guide calls `Client.connect()` | a parsed function/class/method declaration |
+| File path | A synthetic guide links `config/settings.toml` | a contained repository-relative path |
+| Package script / task | A synthetic guide invokes `npm run build` | package manifests and Make/just task declarations |
+| Project command | A synthetic guide runs `tool serve --port 8000` | independently identified executable/command/flags |
+
+Arbitrary behavioural prose is not proved by name matching. Optional model
+assessment is separately labeled and constrained by source citations.
+
+## Supported ecosystems
+
+<!-- support-table:start -->
+| Language | Framework / surface | Support |
+| --- | --- | --- |
+| Python | AST declarations | partial |
+| Python | argparse | partial |
+| Python | Click | partial |
+| Python | Typer | partial |
+| Python | FastAPI | partial |
+| Python | Flask | partial |
+| Python | Django / DRF | none |
+| JavaScript / TypeScript | AST declarations | partial |
+| JavaScript / TypeScript | Commander | partial |
+| JavaScript / TypeScript | yargs | none |
+| JavaScript / TypeScript | Express | partial |
+| JavaScript / TypeScript | Next.js / NestJS routes | none |
+| JSON / YAML / TOML / INI | literal settings | partial |
+| Go / Rust | language-specific configuration | none |
+<!-- support-table:end -->
+
+Partial means recognized literal/static patterns, not complete framework support.
+No framework is advertised as fully supported. Dynamic registration, signatures,
+router composition and generated source may remain unverifiable.
+
+## CI
+
+This ten-line example uses the development Action from this repository:
+
+```yaml
+name: Documentation
+on: [push, pull_request]
+permissions: {contents: read}
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: ./
+        with: {repo: '.', fail-on-drift: 'true'}
+```
+
+Other projects must replace the local action path with the real repository pinned
+to a reviewed commit after publication. Reports include JSON, HTML, SARIF and
+escaped Markdown. The Action needs no write token, accepts no model key, and never
+posts a PR comment automatically. [Action guide](docs/github-action.md).
+
+![Preview of generated PR Markdown, not a submitted comment](docs/assets/pr-comment-preview.png)
+
+## Editor
+
+The development VS Code extension supplies diagnostics, definitions and safe
+quick fixes via the stdio LSP. **Actual squiggle GIF pending a verified editor
+capture**; protocol tests are not presented as a native-editor recording.
+[Extension guide](docs/vscode.md).
+
+## How it works
+
+```mermaid
+flowchart LR
+  D[Docs] --> C[Located claims]
+  S[Source text / AST] --> I[Static index]
+  C --> M[Scoped matching]
+  I --> M
+  M --> H[Bounded Git history]
+  H --> R[Evidence, reports and reviewable fixes]
+```
+
+```mermaid
+flowchart LR
+  Section --> Claim
+  Claim --> Symbol
+  Symbol --> SourceFile
+  SourceFile --> Commit
+```
+
+Rules decide literal claims first. Optional model assessment handles selected
+anchored prose, cannot override code-decided findings, and must cite supplied
+source that passes validation.
+
+## Accuracy and limitations
+
+<!-- accuracy:start -->
+Real-world accuracy is **not yet established**. The 12-repository protocol and
+blank human labeling sheet are in [the benchmark](benchmark/PROTOCOL.md); its
+[dated results](benchmark/RESULTS.md) keep precision/recall pending until the owner
+labels them. Fixture scores establish plumbing, not product accuracy. Missing
+findings can be intentional examples, third-party tools or indexing limitations;
+review every report. [Known limitations](docs/LIMITATIONS.md).
+<!-- accuracy:end -->
+
+## Configuration
 
 ```toml
-docs = ["README.md", "docs/**/*.md", "*.md"]
-exclude = ["node_modules/**", ".venv/**", "vendor/**", "CHANGELOG.md", "**/CHANGELOG.md"]
-languages = "auto" # Or an explicit list, e.g. ["python", "typescript"].
-ignore = []
+# .docs-drift.toml
 min_confidence = 0.6
-
-[llm]
-enabled = false
-# model = "anthropic/claude-sonnet-4.6" # Selected only when the model layer is enabled.
-max_claims = 40
-concurrency = 4
-budget = 0.50
-timeout = 60
-redact_paths = ["private/**"]
-
 [history]
 max_commits = 2000
 ```
 
-Changelogs are excluded because they intentionally describe past behavior.
+The [full configuration reference](docs/configuration.md) is generated from the
+Pydantic model and checked for freshness in CI. Common CLI options work before
+or after subcommands. [CLI reference](docs/CLI.md).
 
-### Optional OpenRouter prose checks
+## Privacy and security
 
-Install with `uv sync --extra llm`. Set `OPENROUTER_API_KEY` in your environment;
-the key is never a configuration field. For PowerShell, enter it without echoing:
+Rule-only scans parse local text/AST and call Git for evidence. They never import
+or execute target modules or fenced commands. Optional model mode sends selected
+redacted documentation/source excerpts through OpenRouter to the chosen provider;
+replay mode sends nothing. The public demo and composite Action are rule-only.
+[Security policy](SECURITY.md) ? [Threat model](docs/SECURITY.md).
 
-```powershell
-$modelKey = Read-Host "OpenRouter API key" -AsSecureString
-$env:OPENROUTER_API_KEY = [System.Net.NetworkCredential]::new("", $modelKey).Password
-uv run docs-drift --repo . scan --llm --llm-budget 0.50
-```
+## Built with voice
 
-The optional layer assesses code-anchored behavioural prose after rules run.
-Rule-decided claims are excluded, and every model judgement must cite an exact
-quote in a supplied source snippet. `[llm]` marks model findings, which are counted
-separately and capped at 0.75 confidence. Read [the security and privacy policy](docs/SECURITY.md)
-for exactly what is sent, redaction limits, injection defence, and budget estimates.
+**AUTHOR TO WRITE / PERSONALISE:** describe your real hands-free workflow with
+Wispr Flow for the No Hands challenge, your usage card and dictated prompts.
+[How I built it ? placeholder](docs/built-with-voice.md). No story or usage figures
+have been invented.
 
-`DOCS_DRIFT_LLM_MODE` accepts `live`, `record`, or `replay`. Replay is key-free and
-fails on a missing request hash. Checked-in recordings are explicitly synthetic
-test responses; they do not demonstrate live-model accuracy. To record genuine
-fixture calls: `uv run python scripts/record.py`; `--dry-run` sends nothing and
-`--prune` removes stale recordings after a successful recording run.
+## Contributing and licence
 
-### Reviewable documentation fixes
-
-```console
-uv run docs-drift --repo . fix
-uv run docs-drift --repo . fix --patch changes.diff
-uv run docs-drift --repo . --format json fix
-uv run docs-drift --repo . fix --write
-uv run docs-drift --repo . fix --write --yes
-uv run docs-drift --repo . fix --llm
-```
-
-The default previews a coloured unified diff. `--write` asks per file; `--yes`
-explicitly skips those prompts. Certain renames, defaults, and removed flags get
-rule edits. Missing names without a replacement remain suggestions. A removed
-`--dry-run` flag carries a reviewer note about changed meaning. Hash checks trigger
-a fresh scan if the file changed; edits preserve BOMs and line endings. Optional
-model sentence rewrites must pass identifier and claim checks before presentation.
-Confidence is between 0 and 1; history limits are nonnegative integers.
-Configuration loading reads TOML text only and executes no repository code.
-
-### Development and packaging
-
-Use `uv run just setup` to sync all extras and install the local pre-commit hook,
-then `uv run just check` for the full quality gate. We use just rather than both
-just and Make: recipes run with native PowerShell on Windows and sh on Unix.
-`rust-just` is included in the development dependencies, so a separate global
-installation is unnecessary. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
-
-```console
-uv run pytest -q
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy
-uv build
-```
-
-CI runs on pushes and pull requests with Ubuntu and Windows, each on Python 3.11
-and 3.13, using full Git history and all extras. The coverage gate is fixed at
-80%; a lower result must be reported, never fixed by lowering the threshold.
-`just test` reports coverage for both the package and the staged-file guard.
-`just fmt` rewrites formatting; `just check` checks formatting without rewriting.
-The `dogfood` CI job and `just demo` currently run CLI help; both will run against
-documentation fixtures when scanning is implemented.
-
-Pre-commit checks Ruff, formatting, final newlines, trailing whitespace, and
-staged-file safety. `scripts/guard.py` checks the Git index, including binary
-files: it blocks files over 1 MB (1,000,000 bytes), `.env` and `.env.*` files,
-and token-shaped Anthropic, GitHub, and AWS keys. It reports locations without
-printing secret values. Text line endings are normalized to LF by `.gitattributes`.
-
-uv installs the default development dependency group in a checkout. A matching
-`dev` extra is available to package users; optional integrations can be installed
-with `uv sync --extra graph`, `--extra llm`, or `--extra web`. Dependency metadata
-uses lower bounds only. Commit `uv.lock` for reproducible development; it does
-not pin dependencies in published package metadata. Hatchling builds a wheel
-and source distribution using the existing src layout. The package includes a
-`py.typed` marker and is licensed under MIT. Publishing itself is not performed.
-
-If uv cannot write to its usual cache in a restricted environment, set
-`UV_CACHE_DIR` to the repository's ignored `.uv-cache` directory before running
-these commands (PowerShell: `$env:UV_CACHE_DIR = Join-Path (Get-Location) '.uv-cache'`).
-
-For pytest under the same restriction, set `PYTEST_DEBUG_TEMPROOT` to an
-existing writable directory, for example `.docs-drift/test-temp`. This keeps
-test scratch files inside the ignored scanner cache without changing normal
-pytest behavior for other environments.
-
-## Working agreement
-
-### Documentation parsing
-
-Discovery applies configured globs and ignores, returning sorted documentation
-metadata. Git roots scan tracked files; other directories use a vendor-pruned
-walk with nested `.gitignore` support. Files over 2 MB warn and are skipped;
-UTF-8 decoding replaces bad bytes. Markdown, `.markdown`, and MDX use static
-Markdown parsing. **RST support is basic and opt-in** through configured globs;
-it recognizes simple heading adornments, not full Sphinx directives or roles.
-
-```python
-from pathlib import Path
-from docs_drift.config import Config
-from docs_drift.docs.discover import discover_docs, read_doc
-from docs_drift.docs.sections import parse_document
-
-root = Path("tests/fixtures/repos/clean-repo")
-for doc in discover_docs(root, Config()):
-    parsed = parse_document(doc, read_doc(root, doc))
-    for section in parsed.sections:
-        print(section.heading, section.start_line, section.end_line, section.context)
-```
-
-Sections retain heading trails, source line ranges, and historical context.
-`is_historical_span(section, line)` also recognizes historical paragraphs inside
-current sections. `Section.historical_spans` stores those ranges without global
-state. Claim extraction is available as a conservative pipeline step:
-
-```python
-from docs_drift.docs.extract_inline import extract_claims
-
-result = extract_claims(parsed)
-for claim in result.claims:
-    print(claim.kind, claim.value, claim.doc_path, claim.line)
-print("historical mentions ignored:", result.historical_skipped)
-```
-
-Backticked flags, environment variables, endpoints, paths, commands, and clearly
-named symbols are stronger evidence than table entries or explicit default
-phrases. Shell fences are inspected as text and known invocations are retained
-as command claims; commands are never run. Historical mentions are suppressed
-and counted. The integrated `scan --claims-only` pipeline merges duplicate
-locations, applies confidence and ignore filters, retains explicitly suppressed
-claims, and counts historical mentions. Matching and verdict generation remain
-unimplemented. Fixture claim recall can be reproduced with
-`uv run python scripts/measure.py`; the command prints its own provenance.
-
-### Shared data contracts
-
-The pipeline shares typed models in `docs_drift.models`. Pure ID helpers in
-`docs_drift.ids` use meaningful content instead of line numbers or UUIDs:
-
-```python
-from docs_drift.ids import make_claim_id
-from docs_drift.models import ClaimKind
-
-before = make_claim_id("docs/usage.md", ["Usage"], ClaimKind.cli_flag, "--port")
-after_line_shift = make_claim_id("docs/usage.md", ["Usage"], ClaimKind.cli_flag, "--port")
-assert before == after_line_shift
-```
-
-`ScanResult.model_dump_json()` writes a versioned report and
-`ScanResult.model_validate_json(text)` restores it. `summary()` counts findings
-by verdict and claim kind; `Finding.is_drift` identifies actionable drift.
-Historical-section classification and matching stay in the pipeline. See
-[the model contract](docs/design.md#shared-models-and-identity-contract) for path,
-location, identity, timestamp, and default-value conventions.
-
-### Fixed evaluation fixtures
-
-The fixture specification builds `py-cli`, `fastapi-svc`, `node-tool`, and
-`clean-repo` with real, deterministic Git histories. The first three preserve
-stale READMEs across source changes; the clean repository covers historical
-sections, excluded changelogs, example values, and third-party flags.
-
-```console
-uv run python tests/fixtures/build_fixtures.py
-uv run python scripts/measure.py
-uv run pytest tests/test_fixtures_build.py tests/test_measure.py -q
-```
-
-Manual generation writes ignored `tests/fixtures/repos/`; tests use fresh temp
-directories and compare independent builds. The builder refuses existing repo
-destinations; use `--output PATH` to select a fresh directory. Never commit the
-nested `.git` folders or import, install, or run generated fixture programs.
-See the hand-authored [answer key and provenance](tests/fixtures/ANSWER_KEY.md).
-The measurement stub only validates the JSON key; it reports no precision or
-recall until scoring exists. Fix detector behavior against these expectations,
-never the expectations against detector output.
-
-### Fixed identity and stack
-
-- PyPI distribution: `docs-drift`; CLI: `docs-drift`; import: `import docs_drift`.
-- Python 3.11+, managed with uv, using a `src/docs_drift/` layout.
-- Typer for the CLI, Rich for terminal output, and Pydantic v2 for models.
-- pytest, Ruff, and strict mypy for checks.
-- Optional extras named `graph`, `llm`, and `web`; basic rule-based scanning must work without them.
-- The optional integrations target FalkorDB (`graph`), Anthropic (`llm`), and FastAPI, Uvicorn, and Jinja2 (`web`), as specified in the scaffold requirements.
-- The current scaffold provides packaging, configuration loading, and CLI stubs only. Scanning and optional integrations are not implemented. Never create automatic commits.
-
-### Definition of done for each change
-
-- The agreed pytest, Ruff, and strict mypy checks pass once the tooling exists. Report exact commands, results, and any checks that could not run; unavailable tooling is not a passing check.
-- Review the diff for scope, correctness, and accidental changes.
-- Update the README when behavior changes and show a representative input/output example.
-- Keep the design and evidence contract consistent with the behavior.
-- Preserve the scan safety boundary and the fixed fixture answer key.
-- Provide a proposed commit message; leave committing to the user.
-
-## Planned module map
-
-The package boundary, configuration loader, and CLI skeleton exist; the remaining modules are planned.
-
-| Path | Responsibility |
-| --- | --- |
-| `src/docs_drift/__init__.py` | Package boundary. |
-| `src/docs_drift/config.py` | Pydantic configuration schema and TOML source selection. |
-| `src/docs_drift/models.py` | Typed claims, evidence, symbols, verdicts, and report models. |
-| `src/docs_drift/docs/` | Discover docs, parse sections and code blocks, extract claims. |
-| `src/docs_drift/index/` | Build source indexes using text and AST only. |
-| `src/docs_drift/match/` | Apply deterministic matching and verdict rules. |
-| `src/docs_drift/history.py` | Attribute confirmed drift using git evidence. |
-| `src/docs_drift/graph/` | Build relationships and support impact queries. |
-| `src/docs_drift/llm/` | Optional, separately labeled prose assessment. |
-| `src/docs_drift/report/` | Render findings and their evidence. |
-| `src/docs_drift/cli.py` | Typer entry point and Rich output. |
-| `src/docs_drift/web/` | Optional FastAPI interface. |
-
-## Illustrative example, not implemented behavior
-
-Documentation at `README.md:42` says `serve --port 8000`. Source evidence and git history establish that `--port` became `--listen`.
-
-```text
-renamed: README.md:42 documents --port; source now declares --listen.
-Doc evidence: README.md:42  serve --port 8000
-Source evidence: src/example/cli.py:18  parser.add_argument("--listen")
-History: a1b2c3d, Priya, 3 September [illustrative attribution]
-```
-
-A missing `--port` declaration alone does not prove a rename. Without a supported mapping, the tool must not invent one.
-# Static code index
-
-`docs-drift index` parses tracked source files as text or AST; it never imports or executes a scan repository. Use `--no-cache` to rebuild, `--list KIND` to inspect one symbol type, `--find NAME` for fuzzy lookup, `--tree` to print CLI commands and flags, and `cache clear` to remove the local index cache. The cache is a per-file atomic JSON document under `.docs-drift/cache/`.
-
-The first indexers support Python declarations and argparse/Click/Typer patterns, JavaScript/TypeScript declarations and common Commander/Express patterns, literal Python/JS routes, package scripts, common config formats, Docker snippets, CI jobs, and common task files. Coverage is partial: dynamic plugin registration, generated declarations, complex router composition, and unsupported ecosystems may remain unverifiable. RST parsing is basic. Rust and Go configuration indexing are not implemented.
-
-| Source language or surface | Current index coverage |
-| --- | --- |
-| Python | AST symbols, argparse, partial Click/Typer, FastAPI/Flask patterns, settings defaults |
-| JavaScript/TypeScript | Tree-sitter-backed symbols, partial Commander patterns, Express routes, package scripts and env examples |
-| JSON, YAML, TOML, INI, Docker, CI and task files | Literal keys, jobs, scripts and targets; format-specific coverage is partial |
-| Django/DRF, Next.js, NestJS, OpenAPI and Rust/Go config | Not implemented or only partial; never infer missing solely from absent symbols |
+See [CONTRIBUTING.md](CONTRIBUTING.md). Run tests, lint and type checks before
+opening a change; do not change a frozen benchmark's rules or prefill human labels.
+The code is [MIT licensed](LICENSE). [Changelog](CHANGELOG.md).

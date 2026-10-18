@@ -1,0 +1,823 @@
+{
+  "schema_version": 1,
+  "repo_path": "node-tool-demo",
+  "head_sha": "e36fa00d8efd0c431f810f11ada620cddb44eb7f",
+  "scan_time": "2026-10-18T12:17:39.231106Z",
+  "config_used": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "content_hash": "1bb05826cfac61f291c733c080b6d2d0834de4ae4c873802c11b5d644bde733b",
+      "format": "markdown"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "doc_path": "README.md",
+      "heading": "node-tool",
+      "heading_level": 1,
+      "heading_path": [
+        "node-tool"
+      ],
+      "start_line": 1,
+      "end_line": 11,
+      "context": "current",
+      "historical_spans": []
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim_d2134d75a71ba55b7b92cfc68346a9db4429fc018d51970b9963c0b63bcd20a3",
+      "kind": "package_script",
+      "raw_text": "npm run build:prod",
+      "value": "build:prod",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 3,
+      "column": 26,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 3,
+          "column": 26,
+          "raw_text": "npm run build:prod",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "d420474915dd3320a343cb79d3ea9f3312e0f6b015393a28d32b994a6134d4a0"
+    },
+    {
+      "claim_id": "claim_d12598cc77a7e55240db1ae1c97f7c9b9bc25bb8327ea4337c0c333592d49816",
+      "kind": "env_var",
+      "raw_text": "process.env.API_URL",
+      "value": "API_URL",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 4,
+      "column": 26,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 4,
+          "column": 26,
+          "raw_text": "process.env.API_URL",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "4676fab835eff9de9e5f8b30c4d26b12e9d948b2bcdf30fccb91e91526e98ee0"
+    },
+    {
+      "claim_id": "claim_4cc2cc9a97ebd3a12eba8a94222339b2daae59de003d4e96979461be916694e6",
+      "kind": "endpoint",
+      "raw_text": "GET /health",
+      "value": "GET /health",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 5,
+      "column": 23,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.95,
+      "locations": [
+        {
+          "line": 5,
+          "column": 23,
+          "raw_text": "GET /health",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "2a37694595703caae9479e739a98d813dc73735ba64302375119549f85a928d4"
+    },
+    {
+      "claim_id": "claim_795780b9865b0206fed67875f3d950558e498427f8020a071496fada6573e72f",
+      "kind": "code_command",
+      "raw_text": "npx node-tool deploy --dry-run",
+      "value": "npx node-tool deploy --dry-run",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 10,
+      "column": 1,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 10,
+          "column": 1,
+          "raw_text": "npx node-tool deploy --dry-run",
+          "extraction": "code_block"
+        },
+        {
+          "line": 10,
+          "column": 1,
+          "raw_text": "npx node-tool deploy --dry-run",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "18ef987d1dc669749ce6b9a95e8334c7bc63b1fe5865667dd90e40d28d488213"
+    },
+    {
+      "claim_id": "claim_480548161d8ba485d5b2808550e68fdbb9c8c5df426dab7cd47b17bf709398de",
+      "kind": "cli_command",
+      "raw_text": "deploy",
+      "value": "deploy",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 10,
+      "column": 1,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 10,
+          "column": 1,
+          "raw_text": "deploy",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "fc922af11ba255908f57ed1415ca2ce79cb66482668fc75806c027400bf8fb8b"
+    },
+    {
+      "claim_id": "claim_5a3da990541e200bea67bf8bbdb3c744c24208a2ac2f4d03e6d866fa93a00949",
+      "kind": "cli_flag",
+      "raw_text": "--dry-run",
+      "value": "--dry-run",
+      "qualifier": "deploy",
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 10,
+      "column": 1,
+      "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+      "extraction": "code_block",
+      "extraction_confidence": 0.85,
+      "locations": [
+        {
+          "line": 10,
+          "column": 1,
+          "raw_text": "--dry-run",
+          "extraction": "code_block"
+        }
+      ],
+      "extraction_sources": [
+        "code_block"
+      ],
+      "group_key": "ef6ca5d1b9dc4e9eb0893249d38f0fd4f56a2777b24bc3f752625af928edba16"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol_id": "symbol_7f4ec6166b128edddef3fa7fb316fa7fb9f9bd74dd3a9f61a2afb0f7b1ed1fe4",
+      "kind": "package_script",
+      "name": "build",
+      "qualified_name": "build",
+      "aliases": [],
+      "default": "tsc",
+      "file": "package.json",
+      "line": 1,
+      "language": "javascript",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_476bd8255c86684b535e3824b81e18168dc6241e80b3d33f8060f559330a598d",
+      "kind": "cli_command",
+      "name": "node-tool",
+      "qualified_name": "src.cli.node-tool",
+      "aliases": [
+        "node-tool"
+      ],
+      "default": null,
+      "file": "src/cli.ts",
+      "line": 1,
+      "language": "typescript",
+      "framework": "commander",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_11431c4e2120a23a2b72f1df729e0fc35900b054592ffce71840f214137e965d",
+      "kind": "cli_command",
+      "name": "node-tool",
+      "qualified_name": "src.cli.npx:node-tool",
+      "aliases": [
+        "node-tool"
+      ],
+      "default": null,
+      "file": "src/cli.ts",
+      "line": 1,
+      "language": "typescript",
+      "framework": "commander",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_9a1a072d06d03fb6534fee333536fc517128c14eaa9160e57def762da426af15",
+      "kind": "env_var",
+      "name": "API_BASE_URL",
+      "qualified_name": "src.cli.API_BASE_URL",
+      "aliases": [],
+      "default": null,
+      "file": "src/cli.ts",
+      "line": 5,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_aa6feab616a2677a50c8b0952b92efe69057a45edd73d7026d1793378c168d17",
+      "kind": "cli_command",
+      "name": "deploy",
+      "qualified_name": "src.cli.deploy",
+      "aliases": [],
+      "default": null,
+      "file": "src/cli.ts",
+      "line": 6,
+      "language": "typescript",
+      "framework": "commander",
+      "parent_id": "symbol_476bd8255c86684b535e3824b81e18168dc6241e80b3d33f8060f559330a598d",
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_ae8c5546ce7d2b7ee39ce02b1a666c84b10bcbfe4f5c4511a12d24598a2777c3",
+      "kind": "route",
+      "name": "GET /healthz",
+      "qualified_name": "GET /healthz",
+      "aliases": [],
+      "default": null,
+      "file": "src/cli.ts",
+      "line": 10,
+      "language": "typescript",
+      "framework": "express",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": "/healthz",
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    }
+  ],
+  "findings": [
+    {
+      "claim": {
+        "claim_id": "claim_d2134d75a71ba55b7b92cfc68346a9db4429fc018d51970b9963c0b63bcd20a3",
+        "kind": "package_script",
+        "raw_text": "npm run build:prod",
+        "value": "build:prod",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 3,
+        "column": 26,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 3,
+            "column": 26,
+            "raw_text": "npm run build:prod",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "d420474915dd3320a343cb79d3ea9f3312e0f6b015393a28d32b994a6134d4a0"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_7f4ec6166b128edddef3fa7fb316fa7fb9f9bd74dd3a9f61a2afb0f7b1ed1fe4",
+        "kind": "package_script",
+        "name": "build",
+        "qualified_name": "build",
+        "aliases": [],
+        "default": "tsc",
+        "file": "package.json",
+        "line": 1,
+        "language": "javascript",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "build",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 3,
+          "text": "npm run build:prod",
+          "end_line": null
+        },
+        {
+          "file": "package.json",
+          "line": 1,
+          "text": "-  \"scripts\": {\"build:prod\": \"tsc\"},\n+  \"scripts\": {\"build\": \"tsc\"},",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "3ef9444ea509abf03bd7a22340d43b0d8dcfd373",
+        "short_sha": "3ef9444",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-02T09:00:00Z",
+        "summary": "Rename the release build script"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed package_script named build:prod was found. Closest indexed candidates: build (package.json:1).",
+        "Git history confirms this name changed to build.",
+        "Git history changed this name in 3ef9444."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "- Build the release with `npm run build:prod`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_d12598cc77a7e55240db1ae1c97f7c9b9bc25bb8327ea4337c0c333592d49816",
+        "kind": "env_var",
+        "raw_text": "process.env.API_URL",
+        "value": "API_URL",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 4,
+        "column": 26,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 4,
+            "column": 26,
+            "raw_text": "process.env.API_URL",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "4676fab835eff9de9e5f8b30c4d26b12e9d948b2bcdf30fccb91e91526e98ee0"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_9a1a072d06d03fb6534fee333536fc517128c14eaa9160e57def762da426af15",
+        "kind": "env_var",
+        "name": "API_BASE_URL",
+        "qualified_name": "src.cli.API_BASE_URL",
+        "aliases": [],
+        "default": null,
+        "file": "src/cli.ts",
+        "line": 5,
+        "language": "python",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "API_BASE_URL",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 4,
+          "text": "process.env.API_URL",
+          "end_line": null
+        },
+        {
+          "file": "src/cli.ts",
+          "line": 1,
+          "text": "-const apiUrl = process.env.API_URL;\n+const apiUrl = process.env.API_BASE_URL;",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "6bd2e416c699a51e45d11a6b56784df6e6061218",
+        "short_sha": "6bd2e41",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-03T09:00:00Z",
+        "summary": "Rename the API base URL variable"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed env_var named API_URL was found. Closest indexed candidates: API_BASE_URL (src/cli.ts:5).",
+        "Git history confirms this name changed to API_BASE_URL.",
+        "Git history changed this name in 6bd2e41."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "- The API URL comes from `process.env.API_URL`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_4cc2cc9a97ebd3a12eba8a94222339b2daae59de003d4e96979461be916694e6",
+        "kind": "endpoint",
+        "raw_text": "GET /health",
+        "value": "GET /health",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 5,
+        "column": 23,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.95,
+        "locations": [
+          {
+            "line": 5,
+            "column": 23,
+            "raw_text": "GET /health",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "2a37694595703caae9479e739a98d813dc73735ba64302375119549f85a928d4"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_ae8c5546ce7d2b7ee39ce02b1a666c84b10bcbfe4f5c4511a12d24598a2777c3",
+        "kind": "route",
+        "name": "GET /healthz",
+        "qualified_name": "GET /healthz",
+        "aliases": [],
+        "default": null,
+        "file": "src/cli.ts",
+        "line": 10,
+        "language": "typescript",
+        "framework": "express",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": "/healthz",
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "/healthz",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 5,
+          "text": "GET /health",
+          "end_line": null
+        },
+        {
+          "file": "src/cli.ts",
+          "line": 1,
+          "text": "-app.get(\"/health\", (_req, res) => res.send(\"ok\"));\n+app.get(\"/healthz\", (_req, res) => res.send(\"ok\"));",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "12804ce9b1afc1a2326d9b0828c1fcea429811a5",
+        "short_sha": "12804ce",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-04T09:00:00Z",
+        "summary": "Rename the health route"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed endpoint named GET /health was found. Closest indexed candidates: GET /healthz (src/cli.ts:10).",
+        "Git history confirms this name changed to /healthz.",
+        "Git history changed this name in 12804ce."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "- The service exposes `GET /health`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_480548161d8ba485d5b2808550e68fdbb9c8c5df426dab7cd47b17bf709398de",
+        "kind": "cli_command",
+        "raw_text": "deploy",
+        "value": "deploy",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 10,
+        "column": 1,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 10,
+            "column": 1,
+            "raw_text": "deploy",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "fc922af11ba255908f57ed1415ca2ce79cb66482668fc75806c027400bf8fb8b"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_aa6feab616a2677a50c8b0952b92efe69057a45edd73d7026d1793378c168d17",
+        "kind": "cli_command",
+        "name": "deploy",
+        "qualified_name": "src.cli.deploy",
+        "aliases": [],
+        "default": null,
+        "file": "src/cli.ts",
+        "line": 6,
+        "language": "typescript",
+        "framework": "commander",
+        "parent_id": "symbol_476bd8255c86684b535e3824b81e18168dc6241e80b3d33f8060f559330a598d",
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "src/cli.ts",
+          "line": 6,
+          "text": "src.cli.deploy",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_command deploy matches src.cli.deploy at src/cli.ts:6."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "npx node-tool deploy --dry-run"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_5a3da990541e200bea67bf8bbdb3c744c24208a2ac2f4d03e6d866fa93a00949",
+        "kind": "cli_flag",
+        "raw_text": "--dry-run",
+        "value": "--dry-run",
+        "qualifier": "deploy",
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 10,
+        "column": 1,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 10,
+            "column": 1,
+            "raw_text": "--dry-run",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "ef6ca5d1b9dc4e9eb0893249d38f0fd4f56a2777b24bc3f752625af928edba16"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 10,
+          "text": "--dry-run",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "e36fa00d8efd0c431f810f11ada620cddb44eb7f",
+        "short_sha": "e36fa00",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-05T09:00:00Z",
+        "summary": "Remove deployment dry run"
+      },
+      "confidence": 0.5,
+      "reasons": [
+        "No indexed cli_flag named --dry-run was found. No close indexed candidates were found."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "npx node-tool deploy --dry-run"
+    },
+    {
+      "claim": {
+        "claim_id": "claim_795780b9865b0206fed67875f3d950558e498427f8020a071496fada6573e72f",
+        "kind": "code_command",
+        "raw_text": "npx node-tool deploy --dry-run",
+        "value": "npx node-tool deploy --dry-run",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 10,
+        "column": 1,
+        "section_id": "section_b70ee5295fcbe7788b56b953964c0d3b96a7c5da8fe3c1b34f3ce72cf0fc880b",
+        "extraction": "code_block",
+        "extraction_confidence": 0.85,
+        "locations": [
+          {
+            "line": 10,
+            "column": 1,
+            "raw_text": "npx node-tool deploy --dry-run",
+            "extraction": "code_block"
+          },
+          {
+            "line": 10,
+            "column": 1,
+            "raw_text": "npx node-tool deploy --dry-run",
+            "extraction": "code_block"
+          }
+        ],
+        "extraction_sources": [
+          "code_block"
+        ],
+        "group_key": "18ef987d1dc669749ce6b9a95e8334c7bc63b1fe5865667dd90e40d28d488213"
+      },
+      "matched_symbol": null,
+      "verdict": "invalid_command",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 10,
+          "text": "npx node-tool deploy --dry-run",
+          "end_line": null
+        },
+        {
+          "file": "README.md",
+          "line": 10,
+          "text": "npx node-tool deploy --dry-run\n                     ^",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.8,
+      "reasons": [
+        "Project command contains unknown command or flag: --dry-run."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "node-tool",
+      "doc_text": "npx node-tool deploy --dry-run"
+    }
+  ],
+  "timings": {
+    "docs": 0.2729282000218518,
+    "index": 0.21029279998037964,
+    "match": 0.005539799982216209,
+    "history": 0.3884690999984741
+  },
+  "warnings": [],
+  "suppressed": [],
+  "historical_ignored": 0,
+  "llm_usage": {},
+  "packages": [
+    {
+      "name": "node-tool",
+      "root": ".",
+      "language": "javascript",
+      "commands": [
+        "build",
+        "node-tool"
+      ]
+    }
+  ],
+  "docs_repo_path": null,
+  "remote_url": "https://github.com/docs-drift/node-tool-demo",
+  "baselined": 0,
+  "package_version": "0.1.0"
+}

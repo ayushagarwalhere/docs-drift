@@ -33,3 +33,13 @@ Thumbs.db
 
 # Generated fixture repositories (including their nested Git metadata).
 /tests/fixtures/repos/
+.pytest-tmp*/
+.npm-cache/
+node_modules/
+.hypothesis/
+# Full raw benchmark scans stay local; committed samples, pins, measurements and source snapshots reproduce them.
+benchmark/runs/*/*--*.json
+benchmark/runs/*/*.log
+docs-drift-bench-*/
+!editors/vscode/.vscode/
+!editors/vscode/.vscode/launch.json

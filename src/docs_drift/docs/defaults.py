@@ -14,7 +14,7 @@ _NUMBER = re.compile(r"^[-+]?\d+(?:\.\d+)?$")
 _DEFAULT_PHRASE = re.compile(
     r"\bdefaults?\s+to\s+(?P<value>`[^`]+`|[^,;.)]+)|"
     r"\bdefault\s*(?::|is)\s*(?P<colon>`[^`]+`|[^,;.)]+)|"
-    r"\([^)]*?\bdefault\s*:?\s*(?P<paren>`[^`]+`|[^)]+)\)|"
+    r"\([^()]*?\bdefault\s*:?\s*(?P<paren>`[^`]+`|[^()]+)\)|"
     r"\bif\s+unset,?\s+uses?\s+(?P<unset>`[^`]+`|[^,;.)]+)",
     re.I,
 )
@@ -163,7 +163,7 @@ def extract_defaults(parsed: ParsedDoc, claims: list[Claim]) -> DefaultsResult: 
             found.append(
                 (subject, subject.expected_default, subject.raw_text, subject.line, subject.column, subject.extraction)
             )
-    lines = parsed.text.splitlines()
+    lines = parsed.lines
     for line_number, line in enumerate(lines, 1):
         section = parsed.line_to_section.get(line_number)
         if section is None or is_historical_span(section, line_number):
@@ -204,7 +204,9 @@ def extract_defaults(parsed: ParsedDoc, claims: list[Claim]) -> DefaultsResult: 
             subject = distances[0][1]
             found.append((subject, raw_value, match.group(), line_number, match.start() + 1, Extraction.prose_pattern))
         # A port number has no safe subject unless the section documents exactly one port-like name.
-        if re.search(r"\b(?:listens?\s+on\s+port|localhost|127\.0\.0\.1):?\s*\d+", line, re.I):
+        if not line.lstrip().startswith("|") and re.search(
+            r"\b(?:listens?\s+on\s+port|localhost|127\.0\.0\.1):?\s*\d+", line, re.I
+        ):
             port_match = re.search(r"(?:port\s+|localhost:|127\.0\.0\.1:)(\d{2,5})", line, re.I)
             port_subjects = [
                 item for item in same_section if "port" in item.value.casefold() or item.value.upper().endswith("_PORT")

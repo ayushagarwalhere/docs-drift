@@ -40,11 +40,12 @@ def test_help_renders() -> None:
         assert text in result.output
 
 
-@pytest.mark.parametrize("command", ["graph", "init", "serve"])
-def test_stub_exits_two(command: str, tmp_path: Path) -> None:
-    result = CliRunner().invoke(app, ["--repo", str(tmp_path), command])
-    assert result.exit_code == 2
-    assert result.output.strip() == "not built yet"
+def test_init_and_graph_are_implemented(tmp_path: Path) -> None:
+    result = CliRunner().invoke(app, ["init", "--repo", str(tmp_path), "--yes"])
+    assert result.exit_code == 0, result.output
+    assert (tmp_path / ".docs-drift.toml").is_file()
+    result = CliRunner().invoke(app, ["graph", "--repo", str(tmp_path), "--format", "json"])
+    assert result.exit_code == 0, result.output
 
 
 def test_explain_requires_a_finding_id(tmp_path: Path) -> None:
@@ -109,8 +110,14 @@ def test_global_options(output_format: str, tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     if output_format == "json":
         assert '"schema_version": 1' in result.output
+    elif output_format == "terminal":
+        assert "docs scanned" in result.output
+    elif output_format == "markdown":
+        assert "Documentation health" in result.output
+    elif output_format == "sarif":
+        assert '"version": "2.1.0"' in result.output
     else:
-        assert "Documentation findings" in result.output
+        assert "<!doctype html>" in result.output
 
 
 def test_claims_only_scan_renders_rows_and_verbose_timings(tmp_path: Path) -> None:

@@ -1,0 +1,5 @@
+clean-repo  ·  <sha>  ·  1 docs scanned  ·  4 claims checked  ·  <time>
+
+OK 4 · MISSING 0 · RENAMED 0 · DEFAULT 0 · INVALID CMD 0 · UNVERIFIABLE 0
+Health 100/100 · suppressed 0 · baselined 0
+Run docs-drift fix to see patches, or docs-drift explain <id> for evidence.

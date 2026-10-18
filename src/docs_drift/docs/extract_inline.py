@@ -115,8 +115,11 @@ def _classify(  # noqa: PLR0911
     ):
         return ClaimKind.config_key, value, 0.75
     # Known source and documentation extensions distinguish paths from dotted symbols.
-    if (value.startswith(".env.") or "/" in value or _FILE_EXT.search(value)) and not value.startswith(
-        ("http://", "https://")
+    if (
+        not re.search(r"\s|[*?]|^\.[A-Za-z]+$", value)
+        and not re.search(r"\b(?:never commit|do not commit|generated|glob|ignore)\b", sentence, re.I)
+        and (value.startswith(".env.") or "/" in value or _FILE_EXT.search(value))
+        and not value.startswith(("http://", "https://"))
     ):
         return ClaimKind.file_path, value, 0.88
     # A code command's own target is useful; flags belonging to unrelated tools are not.
@@ -147,8 +150,8 @@ def _line_column(text: str, raw: str, cursor: list[int]) -> tuple[int, int]:
     return text.count("\n", 0, start) + 1, start - text.rfind("\n", 0, start)
 
 
-def _sentence_for_line(text: str, line: int, column: int) -> str:
-    lines = text.splitlines()
+def _sentence_for_line(text: str | list[str], line: int, column: int) -> str:
+    lines = text.splitlines() if isinstance(text, str) else text
     if not (1 <= line <= len(lines)):
         return ""
     source = lines[line - 1]
@@ -260,7 +263,7 @@ def _table_candidates(parsed: ParsedDoc) -> list[_Candidate]:
         if not any(header_words.search(cell) for cell in names):
             continue
         # The first column is the documented identifier; only a headed default column is a claimed value.
-        default_index = next((i for i, name in enumerate(names) if re.search(r"\bdefault\b", name)), None)
+        default_index = next((i for i, name in enumerate(names) if name.strip() in {"default", "default value"}), None)
         first_heading = names[0] if names else ""
         for row in rows:
             if not row:
@@ -293,9 +296,10 @@ def _table_candidates(parsed: ParsedDoc) -> list[_Candidate]:
             if kind is None:
                 continue
             value = normalized_value or raw.strip("`")
-            default = (
-                row[default_index][0].strip("` ") if default_index is not None and default_index < len(row) else None
-            )
+            default = row[default_index][0].strip() if default_index is not None and default_index < len(row) else None
+            if default and default.startswith("`") and not re.fullmatch(r"`[^`]+`", default):
+                default = None
+            default = default.strip("` ") if default else None
             default = default if default and default.casefold() not in {"none", "n/a", "—", "-"} else None
             candidates.append(_Candidate(kind, value, line, 1, raw, Extraction.table, 0.88, expected_default=default))
     return candidates
@@ -341,6 +345,8 @@ def _prose_candidates(parsed: ParsedDoc, candidates: list[_Candidate]) -> list[_
             continue
         for match in _DEFAULT.finditer(source):
             value = next(group for group in match.groupdict().values() if group is not None).strip()
+            if not value:
+                continue  # RST double-backtick defaults can otherwise yield a whitespace-only span.
             sentence = next(
                 (item for item in _SENTENCE.finditer(source) if item.start() <= match.start() <= item.end()), None
             )
@@ -462,7 +468,7 @@ def extract_claims(parsed: ParsedDoc) -> ExtractionResult:
         occurrence_key = (section.section_id, candidate.kind, candidate.value)
         occurrence = occurrences[occurrence_key]
         occurrences[occurrence_key] += 1
-        sentence = _sentence_for_line(parsed.text, candidate.line, candidate.column)
+        sentence = _sentence_for_line(parsed.lines, candidate.line, candidate.column)
         qualifier = candidate.qualifier
         if qualifier is None and candidate.kind == ClaimKind.cli_flag:
             qualifier = _qualifier(section.heading, sentence, section.heading_level)

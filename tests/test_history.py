@@ -53,6 +53,23 @@ def test_non_git_repository_returns_warning(tmp_path: Path) -> None:
     assert match.warning and "isn't a git repository" in match.warning
 
 
+def test_document_blame_is_utc_cached_and_email_is_opt_in(tmp_path: Path) -> None:
+    _git(tmp_path, "init", "-q")
+    (tmp_path / "README.md").write_text("# Usage\nUse the tool.\n")
+    _git(tmp_path, "add", "README.md")
+    original = _commit(tmp_path, "value = 1\n", "2026-01-01T00:00:00+00:00")
+    _commit(tmp_path, "value = 2\n", "2026-01-02T00:00:00+00:00")
+    history = GitHistory(tmp_path)
+    touched = history.last_touched("README.md", 2)
+    assert touched is not None and touched.sha == original
+    assert touched.author_email is None and touched.date.isoformat().endswith("+00:00")
+    assert history.last_touched("README.md", 2) is touched
+    visible = GitHistory(tmp_path, HistoryConfig(show_emails=True)).last_touched("README.md", 2)
+    assert visible is not None and visible.author_email == "test@example.invalid"
+    assert history.last_touched("README.md", 200) is None
+    assert history.last_touched("README.md", 200) is None
+
+
 def test_history_query_can_be_disabled(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

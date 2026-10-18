@@ -1,0 +1,51 @@
+{
+  "platform": "Windows 11",
+  "python": "3.13.7",
+  "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+  "full_suite": {
+    "passed": 540,
+    "warnings": 1,
+    "seconds": 623.12
+  },
+  "focused_review": {
+    "passed": 40,
+    "seconds": 123.79
+  },
+  "portable_benchmark_report_tests": {
+    "passed": 6,
+    "seconds": 2.68
+  },
+  "strict_mypy_files": 141,
+  "ruff_formatted_files": 203,
+  "dependency_analysis_files": 104,
+  "coverage": {
+    "package_and_scripts": {
+      "covered": 6040,
+      "statements": 7102
+    },
+    "docs": {
+      "covered": 1144,
+      "statements": 1261
+    },
+    "match": {
+      "covered": 314,
+      "statements": 333
+    }
+  },
+  "working_tree_guard": {
+    "files": 330,
+    "issues": 0,
+    "original_git_index_modified": false
+  },
+  "pip_audit": {
+    "known_vulnerabilities": 0,
+    "editable_project_skipped": true
+  },
+  "limits": [
+    "Native editor recording unavailable",
+    "Linux container execution unavailable",
+    "Public hosting awaits user confirmation",
+    "Human accuracy labels blank",
+    "Performance speed targets fail"
+  ]
+}

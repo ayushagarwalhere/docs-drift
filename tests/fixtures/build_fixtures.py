@@ -328,6 +328,27 @@ def build_fixtures(output: Path) -> dict[str, tuple[str, ...]]:
     return {specification.name: _build_repo(output, specification) for specification in specifications}
 
 
+def build_monorepo(output: Path, packages: int = 20, files_per_package: int = 100) -> None:
+    """Create a synthetic workspace for cold/warm scan benchmarks without executing generated code."""
+    output.mkdir(parents=True, exist_ok=False)
+    (output / "package.json").write_text('{"private":true,"workspaces":["packages/*"]}\n', encoding="utf-8")
+    for number in range(packages):
+        name = f"package-{number:02}"
+        root = output / "packages" / name
+        root.mkdir(parents=True)
+        (root / "pyproject.toml").write_text(f'[project]\nname="{name}"\n', encoding="utf-8")
+        (root / "README.md").write_text("# Usage\n\nUse `--port` (default 8000).\n", encoding="utf-8")
+        (root / "cli.py").write_text(
+            'import argparse\np=argparse.ArgumentParser()\np.add_argument("--port", default=8000)\n', encoding="utf-8"
+        )
+        for index in range(files_per_package - 1):
+            (root / f"module_{index:03}.py").write_text(
+                f'"""Generated benchmark source {index}."""\n'
+                f"def calculate_{index}(value):\n    return value + {index}\n",
+                encoding="utf-8",
+            )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parent / "repos")

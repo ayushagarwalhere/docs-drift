@@ -1,19 +1,20 @@
-"""Shared tree-sitter parsers with a stable cache location for Windows DLL loading."""
+"""Load installed JS/TS grammar wheels without runtime downloads or temporary DLLs."""
 
-import os
-from pathlib import Path
-
-from tree_sitter import Parser
-from tree_sitter_language_pack import PackConfig, configure, get_parser
+import tree_sitter_javascript
+import tree_sitter_typescript
+from tree_sitter import Language, Parser
 
 _PARSERS: dict[str, Parser] = {}
 
 
 def parser_for(language: str) -> Parser:
-    """Reuse parsers and keep native grammar DLLs outside disposable fixture trees."""
+    """Reuse native parsers whose grammars ship with the installed dependencies."""
     selected = "typescript" if language == "typescript" else "javascript"
     if selected not in _PARSERS:
-        cache = Path(os.environ.get("DOCS_DRIFT_TS_CACHE", Path.cwd() / ".docs-drift" / "cache" / "tree-sitter"))
-        configure(PackConfig(cache_dir=str(cache)))
-        _PARSERS[selected] = get_parser(selected)
+        capsule = (
+            tree_sitter_typescript.language_typescript()
+            if selected == "typescript"
+            else tree_sitter_javascript.language()
+        )
+        _PARSERS[selected] = Parser(Language(capsule))
     return _PARSERS[selected]

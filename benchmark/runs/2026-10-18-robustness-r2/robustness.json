@@ -1,0 +1,389 @@
+{
+  "warning_scope": "Completed scans only; partial warnings from timed-out scans are unavailable.",
+  "repositories": [
+    {
+      "repo": "rohitg00/ai-engineering-from-scratch",
+      "sha": "467969391fee2b42f8c9d556a2be7802567a6a15",
+      "status": "done",
+      "seconds": 180.4414685999509,
+      "warnings": 62
+    },
+    {
+      "repo": "d2l-ai/d2l-zh",
+      "sha": "e6b18ccea71451a55fcd861d7b96fddf2587b09a",
+      "status": "done",
+      "seconds": 5.727619900018908,
+      "warnings": 0
+    },
+    {
+      "repo": "scikit-learn/scikit-learn",
+      "sha": "85593ca7a07a9956ac891f6bfc3fedca53b74f72",
+      "status": "done",
+      "seconds": 192.65950439998414,
+      "warnings": 0
+    },
+    {
+      "repo": "EbookFoundation/free-programming-books",
+      "sha": "f42a51cd6cddb8401b18c3d6c774bc381730fcd1",
+      "status": "done",
+      "seconds": 10.735220000031404,
+      "warnings": 0
+    },
+    {
+      "repo": "opendatalab/MinerU",
+      "sha": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "status": "done",
+      "seconds": 140.8082727000001,
+      "warnings": 24
+    },
+    {
+      "repo": "abi/screenshot-to-code",
+      "sha": "a8139779f7c5ae231b7f2a86fa7f83ddc5f7badc",
+      "status": "done",
+      "seconds": 19.65774410002632,
+      "warnings": 74
+    },
+    {
+      "repo": "django/django",
+      "sha": "d430084791a61b31cecec132bce3dca19194f7f2",
+      "status": "done",
+      "seconds": 178.20479029999115,
+      "warnings": 4
+    },
+    {
+      "repo": "mvanhorn/last30days-skill",
+      "sha": "0341304f8ecb307ca0a939e48ecd002761ef23b2",
+      "status": "done",
+      "seconds": 43.288068900001235,
+      "warnings": 7
+    },
+    {
+      "repo": "impress/impress.js",
+      "sha": "b44b9694b41fd2c076c3d1ad7a0c3e0cea9eb262",
+      "status": "done",
+      "seconds": 5.059519000002183,
+      "warnings": 0
+    },
+    {
+      "repo": "gorhill/uBlock",
+      "sha": "2818335553a853edb12c02acd8ad98548e232202",
+      "status": "done",
+      "seconds": 31.670800799969584,
+      "warnings": 8
+    },
+    {
+      "repo": "google/zx",
+      "sha": "65fc542d88baac578967e22bea28cb610976578c",
+      "status": "done",
+      "seconds": 6.298353000020143,
+      "warnings": 2
+    },
+    {
+      "repo": "DavidHDev/react-bits",
+      "sha": "d965399df489c7b8da3874e07d716c0d98ab39fd",
+      "status": "done",
+      "seconds": 168.41983430000255,
+      "warnings": 1305
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "sha": "76aaa77df6adc5b889e689007bf99b9a4f74af34",
+      "status": "done",
+      "seconds": 322.6098641999997,
+      "warnings": 9
+    },
+    {
+      "repo": "byoungd/up",
+      "sha": "ff6da9cab2dbcd0604aebfbf2284714257476c7c",
+      "status": "done",
+      "seconds": 9.011582200007979,
+      "warnings": 0
+    },
+    {
+      "repo": "trekhleb/javascript-algorithms",
+      "sha": "85293e3e2b88f4d2ce330d956b139cf628aa1e82",
+      "status": "done",
+      "seconds": 5.8169826999655925,
+      "warnings": 0
+    },
+    {
+      "repo": "vercel/next.js",
+      "sha": "bb63c72077ad7b81b2319f74a7ef3b00c1751483",
+      "status": "done",
+      "seconds": 1470.5578281999915,
+      "warnings": 7171
+    },
+    {
+      "repo": "KeygraphHQ/shannon",
+      "sha": "4bd88c12a9096d0b78ceb2828729d12dca70fa60",
+      "status": "done",
+      "seconds": 2.9146061000064947,
+      "warnings": 6
+    },
+    {
+      "repo": "cypress-io/cypress",
+      "sha": "6bbef0774bf7b06a95ca89cd365d91aa91130932",
+      "status": "done",
+      "seconds": 182.82170489995042,
+      "warnings": 464
+    },
+    {
+      "repo": "CherryHQ/cherry-studio",
+      "sha": "d01b83d2cc58e5a7f95906f2546a5db96e8344e9",
+      "status": "done",
+      "seconds": 382.13336480001453,
+      "warnings": 2964
+    },
+    {
+      "repo": "tldraw/tldraw",
+      "sha": "8a7b1a65ab4c7365319614ffef68590dee23f305",
+      "status": "done",
+      "seconds": 168.3601095000049,
+      "warnings": 920
+    },
+    {
+      "repo": "n8n-io/n8n",
+      "sha": "d2dc2f9ce50294df5c08799af437c56e3e04ab13",
+      "status": "timeout",
+      "seconds": null,
+      "warnings": null
+    },
+    {
+      "repo": "shadcn-ui/ui",
+      "sha": "d2fba50ee5b9113008b5bb908563527b7efd2f27",
+      "status": "done",
+      "seconds": 235.052550399967,
+      "warnings": 3663
+    },
+    {
+      "repo": "socketio/socket.io",
+      "sha": "1eaa582d3b453e3e6f522300ed05b10da0a0799b",
+      "status": "done",
+      "seconds": 21.890720900031738,
+      "warnings": 7
+    },
+    {
+      "repo": "go-gorm/gorm",
+      "sha": "b3d3bf219f0283f8e2e985bac509cb643170f729",
+      "status": "done",
+      "seconds": 1.250382800004445,
+      "warnings": 0
+    },
+    {
+      "repo": "junegunn/fzf",
+      "sha": "55c122f1a0e1340546c8709682bea5561fe0e8fd",
+      "status": "done",
+      "seconds": 1.7656616999884136,
+      "warnings": 0
+    },
+    {
+      "repo": "netdata/netdata",
+      "sha": "b97c83cb13c050386c6458b41b08655f7be66684",
+      "status": "done",
+      "seconds": 176.32538500003284,
+      "warnings": 39
+    },
+    {
+      "repo": "milvus-io/milvus",
+      "sha": "2ca2a79d354cb0e531bd3481b54f78a1608be04f",
+      "status": "done",
+      "seconds": 466.60258669999894,
+      "warnings": 8
+    },
+    {
+      "repo": "netbirdio/netbird",
+      "sha": "cf017119711184a0661062a0c8ac2043e4e8d411",
+      "status": "done",
+      "seconds": 24.086645399976987,
+      "warnings": 103
+    },
+    {
+      "repo": "iawia002/lux",
+      "sha": "dd00f6d258d80b6684a0b9402d7124e5c18ef42f",
+      "status": "done",
+      "seconds": 3.024501900014002,
+      "warnings": 1
+    },
+    {
+      "repo": "mudler/LocalAI",
+      "sha": "0d6e57f9f5f2b666396a87d7062c80c9647ec483",
+      "status": "done",
+      "seconds": 93.32424600003287,
+      "warnings": 23
+    }
+  ],
+  "status_counts": {
+    "done": 29,
+    "timeout": 1
+  },
+  "warning_groups": [
+    {
+      "message": "Tree-sitter syntax errors: recognizable declarations only",
+      "count": 15207,
+      "examples": [
+        {
+          "repo": "abi/screenshot-to-code",
+          "message": "Tree-sitter found syntax errors in frontend/src/App.tsx; extracting recognizable declarations only."
+        },
+        {
+          "repo": "abi/screenshot-to-code",
+          "message": "Tree-sitter found syntax errors in frontend/src/components/ImageLightbox.tsx; extracting recognizable declarations only."
+        },
+        {
+          "repo": "abi/screenshot-to-code",
+          "message": "Tree-sitter found syntax errors in frontend/src/components/ImportCodeSection.tsx; extracting recognizable declarations only."
+        }
+      ]
+    },
+    {
+      "message": "Source skipped: configuration nesting/line parser limit",
+      "count": 910,
+      "examples": [
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Source skipped: configuration nesting/line parser limit: lib/og-fonts/display.json"
+        },
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Source skipped: configuration nesting/line parser limit: lib/og-fonts/mono.json"
+        },
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Source skipped: configuration nesting/line parser limit: lib/og-fonts/serif.json"
+        }
+      ]
+    },
+    {
+      "message": "Skipped minified source",
+      "count": 579,
+      "examples": [
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Skipped minified source manuals/reverse-engineering-101/figures/src/fig-1-1.js."
+        },
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Skipped minified source manuals/reverse-engineering-101/figures/src/fig-1-2.js."
+        },
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Skipped minified source site/certifications.js."
+        }
+      ]
+    },
+    {
+      "message": "Source skipped: non-regular, external, missing or over 1 MB",
+      "count": 104,
+      "examples": [
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Source skipped: non-regular, external, missing or over 1 MB: site/data.js"
+        },
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "Source skipped: non-regular, external, missing or over 1 MB: docker/china/corex.Dockerfile"
+        },
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "Source skipped: non-regular, external, missing or over 1 MB: docker/china/dcu.Dockerfile"
+        }
+      ]
+    },
+    {
+      "message": "<location>: multiple nearby default subjects; skipped",
+      "count": 34,
+      "examples": [
+        {
+          "repo": "mvanhorn/last30days-skill",
+          "message": "AGENTS.md:61: multiple nearby default subjects; skipped"
+        },
+        {
+          "repo": "mvanhorn/last30days-skill",
+          "message": "AGENTS.md:62: multiple nearby default subjects; skipped"
+        },
+        {
+          "repo": "mvanhorn/last30days-skill",
+          "message": "CONFIGURATION.md:68: multiple nearby default subjects; skipped"
+        }
+      ]
+    },
+    {
+      "message": "<location>: multiple port subjects; default skipped",
+      "count": 15,
+      "examples": [
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "docs/en/quick_start/index.md:76: multiple port subjects; default skipped"
+        },
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "docs/en/quick_start/index.md:82: multiple port subjects; default skipped"
+        },
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "docs/en/usage/quick_usage.md:59: multiple port subjects; default skipped"
+        }
+      ]
+    },
+    {
+      "message": "Cannot read documentation",
+      "count": 9,
+      "examples": [
+        {
+          "repo": "opendatalab/MinerU",
+          "message": "Cannot read documentation AGENTS.md: AGENTS.md is not a regular file inside the repository. Rediscover documentation."
+        },
+        {
+          "repo": "abi/screenshot-to-code",
+          "message": "Cannot read documentation CLAUDE.md: CLAUDE.md is not a regular file inside the repository. Rediscover documentation."
+        },
+        {
+          "repo": "gorhill/uBlock",
+          "message": "Cannot read documentation dist/README.md: dist/README.md is not a regular file inside the repository. Rediscover documentation."
+        }
+      ]
+    },
+    {
+      "message": "Cannot list tracked documentation with Git",
+      "count": 3,
+      "examples": [
+        {
+          "repo": "rohitg00/ai-engineering-from-scratch",
+          "message": "Cannot list tracked documentation with Git; walking the repository and its .gitignore files instead."
+        },
+        {
+          "repo": "vercel/next.js",
+          "message": "Cannot list tracked documentation with Git; walking the repository and its .gitignore files instead."
+        },
+        {
+          "repo": "netdata/netdata",
+          "message": "Cannot list tracked documentation with Git; walking the repository and its .gitignore files instead."
+        }
+      ]
+    },
+    {
+      "message": "Could not process individual file",
+      "count": 2,
+      "examples": [
+        {
+          "repo": "KeygraphHQ/shannon",
+          "message": "Could not process CLAUDE.md: ValueError: Document exceeds the parser size or 8,192-character line limit; split generated content."
+        },
+        {
+          "repo": "shadcn-ui/ui",
+          "message": "Could not process apps/v4/content/docs/dark-mode/index.mdx: ValueError: Document exceeds the parser size or 8,192-character line limit; split generated content."
+        }
+      ]
+    },
+    {
+      "message": "Skipped Python source: syntax or decoding error",
+      "count": 1,
+      "examples": [
+        {
+          "repo": "django/django",
+          "message": "Skipped Python source C:\\Users\\agarw\\Desktop\\wispr\\docs-drift\\.docs-drift\\repositories\\django--django\\repository\\tests\\test_runner_apps\\tagged\\tests_syntax_error.py: SyntaxError: invalid decimal literal (tests_syntax_error.py, line 11)"
+        }
+      ]
+    }
+  ]
+}

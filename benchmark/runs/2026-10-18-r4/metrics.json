@@ -1,0 +1,122 @@
+{
+  "pending_labels": 511,
+  "precision": {
+    "repo:django-oscar/django-oscar": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 25,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:dubinc/dub": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 18,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:encode/httpx": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 12,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:expressjs/express": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 0,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:fastapi/fastapi-cli": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 0,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:fastapi/full-stack-fastapi-template": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 14,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:pallets/flask": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 25,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:pre-commit/pre-commit": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 0,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:simonw/sqlite-utils": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 25,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:tj/commander.js": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 2,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:withastro/astro": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 25,
+      "precision": null,
+      "wilson95": null
+    },
+    "repo:yargs/yargs": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 5,
+      "precision": null,
+      "wilson95": null
+    },
+    "verdict:default_changed": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 0,
+      "precision": null,
+      "wilson95": null
+    },
+    "verdict:invalid_command": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 20,
+      "precision": null,
+      "wilson95": null
+    },
+    "verdict:missing": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 120,
+      "precision": null,
+      "wilson95": null
+    },
+    "verdict:renamed": {
+      "true": 0,
+      "labeled": 0,
+      "selected": 11,
+      "precision": null,
+      "wilson95": null
+    }
+  },
+  "estimated_true_positives": null,
+  "estimated_missed_stale_statements": null,
+  "weighted_audit_recall": null,
+  "recall_interval": null,
+  "recall_scope": "ok claims and unextracted doc lines only; excludes unverifiable/low-confidence"
+}

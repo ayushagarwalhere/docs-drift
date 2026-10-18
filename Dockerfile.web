@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM python:3.13-slim-bookworm AS builder
+WORKDIR /build
+COPY pyproject.toml uv.lock README.md LICENSE ./
+COPY src ./src
+ARG PACKAGE_VERSION=0.1.0.dev0
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=$PACKAGE_VERSION
+RUN pip install --no-cache-dir uv==0.9.5 && uv sync --locked --no-dev --extra web --no-editable
+
+FROM python:3.13-slim-bookworm AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --uid 10001 --create-home --shell /usr/sbin/nologin demo \
+    && mkdir /data && chown demo:demo /data
+COPY --from=builder /build/.venv /opt/venv
+ARG BUILD_SHA=development
+ENV PATH="/opt/venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    PORT=8080 DOCS_DRIFT_DATA_DIR=/data DOCS_DRIFT_BUILD_SHA=$BUILD_SHA
+USER 10001:10001
+WORKDIR /data
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=4)"
+CMD ["python", "-m", "docs_drift.web"]

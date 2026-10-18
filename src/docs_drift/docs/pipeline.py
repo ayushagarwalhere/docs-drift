@@ -9,12 +9,13 @@ import time
 import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 
 from docs_drift.config import Config
 from docs_drift.docs.defaults import extract_defaults
 from docs_drift.docs.discover import DiscoveryWarning, discover_docs, read_doc
-from docs_drift.docs.extract_blocks import extract_block_claims
+from docs_drift.docs.extract_blocks import extract_block_claims, project_command_names
 from docs_drift.docs.extract_inline import extract_claims
 from docs_drift.docs.sections import ParsedDoc, is_historical_span, parse_document
 from docs_drift.models import Claim, ClaimLocation, ScanResult, SuppressedClaim
@@ -48,8 +49,25 @@ def _head(root: Path) -> str:
     return value if re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", value) else "0" * 40
 
 
+def snapshot_time(root: Path) -> datetime:
+    """Use the commit timestamp for reproducible snapshots; unversioned input uses the epoch."""
+    try:
+        value = subprocess.run(
+            ["git", "-c", "core.fsmonitor=false", "-C", str(root), "show", "-s", "--format=%ct", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            check=True,
+        )
+        return datetime.fromtimestamp(int(value.stdout.strip()), UTC)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return datetime(1970, 1, 1, tzinfo=UTC)
+
+
 def _suppression(parsed: ParsedDoc, claim: Claim) -> str | None:  # noqa: PLR0911, PLR0912
-    lines = parsed.text.splitlines()
+    if "docs-drift-ignore" not in parsed.text:
+        return None
+    lines = parsed.lines
     if any("docs-drift-ignore-file" in line for line in lines[: min(len(lines), 100)]):
         return "docs-drift-ignore-file"
     if claim.line > 1 and "docs-drift-ignore-next-line" in lines[claim.line - 2]:
@@ -127,7 +145,14 @@ def _merge(parsed: ParsedDoc, claims: list[Claim]) -> list[Claim]:
     return list(groups.values())
 
 
-def scan_claims(repo: Path, config: Config) -> ScanResult:
+def scan_claims(
+    repo: Path,
+    config: Config,
+    *,
+    doc_paths: set[str] | None = None,
+    contents: dict[str, str] | None = None,
+    source_repo: Path | None = None,
+) -> ScanResult:
     """Extract claims without importing or running any code in the scanned repository."""
     root = repo.resolve()
     timings: dict[str, float] = {}
@@ -141,18 +166,41 @@ def scan_claims(repo: Path, config: Config) -> ScanResult:
         warnings.simplefilter("always", DiscoveryWarning)
         with _timed(timings, "discover"):
             docs = discover_docs(root, config)
+            if doc_paths is not None:
+                docs = [doc for doc in docs if doc.path in doc_paths]
+            if contents:
+                from docs_drift.models import DocFile, DocFormat  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+                for path, text in contents.items():
+                    docs = [doc for doc in docs if doc.path != path]
+                    docs.append(
+                        DocFile(
+                            path=path,
+                            content_hash=hashlib.sha256(text.encode()).hexdigest(),
+                            format={".rst": DocFormat.rst, ".mdx": DocFormat.mdx}.get(
+                                Path(path).suffix, DocFormat.markdown
+                            ),
+                        )
+                    )
         warnings_out.extend(str(item.message) for item in caught)
+    command_context = project_command_names(source_repo or root)
     for doc in docs:
         try:
             with _timed(timings, "parse"):
-                parsed = parse_document(doc, read_doc(root, doc))
+                parsed = parse_document(
+                    doc, contents[doc.path] if contents and doc.path in contents else read_doc(root, doc)
+                )
             sections.extend(parsed.sections)
             with _timed(timings, "inline"):
                 inline = extract_claims(parsed)
             with _timed(timings, "blocks"):
-                blocks = extract_block_claims(parsed, root)
+                blocks = extract_block_claims(parsed, source_repo or root, command_context=command_context)
             historical += inline.historical_skipped + blocks.historical_skipped
             source = [claim for claim in [*inline.claims, *blocks.claims] if claim.kind.value != "default_value"]
+            if doc.format.value == "rst":
+                from docs_drift.docs.preprocess import rst_claims  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+                source.extend(rst_claims(parsed))
             with _timed(timings, "defaults"):
                 defaults = extract_defaults(parsed, source)
             with _timed(timings, "merge_filter"):
@@ -174,7 +222,7 @@ def scan_claims(repo: Path, config: Config) -> ScanResult:
     return ScanResult(
         repo_path=root,
         head_sha=_head(root),
-        scan_time=__import__("datetime").datetime.now(__import__("datetime").timezone.utc),
+        scan_time=snapshot_time(source_repo or root),
         config_used=config,
         docs=docs,
         sections=sections,

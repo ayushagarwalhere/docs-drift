@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "docs-drift",
+          "version": "0.1.0",
+          "rules": [
+            {
+              "id": "DD001",
+              "name": "MISSING",
+              "shortDescription": {
+                "text": "Documented name is absent from the source index."
+              },
+              "help": {
+                "text": "Documented name is absent from the source index."
+              },
+              "helpUri": "https://docs-drift.dev/docs/rules/DD001"
+            },
+            {
+              "id": "DD002",
+              "name": "RENAMED",
+              "shortDescription": {
+                "text": "Update the documentation to use the current name."
+              },
+              "help": {
+                "text": "Update the documentation to use the current name."
+              },
+              "helpUri": "https://docs-drift.dev/docs/rules/DD002"
+            },
+            {
+              "id": "DD003",
+              "name": "DEFAULT",
+              "shortDescription": {
+                "text": "The documented default differs from the code."
+              },
+              "help": {
+                "text": "The documented default differs from the code."
+              },
+              "helpUri": "https://docs-drift.dev/docs/rules/DD003"
+            },
+            {
+              "id": "DD004",
+              "name": "INVALID CMD",
+              "shortDescription": {
+                "text": "The documented command is invalid."
+              },
+              "help": {
+                "text": "The documented command is invalid."
+              },
+              "helpUri": "https://docs-drift.dev/docs/rules/DD004"
+            },
+            {
+              "id": "DD005",
+              "name": "UNVERIFIABLE",
+              "shortDescription": {
+                "text": "Available static evidence is insufficient."
+              },
+              "help": {
+                "text": "Available static evidence is insufficient."
+              },
+              "helpUri": "https://docs-drift.dev/docs/rules/DD005"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "DD005",
+          "level": "note",
+          "message": {
+            "text": "--port: unverifiable. No authoritative indexed default was available for this subject. Introduced by 450a93d: Rename port to listen (2026-10-02T09:00:00+00:00)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "README.md"
+                },
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 28,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "claimId/v1": "claim_7aee9594e82a9f081ea1474997448ab4196be0a27cc6f2cc54a73a918d46a488"
+          },
+          "properties": {
+            "confidence": 0.3,
+            "decided_by": "rules"
+          }
+        },
+        {
+          "ruleId": "DD002",
+          "level": "warning",
+          "message": {
+            "text": "--port: renamed. --listen Introduced by 450a93d: Rename port to listen (2026-10-02T09:00:00+00:00)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "README.md"
+                },
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 19,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "claimId/v1": "claim_8ed4cec49e3a4c86e8ad548b85452e088ae736718c1e6952b86b5a914bbf0447"
+          },
+          "properties": {
+            "confidence": 0.92,
+            "decided_by": "rules"
+          }
+        },
+        {
+          "ruleId": "DD003",
+          "level": "warning",
+          "message": {
+            "text": "--workers: default_changed. 8 Introduced by 397bff7: Increase the worker default (2026-10-03T09:00:00+00:00)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "README.md"
+                },
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 19,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "claimId/v1": "claim_0ddc043944f8c1b30f1c40e0aa64cdc5d8f10259074ba7769279304b72a52160"
+          },
+          "properties": {
+            "confidence": 0.95,
+            "decided_by": "rules"
+          }
+        },
+        {
+          "ruleId": "DD001",
+          "level": "warning",
+          "message": {
+            "text": "APP_DEBUG: missing. APP_LOG_LEVEL Introduced by f686fb7: Replace debug environment variable with log level (2026-10-04T09:00:00+00:00)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "README.md"
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 7,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "claimId/v1": "claim_5f2199daeec9e79f6ef17af18d53109eb79f967fe9b7512433afe6780161c526"
+          },
+          "properties": {
+            "confidence": 0.92,
+            "decided_by": "rules"
+          }
+        },
+        {
+          "ruleId": "DD002",
+          "level": "warning",
+          "message": {
+            "text": "migrate: renamed. db-upgrade Introduced by 3fb52f1: Rename the database upgrade subcommand (2026-10-05T09:00:00+00:00)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "README.md"
+                },
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 11,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "claimId/v1": "claim_3e4a78859ff7e5aa9a087b4ac2fbe545e5615d96016374321ac2175a11e957f6"
+          },
+          "properties": {
+            "confidence": 0.92,
+            "decided_by": "rules"
+          }
+        }
+      ]
+    }
+  ]
+}

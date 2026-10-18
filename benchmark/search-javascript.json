@@ -1,0 +1,402 @@
+[
+  {
+    "name": "affaan-m/ECC",
+    "stars": 282969
+  },
+  {
+    "name": "react/react",
+    "stars": 251253
+  },
+  {
+    "name": "trekhleb/javascript-algorithms",
+    "stars": 196680
+  },
+  {
+    "name": "DietrichGebert/ponytail",
+    "stars": 166638
+  },
+  {
+    "name": "Snailclimb/JavaGuide",
+    "stars": 159110
+  },
+  {
+    "name": "airbnb/javascript",
+    "stars": 148061
+  },
+  {
+    "name": "vercel/next.js",
+    "stars": 143069
+  },
+  {
+    "name": "Chalarangelo/30-seconds-of-code",
+    "stars": 129243
+  },
+  {
+    "name": "nodejs/node",
+    "stars": 122401
+  },
+  {
+    "name": "mrdoob/three.js",
+    "stars": 116580
+  },
+  {
+    "name": "axios/axios",
+    "stars": 109301
+  },
+  {
+    "name": "addyosmani/agent-skills",
+    "stars": 108020
+  },
+  {
+    "name": "react/create-react-app",
+    "stars": 103226
+  },
+  {
+    "name": "mui/material-ui",
+    "stars": 99241
+  },
+  {
+    "name": "Leonxlnx/taste-skill",
+    "stars": 98666
+  },
+  {
+    "name": "microsoft/Web-Dev-For-Beginners",
+    "stars": 96985
+  },
+  {
+    "name": "ryanmcdermott/clean-code-javascript",
+    "stars": 94724
+  },
+  {
+    "name": "louislam/uptime-kuma",
+    "stars": 92595
+  },
+  {
+    "name": "modelcontextprotocol/servers",
+    "stars": 91346
+  },
+  {
+    "name": "sveltejs/svelte",
+    "stars": 88403
+  },
+  {
+    "name": "tt-a1i/archify",
+    "stars": 85199
+  },
+  {
+    "name": "anuraghazra/github-readme-stats",
+    "stars": 79842
+  },
+  {
+    "name": "FortAwesome/Font-Awesome",
+    "stars": 76967
+  },
+  {
+    "name": "typicode/json-server",
+    "stars": 75729
+  },
+  {
+    "name": "career-ops-hq/career-ops",
+    "stars": 75421
+  },
+  {
+    "name": "juliangarnier/anime",
+    "stars": 73684
+  },
+  {
+    "name": "hakimel/reveal.js",
+    "stars": 72437
+  },
+  {
+    "name": "expressjs/express",
+    "stars": 69579
+  },
+  {
+    "name": "byoungd/up",
+    "stars": 68884
+  },
+  {
+    "name": "gorhill/uBlock",
+    "stars": 68648
+  },
+  {
+    "name": "chartjs/Chart.js",
+    "stars": 67746
+  },
+  {
+    "name": "Mintplex-Labs/anything-llm",
+    "stars": 67271
+  },
+  {
+    "name": "leonardomso/33-js-concepts",
+    "stars": 66528
+  },
+  {
+    "name": "webpack/webpack",
+    "stars": 65980
+  },
+  {
+    "name": "jgraph/drawio-desktop",
+    "stars": 63546
+  },
+  {
+    "name": "resume/resume.github.com",
+    "stars": 62909
+  },
+  {
+    "name": "lodash/lodash",
+    "stars": 61287
+  },
+  {
+    "name": "adam-p/markdown-here",
+    "stars": 60260
+  },
+  {
+    "name": "jquery/jquery",
+    "stars": 59866
+  },
+  {
+    "name": "bilawalsidhu/gods-eye-view",
+    "stars": 57806
+  },
+  {
+    "name": "scutan90/DeepLearning-500-questions",
+    "stars": 57669
+  },
+  {
+    "name": "h5bp/html5-boilerplate",
+    "stars": 57650
+  },
+  {
+    "name": "gatsbyjs/gatsby",
+    "stars": 55937
+  },
+  {
+    "name": "azl397985856/leetcode",
+    "stars": 55724
+  },
+  {
+    "name": "coreyhaines31/marketingskills",
+    "stars": 55322
+  },
+  {
+    "name": "mozilla/pdf.js",
+    "stars": 54014
+  },
+  {
+    "name": "chinese-poetry/chinese-poetry",
+    "stars": 53762
+  },
+  {
+    "name": "poteto/hiring-without-whiteboards",
+    "stars": 52762
+  },
+  {
+    "name": "prettier/prettier",
+    "stars": 52382
+  },
+  {
+    "name": "Semantic-Org/Semantic-UI",
+    "stars": 51009
+  },
+  {
+    "name": "NARKOZ/hacker-scripts",
+    "stars": 49856
+  },
+  {
+    "name": "DavidHDev/react-bits",
+    "stars": 49582
+  },
+  {
+    "name": "bigskysoftware/htmx",
+    "stars": 49579
+  },
+  {
+    "name": "algorithm-visualizer/algorithm-visualizer",
+    "stars": 48904
+  },
+  {
+    "name": "iamkun/dayjs",
+    "stars": 48659
+  },
+  {
+    "name": "moment/moment",
+    "stars": 47893
+  },
+  {
+    "name": "usebruno/bruno",
+    "stars": 47711
+  },
+  {
+    "name": "Asabeneh/30-Days-Of-JavaScript",
+    "stars": 46940
+  },
+  {
+    "name": "serverless/serverless",
+    "stars": 46924
+  },
+  {
+    "name": "microsoft/monaco-editor",
+    "stars": 46874
+  },
+  {
+    "name": "LeCoupa/awesome-cheatsheets",
+    "stars": 46565
+  },
+  {
+    "name": "google/zx",
+    "stars": 45804
+  },
+  {
+    "name": "Leaflet/Leaflet",
+    "stars": 45765
+  },
+  {
+    "name": "sudheerj/reactjs-interview-questions",
+    "stars": 44885
+  },
+  {
+    "name": "meteor/meteor",
+    "stars": 44793
+  },
+  {
+    "name": "NaiboWang/EasySpider",
+    "stars": 44706
+  },
+  {
+    "name": "parcel-bundler/parcel",
+    "stars": 44008
+  },
+  {
+    "name": "yangshun/front-end-interview-handbook",
+    "stars": 44006
+  },
+  {
+    "name": "Unitech/pm2",
+    "stars": 43312
+  },
+  {
+    "name": "saadeghi/daisyui",
+    "stars": 42619
+  },
+  {
+    "name": "dcloudio/uni-app",
+    "stars": 41616
+  },
+  {
+    "name": "goabstract/Awesome-Design-Tools",
+    "stars": 41523
+  },
+  {
+    "name": "yarnpkg/yarn",
+    "stars": 41469
+  },
+  {
+    "name": "nwjs/nw.js",
+    "stars": 41138
+  },
+  {
+    "name": "PatrickJS/awesome-cursorrules",
+    "stars": 40952
+  },
+  {
+    "name": "remoteintech/remote-jobs",
+    "stars": 40891
+  },
+  {
+    "name": "phaserjs/phaser",
+    "stars": 40498
+  },
+  {
+    "name": "github/awesome-copilot",
+    "stars": 40149
+  },
+  {
+    "name": "drawdb-io/drawdb",
+    "stars": 40067
+  },
+  {
+    "name": "preactjs/preact",
+    "stars": 38938
+  },
+  {
+    "name": "Dogfalo/materialize",
+    "stars": 38783
+  },
+  {
+    "name": "naptha/tesseract.js",
+    "stars": 38769
+  },
+  {
+    "name": "impress/impress.js",
+    "stars": 38156
+  },
+  {
+    "name": "denysdovhan/wtfjs",
+    "stars": 37692
+  },
+  {
+    "name": "fastify/fastify",
+    "stars": 37284
+  },
+  {
+    "name": "markedjs/marked",
+    "stars": 37239
+  },
+  {
+    "name": "songquanpeng/one-api",
+    "stars": 37193
+  },
+  {
+    "name": "gchq/CyberChef",
+    "stars": 36149
+  },
+  {
+    "name": "carbon-app/carbon",
+    "stars": 36116
+  },
+  {
+    "name": "ryanhanwu/How-To-Ask-Questions-The-Smart-Way",
+    "stars": 35912
+  },
+  {
+    "name": "maboloshi/github-chinese",
+    "stars": 35882
+  },
+  {
+    "name": "koajs/koa",
+    "stars": 35679
+  },
+  {
+    "name": "alvarotrigo/fullPage.js",
+    "stars": 35376
+  },
+  {
+    "name": "typicode/husky",
+    "stars": 35354
+  },
+  {
+    "name": "sahat/hackathon-starter",
+    "stars": 35254
+  },
+  {
+    "name": "qishibo/AnotherRedisDesktopManager",
+    "stars": 34810
+  },
+  {
+    "name": "freestylefly/awesome-gpt-image-2",
+    "stars": 34652
+  },
+  {
+    "name": "SillyTavern/SillyTavern",
+    "stars": 34631
+  },
+  {
+    "name": "openai/codex-plugin-cc",
+    "stars": 34349
+  },
+  {
+    "name": "TheAlgorithms/JavaScript",
+    "stars": 34283
+  }
+]

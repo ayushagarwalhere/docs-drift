@@ -1,0 +1,36 @@
+node-tool  ·  <sha>  ·  1 docs scanned  ·  6 claims checked  ·  <time>
+
+README.md
+  RENAMED README.md:3
+    - Build the release with `npm run build:prod`.
+                                      ^^^^^^^^^^
+    → build
+    Introduced by 3ef9444 · Rename the release build script · <age>
+    claim_d2134d75a71ba55b7b92cfc68346a9db4429fc018d51970b9963c0b63bcd20a3
+  RENAMED README.md:4
+    - The API URL comes from `process.env.API_URL`.
+                                          ^^^^^^^
+    → API_BASE_URL
+    Introduced by 6bd2e41 · Rename the API base URL variable · <age>
+    claim_d12598cc77a7e55240db1ae1c97f7c9b9bc25bb8327ea4337c0c333592d49816
+  RENAMED README.md:5
+    - The service exposes `GET /health`.
+                           ^^^^^^^^^^^
+    → /healthz
+    Introduced by 12804ce · Rename the health route · <age>
+    claim_4cc2cc9a97ebd3a12eba8a94222339b2daae59de003d4e96979461be916694e6
+  MISSING README.md:10
+    npx node-tool deploy --dry-run
+                         ^^^^^^^^^
+    → No indexed cli_flag named --dry-run was found. No close indexed candidates were found.
+    Introduced by e36fa00 · Remove deployment dry run · <age>
+    claim_5a3da990541e200bea67bf8bbdb3c744c24208a2ac2f4d03e6d866fa93a00949
+  INVALID CMD README.md:10
+    npx node-tool deploy --dry-run
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    → Project command contains unknown command or flag: --dry-run.
+    claim_795780b9865b0206fed67875f3d950558e498427f8020a071496fada6573e72f
+
+OK 1 · MISSING 1 · RENAMED 3 · DEFAULT 0 · INVALID CMD 1 · UNVERIFIABLE 0
+Health 17/100 · suppressed 0 · baselined 0
+Run docs-drift fix to see patches, or docs-drift explain <id> for evidence.

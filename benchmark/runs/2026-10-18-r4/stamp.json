@@ -1,0 +1,42 @@
+{
+  "run_id": "2026-10-18-r4",
+  "date": "2026-10-18",
+  "version": "0.1.0",
+  "scanner_commit": "d6e96eb92bde9632b6f0faf69bcbbb508ef57717",
+  "dirty": true,
+  "source_sha256": "da3599d3d72ac498d33d3da3114ee7dbc3c7050846ab74b9c61fcd1558a08673",
+  "protocol_sha256": "123ba551d5f908d335601943da0eed8086b8007941becac54264a3954fda61f9",
+  "labeler": null,
+  "finding_seed": 20261026,
+  "recall_seed": 20261027,
+  "config": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  }
+}

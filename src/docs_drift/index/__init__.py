@@ -32,11 +32,13 @@ from docs_drift.index.js_routes import JavaScriptRouteIndexer as _JavaScriptRout
 from docs_drift.index.js_symbols import JavaScriptIndexer as _JavaScriptIndexer  # noqa: E402, F401
 from docs_drift.index.python_cli import PythonCLIIndexer as _PythonCLIIndexer  # noqa: E402, F401
 from docs_drift.index.python_routes import PythonRouteIndexer as _PythonRouteIndexer  # noqa: E402, F401
+from docs_drift.index.python_source import clear_python_cache  # noqa: E402
 from docs_drift.index.python_symbols import PythonIndexer as _PythonIndexer  # noqa: E402, F401
+from docs_drift.index.python_symbols import _module_name  # noqa: E402
 from docs_drift.index.tasks import TaskIndexer as _TaskIndexer  # noqa: E402, F401
 
 INDEX_SCHEMA = 1
-INDEXER_VERSION = f"{__version__}:1"
+INDEXER_VERSION = f"{__version__}:4"
 MIN_INDEX_RECORD_FIELDS = 2
 
 
@@ -45,8 +47,12 @@ def _blob_hashes(repo: Path, files: Sequence[Path]) -> tuple[dict[str, str], set
     env["GIT_OPTIONAL_LOCKS"] = "0"
     base = ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", f"core.hooksPath={os.devnull}"]
     try:
-        indexed = subprocess.run([*base, "ls-files", "-s", "-z"], capture_output=True, check=True, env=env).stdout
-        modified = subprocess.run([*base, "ls-files", "-m", "-z"], capture_output=True, check=True, env=env).stdout
+        indexed = subprocess.run(
+            [*base, "ls-files", "-s", "-z"], capture_output=True, check=True, env=env, timeout=5
+        ).stdout
+        modified = subprocess.run(
+            [*base, "ls-files", "-m", "-z"], capture_output=True, check=True, env=env, timeout=5
+        ).stdout
     except (OSError, subprocess.SubprocessError):
         return {}, {path.relative_to(repo).as_posix() for path in files}
     hashes = {}
@@ -116,17 +122,23 @@ def clear_cache(repo: Path) -> bool:
 def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIndex:  # noqa: PLR0912, PLR0915
     """Index tracked source text with per-file failure isolation and stable ordering."""
     root = repo.resolve()
-    files = source_files(root, config.exclude)
+    _module_name.cache_clear()
+    clear_python_cache()
+    file_warnings: list[str] = []
+    files = source_files(root, config.exclude, warnings_out=file_warnings)
     grouped: dict[str, list[Path]] = {}
     for path in files:
         language = language_for(path)
         if language:
             grouped.setdefault(language, []).append(path)
     result = CodeIndex(
+        warnings=file_warnings,
         files_by_language={language: len(paths) for language, paths in sorted(grouped.items())},
         source_paths=[path.relative_to(root).as_posix() for path in files],
     )
     cache_path = root / ".docs-drift" / "cache" / f"index-v{INDEX_SCHEMA}.json"
+    if not cache_path.resolve().is_relative_to(root):
+        no_cache = True
     fingerprints = _fingerprints(root, files)
     cached = _read_cache(cache_path) if not no_cache else None
     cached_files_obj = cached.get("files", {}) if cached else {}
@@ -150,6 +162,9 @@ def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIn
             and cached_files[relative].get("fingerprint") == fingerprint
         )
     }
+    cached_warnings = cached.get("warnings") if cached else None
+    if not changed and isinstance(cached_warnings, list):
+        result.warnings.extend(str(warning) for warning in cached_warnings)
     indexed_by_file: dict[str, list[Symbol]] = {}
     for symbol in result.symbols:
         indexed_by_file.setdefault(symbol.file, []).append(symbol)
@@ -170,7 +185,21 @@ def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIn
                     for symbol in new_symbols:
                         indexed_by_file.setdefault(symbol.file, []).append(symbol)
                 except Exception as exc:
-                    result.warnings.append(f"Indexer {indexer.name} failed on {language}: {type(exc).__name__}: {exc}")
+                    result.warnings.append(
+                        f"Indexer {indexer.name} batch failed on {language}; retrying individual files: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                    for path in paths:
+                        try:
+                            new_symbols = indexer.index(root, [path])
+                            result.symbols.extend(new_symbols)
+                            for symbol in new_symbols:
+                                indexed_by_file.setdefault(symbol.file, []).append(symbol)
+                        except Exception as file_exc:
+                            relative = path.relative_to(root).as_posix()
+                            result.warnings.append(
+                                f"Indexer {indexer.name} skipped {relative}: {type(file_exc).__name__}: {file_exc}"
+                            )
             else:
                 for path in paths:
                     try:
@@ -197,8 +226,15 @@ def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIn
         }
         _write_cache(
             cache_path,
-            {"schema": INDEX_SCHEMA, "indexer_version": INDEXER_VERSION, "files": {**old_files, **fresh_files}},
+            {
+                "schema": INDEX_SCHEMA,
+                "indexer_version": INDEXER_VERSION,
+                "files": {**old_files, **fresh_files},
+                "warnings": list(dict.fromkeys(result.warnings)),
+            },
         )
+    clear_python_cache()
+    _module_name.cache_clear()
     return result
 
 

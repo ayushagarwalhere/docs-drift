@@ -3,10 +3,12 @@
 import ast
 import re
 from collections.abc import Sequence
+from functools import lru_cache
 from pathlib import Path
 
 from docs_drift.ids import make_symbol_id
 from docs_drift.index import register
+from docs_drift.index.python_source import read_python
 from docs_drift.models import Symbol, SymbolKind
 
 _UPPER = re.compile(r"^[A-Z][A-Z0-9_]*$")
@@ -19,10 +21,11 @@ def _literal(node: ast.AST | None, source: str) -> str | None:
     try:
         value = ast.literal_eval(node)
     except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
-        return ast.get_source_segment(source, node) or None
+        return None
     return str(value)
 
 
+@lru_cache(maxsize=8192)
 def _module_name(repo: Path, path: Path) -> str:
     relative = path.relative_to(repo)
     parts = list(relative.with_suffix("").parts)
@@ -59,8 +62,7 @@ class PythonIndexer:
                 if path.stat().st_size > MAX_SOURCE_BYTES:
                     self.warnings.append(f"Skipped Python source {path}: larger than 1 MB.")
                     continue
-                source = path.read_text(encoding="utf-8", errors="replace")
-                tree = ast.parse(source, filename=str(path))
+                source, tree = read_python(path)
             except (OSError, SyntaxError, ValueError) as exc:
                 self.warnings.append(f"Skipped Python source {path}: {type(exc).__name__}: {exc}")
                 continue

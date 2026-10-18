@@ -1,0 +1,14 @@
+title = "docs-drift: default secret rules with verified generated-ID exception"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Generated claim grouping SHA256, verified by recomputing kind/value/qualifier; never a credential"
+condition = "AND"
+regexTarget = "line"
+regexes = ['''^\s*"group_key":\s*"[0-9a-f]{64}",?\s*$''']
+paths = ['''^(examples/py-cli\.json|src/docs_drift/web/examples/(py-cli|node-tool|fastapi-svc|clean-repo|rich-cli|files-to-prompt)\.json)$''']

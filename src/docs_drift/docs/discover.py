@@ -51,9 +51,9 @@ def _tracked_paths(repo: Path) -> list[str] | None:
         "--exclude-standard",
     ]
     try:
-        tracked = subprocess.run(command, check=True, capture_output=True, env=env).stdout
-        ignored = subprocess.run([*command, "--ignored"], check=True, capture_output=True, env=env).stdout
-    except (OSError, subprocess.CalledProcessError):
+        tracked = subprocess.run(command, check=True, capture_output=True, env=env, timeout=5).stdout
+        ignored = subprocess.run([*command, "--ignored"], check=True, capture_output=True, env=env, timeout=5).stdout
+    except (OSError, subprocess.SubprocessError):
         _warn("Cannot list tracked documentation with Git; walking the repository and its .gitignore files instead.")
         return None
     ignored_paths = set(ignored.split(b"\0"))
@@ -134,7 +134,12 @@ def discover_docs(repo: Path, config: Config) -> list[DocFile]:
     root = repo.resolve()
     if not root.is_dir():
         raise ValueError("Choose an existing repository directory before discovering documentation.")
-    includes, excludes = _globs(config.docs), _globs(config.exclude)
+    patterns = config.docs
+    if patterns == Config().docs:
+        from docs_drift.workspaces import docs_patterns  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+        patterns = [*patterns, *docs_patterns(root)]
+    includes, excludes = _globs(patterns), _globs(config.exclude)
     paths = _tracked_paths(root)
     candidates = _walk(root, root) if paths is None else iter(paths)
     docs = []
@@ -147,7 +152,10 @@ def discover_docs(repo: Path, config: Config) -> list[DocFile]:
         except (OSError, ValueError) as exc:
             _warn(f"Cannot read documentation {relative}: {exc}")
             continue
-        docs.append(DocFile(path=relative, content_hash=hashlib.sha256(content).hexdigest(), format=format_))
+        try:
+            docs.append(DocFile(path=relative, content_hash=hashlib.sha256(content).hexdigest(), format=format_))
+        except ValueError:
+            _warn(f"Cannot read documentation {relative!r}: unsupported path; skipped.")
     return docs
 
 

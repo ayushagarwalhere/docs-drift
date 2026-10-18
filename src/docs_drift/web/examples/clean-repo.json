@@ -1,0 +1,646 @@
+{
+  "schema_version": 1,
+  "repo_path": "clean-repo-demo",
+  "head_sha": "5fb1867a2ba126ba8e33f6ec78942efa54384069",
+  "scan_time": "2026-10-18T12:17:40.253947Z",
+  "config_used": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "content_hash": "0f7ab058013f8404da2a3f120084beab0e0c0786b539b9ea2b054cd9adb21e7a",
+      "format": "markdown"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "section_7a145c62aa0cf732b0de3c601dc37f74654fa3d67891fc739fe8fafac537f08d",
+      "doc_path": "README.md",
+      "heading": "clean-repo",
+      "heading_level": 1,
+      "heading_path": [
+        "clean-repo"
+      ],
+      "start_line": 1,
+      "end_line": 2,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+      "doc_path": "README.md",
+      "heading": "Current usage",
+      "heading_level": 2,
+      "heading_path": [
+        "clean-repo",
+        "Current usage"
+      ],
+      "start_line": 3,
+      "end_line": 11,
+      "context": "current",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_2fd8bccf139eed00232a933f7bbfe0e5529ff46e010c5cfafc1b88fe2523e246",
+      "doc_path": "README.md",
+      "heading": "Migrating from v1",
+      "heading_level": 2,
+      "heading_path": [
+        "clean-repo",
+        "Migrating from v1"
+      ],
+      "start_line": 12,
+      "end_line": 15,
+      "context": "historical",
+      "historical_spans": []
+    },
+    {
+      "section_id": "section_66098e59e57db6c69fa1b8b4676f3cd287256584b02b85b9663906bb2506420b",
+      "doc_path": "README.md",
+      "heading": "Third-party tools",
+      "heading_level": 2,
+      "heading_path": [
+        "clean-repo",
+        "Third-party tools"
+      ],
+      "start_line": 16,
+      "end_line": 21,
+      "context": "current",
+      "historical_spans": []
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim_c1db4d8c972b8b82de67f2901a7c84f9f178176942198e00e34c549605a60930",
+      "kind": "cli_flag",
+      "raw_text": "--workers",
+      "value": "--workers",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 6,
+      "column": 5,
+      "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 6,
+          "column": 5,
+          "raw_text": "--workers",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "acbb8e0fa89f433763cfe879d96c3c9f72c7d28e560541fb6091a0889bcb1a0a"
+    },
+    {
+      "claim_id": "claim_63c575ee0695bc1cfa9d61e90170a18658771c969f65e2bed4ab4550d57cc584",
+      "kind": "env_var",
+      "raw_text": "APP_LOG_LEVEL",
+      "value": "APP_LOG_LEVEL",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 7,
+      "column": 5,
+      "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.95,
+      "locations": [
+        {
+          "line": 7,
+          "column": 5,
+          "raw_text": "APP_LOG_LEVEL",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "dc632fcd363ecffe4dabda6496b38c8f4c189f7cdcf6421dca3bbf694d607954"
+    },
+    {
+      "claim_id": "claim_ca10b68cdbc976a42c1e05a6d75f09b378bb66dac7aeb73e7df08fbf7f7d990c",
+      "kind": "make_target",
+      "raw_text": "make test",
+      "value": "test",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 8,
+      "column": 5,
+      "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.9,
+      "locations": [
+        {
+          "line": 8,
+          "column": 5,
+          "raw_text": "make test",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "764f3bd8b9b1519486c80dd313e5b49b91463ab1995554e7b6ce73922e207a06"
+    },
+    {
+      "claim_id": "claim_609c09c747654ad3a3e4dd828e92dd3a4e4f6c1e2a8c14f50c4c1054ee8f6d1d",
+      "kind": "default_value",
+      "raw_text": "default is `8`",
+      "value": "--workers",
+      "qualifier": "cli_flag",
+      "expected_default": "8",
+      "doc_path": "README.md",
+      "line": 6,
+      "column": 17,
+      "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+      "extraction": "prose_pattern",
+      "extraction_confidence": 0.55,
+      "locations": [
+        {
+          "line": 6,
+          "column": 17,
+          "raw_text": "default is `8`",
+          "extraction": "prose_pattern"
+        }
+      ],
+      "extraction_sources": [
+        "prose_pattern"
+      ],
+      "group_key": "79ddd206ba56690096f61d53bdd1a47f71d3226d545739edea8581f7ba997773"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol_id": "symbol_3d0b5b3ba9044ac3fbff1e1459399e15635ce176e92517afb2b243dc55d4a463",
+      "kind": "make_target",
+      "name": "test",
+      "qualified_name": "test",
+      "aliases": [],
+      "default": null,
+      "file": "Makefile",
+      "line": 1,
+      "language": "make",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_f46984ed055ff7b810b6bd47684db9f280e5c3b3d4c7ae72814c81b144493a60",
+      "kind": "function",
+      "name": "main",
+      "qualified_name": "cli.main",
+      "aliases": [],
+      "default": null,
+      "file": "cli.py",
+      "line": 4,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_27a6dcff770a5fe755888fc3f70445d6ede2a44a0bcc0c5f6bd68d8a03b561b4",
+      "kind": "cli_command",
+      "name": "serve",
+      "qualified_name": "cli.serve",
+      "aliases": [],
+      "default": null,
+      "file": "cli.py",
+      "line": 6,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_b1aff1c29930fa208e11ddcc45d6650ad414d3d157b3528b8b0f696973d46765",
+      "kind": "cli_flag",
+      "name": "--listen",
+      "qualified_name": "cli.serve.--listen",
+      "aliases": [],
+      "default": "9000",
+      "file": "cli.py",
+      "line": 7,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+      "kind": "cli_flag",
+      "name": "--workers",
+      "qualified_name": "cli.serve.--workers",
+      "aliases": [],
+      "default": "8",
+      "file": "cli.py",
+      "line": 8,
+      "language": "python",
+      "framework": "argparse",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_72c12062f3b6a0340f97b890f08d459d6487e6e4a295e6a0ab790bcc2c21f256",
+      "kind": "env_var",
+      "name": "APP_LOG_LEVEL",
+      "qualified_name": "cli.APP_LOG_LEVEL",
+      "aliases": [],
+      "default": "INFO",
+      "file": "cli.py",
+      "line": 9,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    }
+  ],
+  "findings": [
+    {
+      "claim": {
+        "claim_id": "claim_c1db4d8c972b8b82de67f2901a7c84f9f178176942198e00e34c549605a60930",
+        "kind": "cli_flag",
+        "raw_text": "--workers",
+        "value": "--workers",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 6,
+        "column": 5,
+        "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 6,
+            "column": 5,
+            "raw_text": "--workers",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "acbb8e0fa89f433763cfe879d96c3c9f72c7d28e560541fb6091a0889bcb1a0a"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+        "kind": "cli_flag",
+        "name": "--workers",
+        "qualified_name": "cli.serve.--workers",
+        "aliases": [],
+        "default": "8",
+        "file": "cli.py",
+        "line": 8,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "cli.py",
+          "line": 8,
+          "text": "cli.serve.--workers",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "cli_flag --workers matches cli.serve.--workers at cli.py:8."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "clean-repo",
+      "doc_text": "The `--workers` default is `8`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_63c575ee0695bc1cfa9d61e90170a18658771c969f65e2bed4ab4550d57cc584",
+        "kind": "env_var",
+        "raw_text": "APP_LOG_LEVEL",
+        "value": "APP_LOG_LEVEL",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 7,
+        "column": 5,
+        "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.95,
+        "locations": [
+          {
+            "line": 7,
+            "column": 5,
+            "raw_text": "APP_LOG_LEVEL",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "dc632fcd363ecffe4dabda6496b38c8f4c189f7cdcf6421dca3bbf694d607954"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_72c12062f3b6a0340f97b890f08d459d6487e6e4a295e6a0ab790bcc2c21f256",
+        "kind": "env_var",
+        "name": "APP_LOG_LEVEL",
+        "qualified_name": "cli.APP_LOG_LEVEL",
+        "aliases": [],
+        "default": "INFO",
+        "file": "cli.py",
+        "line": 9,
+        "language": "python",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "cli.py",
+          "line": 9,
+          "text": "cli.APP_LOG_LEVEL",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "env_var APP_LOG_LEVEL matches cli.APP_LOG_LEVEL at cli.py:9."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "clean-repo",
+      "doc_text": "The `APP_LOG_LEVEL` environment variable controls verbosity."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_ca10b68cdbc976a42c1e05a6d75f09b378bb66dac7aeb73e7df08fbf7f7d990c",
+        "kind": "make_target",
+        "raw_text": "make test",
+        "value": "test",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 8,
+        "column": 5,
+        "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.9,
+        "locations": [
+          {
+            "line": 8,
+            "column": 5,
+            "raw_text": "make test",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "764f3bd8b9b1519486c80dd313e5b49b91463ab1995554e7b6ce73922e207a06"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_3d0b5b3ba9044ac3fbff1e1459399e15635ce176e92517afb2b243dc55d4a463",
+        "kind": "make_target",
+        "name": "test",
+        "qualified_name": "test",
+        "aliases": [],
+        "default": null,
+        "file": "Makefile",
+        "line": 1,
+        "language": "make",
+        "framework": null,
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "Makefile",
+          "line": 1,
+          "text": "test",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "make_target test matches test at Makefile:1."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "clean-repo",
+      "doc_text": "Run `make test`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_609c09c747654ad3a3e4dd828e92dd3a4e4f6c1e2a8c14f50c4c1054ee8f6d1d",
+        "kind": "default_value",
+        "raw_text": "default is `8`",
+        "value": "--workers",
+        "qualifier": "cli_flag",
+        "expected_default": "8",
+        "doc_path": "README.md",
+        "line": 6,
+        "column": 17,
+        "section_id": "section_d5ca075c0432ae03c81fc3d5dbc4a4014ff656ba7e7481c3105e0c0282d72bb5",
+        "extraction": "prose_pattern",
+        "extraction_confidence": 0.55,
+        "locations": [
+          {
+            "line": 6,
+            "column": 17,
+            "raw_text": "default is `8`",
+            "extraction": "prose_pattern"
+          }
+        ],
+        "extraction_sources": [
+          "prose_pattern"
+        ],
+        "group_key": "79ddd206ba56690096f61d53bdd1a47f71d3226d545739edea8581f7ba997773"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_0f9006638800848074f8dca81f512cd6922bbb37243a8ab5c5ed4b65db3df373",
+        "kind": "cli_flag",
+        "name": "--workers",
+        "qualified_name": "cli.serve.--workers",
+        "aliases": [],
+        "default": "8",
+        "file": "cli.py",
+        "line": 8,
+        "language": "python",
+        "framework": "argparse",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "ok",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 6,
+          "text": "default is `8`",
+          "end_line": null
+        },
+        {
+          "file": "cli.py",
+          "line": 8,
+          "text": "cli.serve.--workers default=8",
+          "end_line": null
+        }
+      ],
+      "introduced_by": null,
+      "confidence": 0.95,
+      "reasons": [
+        "Documented default '8' matches code."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "clean-repo",
+      "doc_text": "The `--workers` default is `8`."
+    }
+  ],
+  "timings": {
+    "docs": 0.3033794999937527,
+    "index": 0.16706359997624531,
+    "match": 0.002267999981995672,
+    "history": 0.00048129999777302146
+  },
+  "warnings": [],
+  "suppressed": [],
+  "historical_ignored": 2,
+  "llm_usage": {},
+  "packages": [
+    {
+      "name": "clean-repo",
+      "root": ".",
+      "language": "unknown",
+      "commands": []
+    }
+  ],
+  "docs_repo_path": null,
+  "remote_url": "https://github.com/docs-drift/clean-repo-demo",
+  "baselined": 0,
+  "package_version": "0.1.0"
+}

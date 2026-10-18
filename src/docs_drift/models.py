@@ -6,6 +6,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
+from docs_drift import __version__
 from docs_drift.config import Config
 from docs_drift.ids import normalize_repo_path
 
@@ -199,14 +200,24 @@ class Finding(PipelineModel):
     reasons: Annotated[list[NonemptyText], Field(min_length=1)]
     decided_by: DecidedBy = DecidedBy.rules
     replayed: bool = False
+    package: str | None = None
+    doc_text: str | None = None
 
     @property
     def is_drift(self) -> bool:
         return self.verdict in {Verdict.missing, Verdict.renamed, Verdict.default_changed, Verdict.invalid_command}
 
 
+class Package(PipelineModel):
+    name: NonemptyText
+    root: str
+    language: str
+    commands: list[str] = Field(default_factory=list)
+
+
 class ScanResult(PipelineModel):
     schema_version: Literal[1] = 1
+    package_version: str = Field(default_factory=lambda: __version__)
     repo_path: Path
     head_sha: GitSHA
     scan_time: AwareDatetime
@@ -221,6 +232,10 @@ class ScanResult(PipelineModel):
     suppressed: list[SuppressedClaim] = Field(default_factory=list)
     historical_ignored: int = Field(default=0, ge=0)
     llm_usage: dict[str, float] = Field(default_factory=dict)
+    packages: list[Package] = Field(default_factory=list)
+    docs_repo_path: Path | None = None
+    remote_url: str | None = None
+    baselined: int = Field(default=0, ge=0)
 
     def summary(self) -> dict[str, dict[str, int]]:
         """Count findings by verdict and claim kind, including zero-count categories."""

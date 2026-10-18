@@ -1,0 +1,402 @@
+[
+  {
+    "name": "avelino/awesome-go",
+    "stars": 189031
+  },
+  {
+    "name": "ollama/ollama",
+    "stars": 183699
+  },
+  {
+    "name": "golang/go",
+    "stars": 139299
+  },
+  {
+    "name": "kubernetes/kubernetes",
+    "stars": 128339
+  },
+  {
+    "name": "JuliusBrussee/caveman",
+    "stars": 113379
+  },
+  {
+    "name": "microsoft/TypeScript",
+    "stars": 111522
+  },
+  {
+    "name": "fatedier/frp",
+    "stars": 109976
+  },
+  {
+    "name": "infiniflow/ragflow",
+    "stars": 92410
+  },
+  {
+    "name": "gohugoio/hugo",
+    "stars": 90148
+  },
+  {
+    "name": "syncthing/syncthing",
+    "stars": 89488
+  },
+  {
+    "name": "gin-gonic/gin",
+    "stars": 89369
+  },
+  {
+    "name": "junegunn/fzf",
+    "stars": 83629
+  },
+  {
+    "name": "jesseduffield/lazygit",
+    "stars": 83267
+  },
+  {
+    "name": "netdata/netdata",
+    "stars": 80994
+  },
+  {
+    "name": "caddyserver/caddy",
+    "stars": 78099
+  },
+  {
+    "name": "nektos/act",
+    "stars": 72371
+  },
+  {
+    "name": "moby/moby",
+    "stars": 72202
+  },
+  {
+    "name": "prometheus/prometheus",
+    "stars": 66619
+  },
+  {
+    "name": "traefik/traefik",
+    "stars": 65268
+  },
+  {
+    "name": "usememos/memos",
+    "stars": 63885
+  },
+  {
+    "name": "pocketbase/pocketbase",
+    "stars": 61469
+  },
+  {
+    "name": "rclone/rclone",
+    "stars": 60380
+  },
+  {
+    "name": "FiloSottile/mkcert",
+    "stars": 59743
+  },
+  {
+    "name": "go-gitea/gitea",
+    "stars": 58547
+  },
+  {
+    "name": "router-for-me/CLIProxyAPI",
+    "stars": 55581
+  },
+  {
+    "name": "wagoodman/dive",
+    "stars": 54647
+  },
+  {
+    "name": "jesseduffield/lazydocker",
+    "stars": 53153
+  },
+  {
+    "name": "multica-ai/multica",
+    "stars": 53097
+  },
+  {
+    "name": "etcd-io/etcd",
+    "stars": 52391
+  },
+  {
+    "name": "ethereum/go-ethereum",
+    "stars": 51410
+  },
+  {
+    "name": "AlistGo/alist",
+    "stars": 50317
+  },
+  {
+    "name": "QuantumNous/new-api",
+    "stars": 50160
+  },
+  {
+    "name": "hashicorp/terraform",
+    "stars": 49963
+  },
+  {
+    "name": "mudler/LocalAI",
+    "stars": 49619
+  },
+  {
+    "name": "MHSanaei/3x-ui",
+    "stars": 48221
+  },
+  {
+    "name": "gogs/gogs",
+    "stars": 47883
+  },
+  {
+    "name": "alibaba/open-code-review",
+    "stars": 47568
+  },
+  {
+    "name": "v2ray/v2ray-core",
+    "stars": 46919
+  },
+  {
+    "name": "cli/cli",
+    "stars": 46681
+  },
+  {
+    "name": "milvus-io/milvus",
+    "stars": 46413
+  },
+  {
+    "name": "charmbracelet/bubbletea",
+    "stars": 45444
+  },
+  {
+    "name": "juanfont/headscale",
+    "stars": 44752
+  },
+  {
+    "name": "spf13/cobra",
+    "stars": 44705
+  },
+  {
+    "name": "danielmiessler/Fabric",
+    "stars": 44329
+  },
+  {
+    "name": "Wei-Shaw/sub2api",
+    "stars": 44284
+  },
+  {
+    "name": "astaxie/build-web-application-with-golang",
+    "stars": 43876
+  },
+  {
+    "name": "XTLS/Xray-core",
+    "stars": 42167
+  },
+  {
+    "name": "pingcap/tidb",
+    "stars": 40648
+  },
+  {
+    "name": "schollz/croc",
+    "stars": 40625
+  },
+  {
+    "name": "photoprism/photoprism",
+    "stars": 40317
+  },
+  {
+    "name": "gofiber/fiber",
+    "stars": 40217
+  },
+  {
+    "name": "evanw/esbuild",
+    "stars": 40097
+  },
+  {
+    "name": "go-gorm/gorm",
+    "stars": 39976
+  },
+  {
+    "name": "The-Vibe-Company/quivr",
+    "stars": 39598
+  },
+  {
+    "name": "SagerNet/sing-box",
+    "stars": 38968
+  },
+  {
+    "name": "harness/harness",
+    "stars": 38568
+  },
+  {
+    "name": "aquasecurity/trivy",
+    "stars": 38490
+  },
+  {
+    "name": "istio/istio",
+    "stars": 38445
+  },
+  {
+    "name": "docker/compose",
+    "stars": 38387
+  },
+  {
+    "name": "tailscale/tailscale",
+    "stars": 37707
+  },
+  {
+    "name": "glanceapp/glance",
+    "stars": 37541
+  },
+  {
+    "name": "IceWhaleTech/CasaOS",
+    "stars": 37331
+  },
+  {
+    "name": "1Panel-dev/1Panel",
+    "stars": 37198
+  },
+  {
+    "name": "restic/restic",
+    "stars": 36642
+  },
+  {
+    "name": "wailsapp/wails",
+    "stars": 36585
+  },
+  {
+    "name": "hashicorp/vault",
+    "stars": 36395
+  },
+  {
+    "name": "esengine/DeepSeek-Reasonix",
+    "stars": 35837
+  },
+  {
+    "name": "seaweedfs/seaweedfs",
+    "stars": 35561
+  },
+  {
+    "name": "unknwon/the-way-to-go_ZH_CN",
+    "stars": 35005
+  },
+  {
+    "name": "binwiederhier/ntfy",
+    "stars": 34891
+  },
+  {
+    "name": "derailed/k9s",
+    "stars": 34834
+  },
+  {
+    "name": "v2fly/v2ray-core",
+    "stars": 34685
+  },
+  {
+    "name": "Tencent/WeKnora",
+    "stars": 34586
+  },
+  {
+    "name": "ehang-io/nps",
+    "stars": 34248
+  },
+  {
+    "name": "k3s-io/k3s",
+    "stars": 34211
+  },
+  {
+    "name": "halfrost/LeetCode-Go",
+    "stars": 33812
+  },
+  {
+    "name": "github/github-mcp-server",
+    "stars": 33716
+  },
+  {
+    "name": "zeromicro/go-zero",
+    "stars": 33387
+  },
+  {
+    "name": "podman-container-tools/podman",
+    "stars": 33069
+  },
+  {
+    "name": "labstack/echo",
+    "stars": 32775
+  },
+  {
+    "name": "cockroachdb/cockroach",
+    "stars": 32574
+  },
+  {
+    "name": "beego/beego",
+    "stars": 32426
+  },
+  {
+    "name": "kubernetes/minikube",
+    "stars": 32194
+  },
+  {
+    "name": "dokku/dokku",
+    "stars": 32190
+  },
+  {
+    "name": "projectdiscovery/nuclei",
+    "stars": 32102
+  },
+  {
+    "name": "grafana/k6",
+    "stars": 31971
+  },
+  {
+    "name": "iawia002/lux",
+    "stars": 31780
+  },
+  {
+    "name": "abiosoft/colima",
+    "stars": 31263
+  },
+  {
+    "name": "vxcontrol/pentagi",
+    "stars": 31023
+  },
+  {
+    "name": "chubin/wttr.in",
+    "stars": 30679
+  },
+  {
+    "name": "opentofu/opentofu",
+    "stars": 30530
+  },
+  {
+    "name": "spf13/viper",
+    "stars": 30490
+  },
+  {
+    "name": "helm/helm",
+    "stars": 30334
+  },
+  {
+    "name": "gitleaks/gitleaks",
+    "stars": 30088
+  },
+  {
+    "name": "hashicorp/consul",
+    "stars": 30088
+  },
+  {
+    "name": "sipeed/picoclaw",
+    "stars": 30087
+  },
+  {
+    "name": "netbirdio/netbird",
+    "stars": 30043
+  },
+  {
+    "name": "micro-editor/micro",
+    "stars": 29719
+  },
+  {
+    "name": "goharbor/harbor",
+    "stars": 29564
+  },
+  {
+    "name": "XIU2/CloudflareSpeedTest",
+    "stars": 29489
+  }
+]

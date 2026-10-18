@@ -1,0 +1,65 @@
+[
+  {
+    "scan_id": "example-py-cli",
+    "name": "py-cli demo",
+    "repo_url": "https://github.com/docs-drift/py-cli-demo",
+    "file": "py-cli.json",
+    "kind": "fixture",
+    "verified": true,
+    "note": "Synthetic fixture with a deterministic Git history."
+  },
+  {
+    "scan_id": "example-fastapi-svc",
+    "name": "fastapi-svc demo",
+    "repo_url": "https://github.com/docs-drift/fastapi-svc-demo",
+    "file": "fastapi-svc.json",
+    "kind": "fixture",
+    "verified": true,
+    "note": "Synthetic fixture with a deterministic Git history."
+  },
+  {
+    "scan_id": "example-node-tool",
+    "name": "node-tool demo",
+    "repo_url": "https://github.com/docs-drift/node-tool-demo",
+    "file": "node-tool.json",
+    "kind": "fixture",
+    "verified": true,
+    "note": "Synthetic fixture with a deterministic Git history."
+  },
+  {
+    "scan_id": "example-clean-repo",
+    "name": "clean-repo demo",
+    "repo_url": "https://github.com/docs-drift/clean-repo-demo",
+    "file": "clean-repo.json",
+    "kind": "fixture",
+    "verified": true,
+    "note": "Synthetic fixture with a deterministic Git history."
+  },
+  {
+    "scan_id": "example-rich-cli",
+    "name": "rich-cli",
+    "repo_url": "https://github.com/textualize/rich-cli",
+    "file": "rich-cli.json",
+    "kind": "public",
+    "sha": "46f4d2469097be395558768714a5f07ebccf1412",
+    "verified": true,
+    "note": "Manually checked README.md:61 (--line-number) against src/rich_cli/__main__.py:358 (--line-numbers), and README.md:180 (--p) against the --print/-p declaration. Other static findings are not manually certified.",
+    "verified_values": [
+      "--line-number",
+      "--p"
+    ]
+  },
+  {
+    "scan_id": "example-files-to-prompt",
+    "name": "files-to-prompt \u00b7 historical",
+    "repo_url": "https://github.com/simonw/files-to-prompt",
+    "file": "files-to-prompt.json",
+    "kind": "public",
+    "sha": "ae06f2039f3a1dc1c9f3b4657fb51459490768f2",
+    "verified": true,
+    "note": "Historical snapshot, intentionally pinned before the upstream fix: README.md:55 says c/--cxml; files_to_prompt/cli.py declares -c/--cxml. Fixed upstream by f7cf729babc92604b9cd06c3d9cad32daff0f276. Other findings may reflect scanner limitations, not real defects.",
+    "verified_values": [
+      "c/--cxml"
+    ]
+  }
+]

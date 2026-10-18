@@ -1,46 +1,125 @@
 [build-system]
-requires = ["hatchling>=1.27"]
+requires = ["hatchling>=1.27", "hatch-vcs>=0.5", "hatch-fancy-pypi-readme>=25.1"]
 build-backend = "hatchling.build"
 
 [project]
 name = "docs-drift"
-version = "0.1.0"
+dynamic = ["version", "readme"]
 description = "Find evidence-backed drift between repository documentation and code."
-readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
+keywords = ["documentation", "drift", "static-analysis", "cli", "sarif", "developer-tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
 dependencies = [
-    "typer>=0.15",
+    "typer>=0.27.3,<0.28",
     "rich>=13.9",
     "pydantic>=2.7",
     "markdown-it-py>=3.0",
     "pathspec>=1.0",
-    "tree-sitter>=0.25",
-    "tree-sitter-language-pack>=0.10",
+    "tree-sitter>=0.25,<0.27",
+    "tree-sitter-javascript>=0.25,<0.26",
+    "tree-sitter-typescript>=0.23.2,<0.24",
     "rapidfuzz>=3.9",
     "tomli-w>=1.0",
+    "jinja2>=3.1",
+    "pyyaml>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/ayushagarwalhere/docs-drift"
+Documentation = "https://ayushagarwalhere.github.io/docs-drift/"
+Source = "https://github.com/ayushagarwalhere/docs-drift"
+Issues = "https://github.com/ayushagarwalhere/docs-drift/issues"
+Changelog = "https://github.com/ayushagarwalhere/docs-drift/blob/main/CHANGELOG.md"
 
 [project.scripts]
 docs-drift = "docs_drift.cli:app"
 
 [project.optional-dependencies]
-graph = ["falkordb>=1.0"]
+graph = []
+docs = ["mkdocs-material>=9.6"]
+watch = ["watchfiles>=1.0,<2"]
+lsp = ["pygls>=2.0,<3", "lsprotocol>=2025.0"]
 llm = ["httpx>=0.28"]
 web = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "jinja2>=3.1"]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40", "httpx>=0.28"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.17.1",
+    "mypy>=1.14",
+    "pre-commit>=4.0",
+    "rust-just>=1.40",
+    "httpx>=0.28",
+    "jsonschema>=4.23",
+    "types-pyyaml>=6",
+    "types-jsonschema>=4.26",
+    "playwright>=1.48",
+    "hypothesis>=6.100",
+    "pip-audit>=2.9",
+    "deptry>=0.24",
+    "pillow>=11",
+]
 
 # Mirror the published dev extra so plain `uv run pytest` works in a checkout.
 # All imported dependencies currently provide their own typing information.
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.17.1", "mypy>=1.14", "pre-commit>=4.0", "rust-just>=1.40", "httpx>=0.28"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.17.1",
+    "mypy>=1.14",
+    "pre-commit>=4.0",
+    "rust-just>=1.40",
+    "httpx>=0.28",
+    "jsonschema>=4.23",
+    "types-pyyaml>=6",
+    "types-jsonschema>=4.26",
+    "playwright>=1.48",
+    "hypothesis>=6.100",
+    "pip-audit>=2.9",
+    "deptry>=0.24",
+    "pillow>=11",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/docs_drift"]
 
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = '^v(?P<version>\d+\.\d+\.\d+(?:-rc\.\d+)?)$'
+fallback-version = "0.1.0.dev0"
+
+[tool.hatch.version.raw-options]
+git_describe_command = ["git", "describe", "--dirty", "--tags", "--long", "--match", "v[0-9]*.[0-9]*.[0-9]*"]
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+fragments = [{path = "README.md"}]
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '!\[([^\]]*)\]\((?!https?://)([^)]+)\)'
+replacement = '![\1](https://raw.githubusercontent.com/ayushagarwalhere/docs-drift/main/\2)'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '(\]\()(?!https?://|#)([^)]+)(\))'
+replacement = '\1https://github.com/ayushagarwalhere/docs-drift/blob/main/\2\3'
+
 [tool.hatch.build.targets.sdist]
-include = ["src/", "scripts/", "tests/", "docs/", "README.md", "CONTRIBUTING.md", "LICENSE", "pyproject.toml", "justfile", ".gitattributes", ".pre-commit-config.yaml"]
+include = ["src/", "scripts/", "tests/", "benchmark/", "docs/", "editors/", "examples/", "CHANGELOG.md", "README.md", "RELEASING.md", "SUBMISSION.md", "CONTRIBUTING.md", "SECURITY.md", "LICENSE", "pyproject.toml", "uv.lock", "justfile", ".gitattributes", ".pre-commit-config.yaml"]
+exclude = ["/tests/fixtures/repos", "/.docs-drift", "**/__pycache__", "**/node_modules", "**/.git", "/benchmark/runs", "/benchmark/search-*.json", "/examples/*.cast", "/examples/*.png", "/docs/assets/*.gif"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -52,7 +131,7 @@ addopts = ["--ignore=tests/fixtures/repos"]
 source = ["docs_drift", "scripts"]
 
 [tool.coverage.report]
-fail_under = 80
+fail_under = 85
 show_missing = true
 
 [tool.ruff]
@@ -71,7 +150,14 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "PL"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "scripts", "tests"]
+files = ["src", "scripts", "tests", "benchmark"]
 plugins = ["pydantic.mypy"]
 # Fixture code is scan input, not part of the typed implementation.
-exclude = ["^tests/fixtures/repos/"]
+exclude = ["^tests/fixtures/repos/", "^tests/fixtures/injection/"]
+
+[tool.deptry]
+known_first_party = ["docs_drift", "scripts", "tests", "benchmark"]
+optional_dependencies_dev_groups = ["dev", "docs"]
+[tool.deptry.per_rule_ignores]
+# These are development-only QA scripts, not shipped runtime imports.
+DEP004 = ["playwright", "PIL"]

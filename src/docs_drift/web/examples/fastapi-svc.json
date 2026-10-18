@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "repo_path": "fastapi-svc-demo",
+  "head_sha": "5b559ed74770a06859fe6e5450978b7c1ff31c05",
+  "scan_time": "2026-10-18T12:17:38.280834Z",
+  "config_used": {
+    "docs": [
+      "README.md",
+      "docs/**/*.md",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/**",
+      ".venv/**",
+      "vendor/**",
+      "CHANGELOG.md",
+      "**/CHANGELOG.md"
+    ],
+    "languages": "auto",
+    "ignore": [],
+    "min_confidence": 0.6,
+    "llm": {
+      "enabled": false,
+      "model": null,
+      "max_claims": 40,
+      "concurrency": 4,
+      "timeout": 60.0,
+      "budget": 0.5,
+      "redact_paths": []
+    },
+    "history": {
+      "max_commits": 2000,
+      "show_emails": false
+    }
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "content_hash": "4de956bcece86bb58953da5a3d886500c400c6ed5021a7f2b6539b72dbd20707",
+      "format": "markdown"
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "doc_path": "README.md",
+      "heading": "fastapi-svc",
+      "heading_level": 1,
+      "heading_path": [
+        "fastapi-svc"
+      ],
+      "start_line": 1,
+      "end_line": 7,
+      "context": "current",
+      "historical_spans": []
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim_d82f88afc8811481b617475b8003d11181002ea4c1434b5d05f261eff9c67be8",
+      "kind": "endpoint",
+      "raw_text": "GET /users/{id}",
+      "value": "GET /users/{param}",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 3,
+      "column": 22,
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.95,
+      "locations": [
+        {
+          "line": 3,
+          "column": 22,
+          "raw_text": "GET /users/{id}",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "538047f2845492fed329f131442a08eadabc5a049777febbed95abc547d3cee5"
+    },
+    {
+      "claim_id": "claim_461bc200b34b24893c2055e275451505bbe975edc58bda933ef788fd4427b5f1",
+      "kind": "endpoint",
+      "raw_text": "POST /login",
+      "value": "POST /login",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 4,
+      "column": 16,
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.95,
+      "locations": [
+        {
+          "line": 4,
+          "column": 16,
+          "raw_text": "POST /login",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "cfc27349a0a4bba6a37129e2fa31c5c4dea4db7d0164584cebbaf30451c3e939"
+    },
+    {
+      "claim_id": "claim_98c0a25a8cf75233caffa287fc5e0f09ec18ccc3fea6c54cd3aa6bf05347f997",
+      "kind": "config_key",
+      "raw_text": "request_timeout",
+      "value": "request_timeout",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 5,
+      "column": 32,
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.75,
+      "locations": [
+        {
+          "line": 5,
+          "column": 32,
+          "raw_text": "request_timeout",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "b671a17c967574b3a39afe91a844f36bfd133565a9eba66c55d06fcac593756b"
+    },
+    {
+      "claim_id": "claim_b4d539ee5f8e1635fd16f959378cf10ce18a8eed6731cca590dcb10255ab5546",
+      "kind": "symbol",
+      "raw_text": "create_app",
+      "value": "create_app",
+      "qualifier": null,
+      "expected_default": null,
+      "doc_path": "README.md",
+      "line": 7,
+      "column": 31,
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "extraction": "inline_code",
+      "extraction_confidence": 0.72,
+      "locations": [
+        {
+          "line": 7,
+          "column": 31,
+          "raw_text": "create_app",
+          "extraction": "inline_code"
+        }
+      ],
+      "extraction_sources": [
+        "inline_code"
+      ],
+      "group_key": "99dd37118b896a0cd5e96e70ff46d58a23cc2ce21368afdbb2c07e5b562189c6"
+    },
+    {
+      "claim_id": "claim_9a1555c68ded34143eede3ce983b01cb973da0580f9435015bd5a0417ebb79cd",
+      "kind": "default_value",
+      "raw_text": "defaults to `30`",
+      "value": "request_timeout",
+      "qualifier": "config_key",
+      "expected_default": "30",
+      "doc_path": "README.md",
+      "line": 6,
+      "column": 23,
+      "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+      "extraction": "prose_pattern",
+      "extraction_confidence": 0.55,
+      "locations": [
+        {
+          "line": 6,
+          "column": 23,
+          "raw_text": "defaults to `30`",
+          "extraction": "prose_pattern"
+        }
+      ],
+      "extraction_sources": [
+        "prose_pattern"
+      ],
+      "group_key": "572d756ce267d7e728edeb55a3dd58f92d0fd0e31feb2ae4540ffcacb201ef47"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol_id": "symbol_9cacc0905bf8f1082242c31cc2cd7c94bdc2e0661dec71fd612b073687f954d5",
+      "kind": "class",
+      "name": "Settings",
+      "qualified_name": "service.Settings",
+      "aliases": [],
+      "default": null,
+      "file": "service.py",
+      "line": 4,
+      "language": "python",
+      "framework": "python-settings",
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_2167df17623f2cffaaa2602c6f83c91af8cfa4ad1e7da3e7ef0b7a4b8f936bb0",
+      "kind": "config_key",
+      "name": "timeout_seconds",
+      "qualified_name": "service.Settings.timeout_seconds",
+      "aliases": [],
+      "default": "60",
+      "file": "service.py",
+      "line": 5,
+      "language": "python",
+      "framework": "pydantic-settings",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_785a7bac94a4a62b579e6941ee58883e8b3ef2cd9950bb2c05f21633d8c52a2f",
+      "kind": "env_var",
+      "name": "TIMEOUT_SECONDS",
+      "qualified_name": "service.Settings.TIMEOUT_SECONDS",
+      "aliases": [],
+      "default": "60",
+      "file": "service.py",
+      "line": 5,
+      "language": "python",
+      "framework": "pydantic-settings",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": true,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_9054346becacb82876d4f68d3fa725f60b25c5eacb3b2220802dce19b4fa9168",
+      "kind": "function",
+      "name": "build_app",
+      "qualified_name": "service.build_app",
+      "aliases": [],
+      "default": null,
+      "file": "service.py",
+      "line": 7,
+      "language": "python",
+      "framework": null,
+      "parent_id": null,
+      "exported": true,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": null,
+      "handler": null,
+      "partial_prefix": false,
+      "ts_type": false
+    },
+    {
+      "symbol_id": "symbol_5ae1d9de7e2e4b9aeb689de6ab8f936296a81f6926e189863c6f2a934ac3f754",
+      "kind": "route",
+      "name": "GET /v2/users/{param}",
+      "qualified_name": "GET /v2/users/{param}",
+      "aliases": [],
+      "default": null,
+      "file": "service.py",
+      "line": 11,
+      "language": "python",
+      "framework": "fastapi",
+      "parent_id": null,
+      "exported": false,
+      "decorators": [],
+      "derived": false,
+      "setting_group": null,
+      "authoritative": true,
+      "raw_path": "/v2/users/{id}",
+      "handler": "service.get_user",
+      "partial_prefix": false,
+      "ts_type": false
+    }
+  ],
+  "findings": [
+    {
+      "claim": {
+        "claim_id": "claim_d82f88afc8811481b617475b8003d11181002ea4c1434b5d05f261eff9c67be8",
+        "kind": "endpoint",
+        "raw_text": "GET /users/{id}",
+        "value": "GET /users/{param}",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 3,
+        "column": 22,
+        "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.95,
+        "locations": [
+          {
+            "line": 3,
+            "column": 22,
+            "raw_text": "GET /users/{id}",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "538047f2845492fed329f131442a08eadabc5a049777febbed95abc547d3cee5"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_5ae1d9de7e2e4b9aeb689de6ab8f936296a81f6926e189863c6f2a934ac3f754",
+        "kind": "route",
+        "name": "GET /v2/users/{param}",
+        "qualified_name": "GET /v2/users/{param}",
+        "aliases": [],
+        "default": null,
+        "file": "service.py",
+        "line": 11,
+        "language": "python",
+        "framework": "fastapi",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": "/v2/users/{id}",
+        "handler": "service.get_user",
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "GET /v2/users/{param}",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 3,
+          "text": "GET /users/{id}",
+          "end_line": null
+        },
+        {
+          "file": "service.py",
+          "line": 11,
+          "text": "GET /v2/users/{param}",
+          "end_line": null
+        },
+        {
+          "file": "service.py",
+          "line": 1,
+          "text": "-    @app.get(\"/users/{id}\")\n+    @app.get(\"/v2/users/{id}\")",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "2d94162dcf4e30283d9b39de7ad354a83b22cdeb",
+        "short_sha": "2d94162",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-02T09:00:00Z",
+        "summary": "Move user lookup to v2"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed endpoint named GET /users/{param} was found. Closest indexed candidates: GET /v2/users/{param} (service.py:11).",
+        "Likely rename: GET /users/{param} resembles GET /v2/users/{param} (85/100).",
+        "Git history changed this name in 2d94162."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "fastapi-svc",
+      "doc_text": "- Read one user with `GET /users/{id}`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_461bc200b34b24893c2055e275451505bbe975edc58bda933ef788fd4427b5f1",
+        "kind": "endpoint",
+        "raw_text": "POST /login",
+        "value": "POST /login",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 4,
+        "column": 16,
+        "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.95,
+        "locations": [
+          {
+            "line": 4,
+            "column": 16,
+            "raw_text": "POST /login",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "cfc27349a0a4bba6a37129e2fa31c5c4dea4db7d0164584cebbaf30451c3e939"
+      },
+      "matched_symbol": null,
+      "verdict": "missing",
+      "suggestion": null,
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 4,
+          "text": "POST /login",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "a6da42660fd9269d32e105ad2477d12a24b9afff",
+        "short_sha": "a6da426",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-03T09:00:00Z",
+        "summary": "Remove the login endpoint"
+      },
+      "confidence": 0.5,
+      "reasons": [
+        "No indexed endpoint named POST /login was found. No close indexed candidates were found."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "fastapi-svc",
+      "doc_text": "- Sign in with `POST /login`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_98c0a25a8cf75233caffa287fc5e0f09ec18ccc3fea6c54cd3aa6bf05347f997",
+        "kind": "config_key",
+        "raw_text": "request_timeout",
+        "value": "request_timeout",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 5,
+        "column": 32,
+        "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.75,
+        "locations": [
+          {
+            "line": 5,
+            "column": 32,
+            "raw_text": "request_timeout",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "b671a17c967574b3a39afe91a844f36bfd133565a9eba66c55d06fcac593756b"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_2167df17623f2cffaaa2602c6f83c91af8cfa4ad1e7da3e7ef0b7a4b8f936bb0",
+        "kind": "config_key",
+        "name": "timeout_seconds",
+        "qualified_name": "service.Settings.timeout_seconds",
+        "aliases": [],
+        "default": "60",
+        "file": "service.py",
+        "line": 5,
+        "language": "python",
+        "framework": "pydantic-settings",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "timeout_seconds",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 5,
+          "text": "request_timeout",
+          "end_line": null
+        },
+        {
+          "file": "service.py",
+          "line": 1,
+          "text": "-    request_timeout: int = 30\n+    timeout_seconds: int = 60",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "b7d9a6dbecd5200a369f7fa67814ae18756e7f05",
+        "short_sha": "b7d9a6d",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-04T09:00:00Z",
+        "summary": "Rename timeout setting and increase its default"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed config_key named request_timeout was found. Closest indexed candidates: timeout_seconds (service.py:5).",
+        "Git history confirms this name changed to timeout_seconds.",
+        "Git history changed this name in b7d9a6d."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "fastapi-svc",
+      "doc_text": "- Configure the settings field `request_timeout`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_b4d539ee5f8e1635fd16f959378cf10ce18a8eed6731cca590dcb10255ab5546",
+        "kind": "symbol",
+        "raw_text": "create_app",
+        "value": "create_app",
+        "qualifier": null,
+        "expected_default": null,
+        "doc_path": "README.md",
+        "line": 7,
+        "column": 31,
+        "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+        "extraction": "inline_code",
+        "extraction_confidence": 0.72,
+        "locations": [
+          {
+            "line": 7,
+            "column": 31,
+            "raw_text": "create_app",
+            "extraction": "inline_code"
+          }
+        ],
+        "extraction_sources": [
+          "inline_code"
+        ],
+        "group_key": "99dd37118b896a0cd5e96e70ff46d58a23cc2ce21368afdbb2c07e5b562189c6"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_9054346becacb82876d4f68d3fa725f60b25c5eacb3b2220802dce19b4fa9168",
+        "kind": "function",
+        "name": "build_app",
+        "qualified_name": "service.build_app",
+        "aliases": [],
+        "default": null,
+        "file": "service.py",
+        "line": 7,
+        "language": "python",
+        "framework": null,
+        "parent_id": null,
+        "exported": true,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "renamed",
+      "suggestion": "build_app",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 7,
+          "text": "create_app",
+          "end_line": null
+        },
+        {
+          "file": "service.py",
+          "line": 1,
+          "text": "-def create_app():\n+def build_app():",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "5b559ed74770a06859fe6e5450978b7c1ff31c05",
+        "short_sha": "5b559ed",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-05T09:00:00Z",
+        "summary": "Rename the application factory"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No indexed symbol named create_app was found. Closest indexed candidates: build_app (service.py:7).",
+        "Git history confirms this name changed to build_app.",
+        "Git history changed this name in 5b559ed."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "fastapi-svc",
+      "doc_text": "- Create the application with `create_app`."
+    },
+    {
+      "claim": {
+        "claim_id": "claim_9a1555c68ded34143eede3ce983b01cb973da0580f9435015bd5a0417ebb79cd",
+        "kind": "default_value",
+        "raw_text": "defaults to `30`",
+        "value": "request_timeout",
+        "qualifier": "config_key",
+        "expected_default": "30",
+        "doc_path": "README.md",
+        "line": 6,
+        "column": 23,
+        "section_id": "section_5ee950afa34385cd074485202ec5f72c0b7729d8b7ef7d477352b0abf6720c27",
+        "extraction": "prose_pattern",
+        "extraction_confidence": 0.55,
+        "locations": [
+          {
+            "line": 6,
+            "column": 23,
+            "raw_text": "defaults to `30`",
+            "extraction": "prose_pattern"
+          }
+        ],
+        "extraction_sources": [
+          "prose_pattern"
+        ],
+        "group_key": "572d756ce267d7e728edeb55a3dd58f92d0fd0e31feb2ae4540ffcacb201ef47"
+      },
+      "matched_symbol": {
+        "symbol_id": "symbol_2167df17623f2cffaaa2602c6f83c91af8cfa4ad1e7da3e7ef0b7a4b8f936bb0",
+        "kind": "config_key",
+        "name": "timeout_seconds",
+        "qualified_name": "service.Settings.timeout_seconds",
+        "aliases": [],
+        "default": "60",
+        "file": "service.py",
+        "line": 5,
+        "language": "python",
+        "framework": "pydantic-settings",
+        "parent_id": null,
+        "exported": false,
+        "decorators": [],
+        "derived": false,
+        "setting_group": null,
+        "authoritative": true,
+        "raw_path": null,
+        "handler": null,
+        "partial_prefix": false,
+        "ts_type": false
+      },
+      "verdict": "default_changed",
+      "suggestion": "timeout_seconds (default 60)",
+      "evidence": [
+        {
+          "file": "README.md",
+          "line": 6,
+          "text": "defaults to `30`",
+          "end_line": null
+        },
+        {
+          "file": "service.py",
+          "line": 1,
+          "text": "-    request_timeout: int = 30\n+    timeout_seconds: int = 60",
+          "end_line": null
+        }
+      ],
+      "introduced_by": {
+        "sha": "b7d9a6dbecd5200a369f7fa67814ae18756e7f05",
+        "short_sha": "b7d9a6d",
+        "author_name": "Author hidden",
+        "author_email": null,
+        "date": "2026-10-04T09:00:00Z",
+        "summary": "Rename timeout setting and increase its default"
+      },
+      "confidence": 0.92,
+      "reasons": [
+        "No authoritative indexed default was available for this subject.",
+        "The documented setting was renamed to timeout_seconds and its code default is 60.",
+        "Git history changed this name in b7d9a6d."
+      ],
+      "decided_by": "rules",
+      "replayed": false,
+      "package": "fastapi-svc",
+      "doc_text": "- The request timeout defaults to `30` seconds."
+    }
+  ],
+  "timings": {
+    "docs": 0.23573020001640543,
+    "index": 0.15842150000389665,
+    "match": 0.003522199986036867,
+    "history": 0.40941289998590946
+  },
+  "warnings": [],
+  "suppressed": [],
+  "historical_ignored": 0,
+  "llm_usage": {},
+  "packages": [
+    {
+      "name": "fastapi-svc",
+      "root": ".",
+      "language": "unknown",
+      "commands": []
+    }
+  ],
+  "docs_repo_path": null,
+  "remote_url": "https://github.com/docs-drift/fastapi-svc-demo",
+  "baselined": 0,
+  "package_version": "0.1.0"
+}

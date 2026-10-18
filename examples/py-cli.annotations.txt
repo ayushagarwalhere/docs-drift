@@ -1,0 +1,4 @@
+::warning file=README.md,line=4,col=19::--port: renamed. --listen Introduced by 450a93d: Rename port to listen (2026-10-02T09:00:00+00:00).
+::warning file=README.md,line=6,col=19::--workers: default_changed. 8 Introduced by 397bff7: Increase the worker default (2026-10-03T09:00:00+00:00).
+::warning file=README.md,line=7,col=7::APP_DEBUG: missing. APP_LOG_LEVEL Introduced by f686fb7: Replace debug environment variable with log level (2026-10-04T09:00:00+00:00).
+::warning file=README.md,line=8,col=11::migrate: renamed. db-upgrade Introduced by 3fb52f1: Rename the database upgrade subcommand (2026-10-05T09:00:00+00:00).

@@ -1,0 +1,56 @@
+site_name: docs-drift
+site_description: Find documentation statements that code no longer supports.
+docs_dir: docs
+site_dir: .docs-drift/site
+theme:
+  name: material
+  font: false
+  palette:
+    - scheme: default
+      primary: teal
+      toggle: {icon: material/brightness-7, name: Switch to dark mode}
+    - scheme: slate
+      primary: teal
+      toggle: {icon: material/brightness-4, name: Switch to light mode}
+  features: [navigation.sections, content.code.copy]
+plugins: [search]
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+nav:
+  - Overview: index.md
+  - Getting started: getting-started.md
+  - Configuration: configuration.md
+  - Claims and verdicts: claims.md
+  - Supported ecosystems: support.md
+  - Rules:
+      - DD001: rules/DD001.md
+      - DD002: rules/DD002.md
+      - DD003: rules/DD003.md
+      - DD004: rules/DD004.md
+  - Integrations:
+      - GitHub Action: github-action.md
+      - Pre-commit and CI: ci.md
+      - VS Code: vscode.md
+      - Python API: python-api.md
+  - Design:
+      - How it works: how-it-works.md
+      - Graph schema: graph.md
+      - LLM mode: llm-mode.md
+  - Trust:
+      - Security: SECURITY.md
+      - Benchmark: benchmark.md
+      - Limitations: LIMITATIONS.md
+      - Performance: RESULTS.md
+  - FAQ: faq.md
+  - Built with voice: built-with-voice.md
+  - Changelog: CHANGELOG.md
+exclude_docs: |
+  /VERIFICATION.md
+  /WEB-VERIFICATION.md

@@ -3,12 +3,14 @@
 import re
 from collections import Counter
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import PurePosixPath
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 
 from docs_drift.ids import make_section_id
+from docs_drift.limits import MAX_DOC_CHARS, MAX_LINE_CHARS, MAX_MARKUP_OPENERS
 from docs_drift.models import DocFile, DocFormat, Section, SectionContext
 
 MIN_ADORNMENT_LENGTH = 3
@@ -22,6 +24,10 @@ class ParsedDoc:
     line_to_section: dict[int, Section]
     text: str
 
+    @cached_property
+    def lines(self) -> list[str]:
+        return self.text.splitlines()
+
 
 def _historical_heading(heading: str) -> bool:
     words = (
@@ -29,7 +35,8 @@ def _historical_heading(heading: str) -> bool:
         r"breaking changes|what['\u2019]s new)\b"
     )
     versions = r"\bv\d+(?:\.\d+)*(?:\.x)?\b|\b\d+(?:\.\d+)*\.x\b|\b\d+\.\d+\.\d+\b"
-    return re.search(f"{words}|{versions}", heading, re.IGNORECASE) is not None
+    illustrative = r"\b(?:synthetic|illustrative)\s+(?:examples?|fixtures?)\b"
+    return re.search(f"{words}|{versions}|{illustrative}", heading, re.IGNORECASE) is not None
 
 
 def _historical_file(path: str) -> bool:
@@ -149,6 +156,27 @@ def _simple_tokens(text: str, *, rst: bool) -> list[Token]:
     levels: dict[str, int] = {}
     index = 0
     while index < len(lines):
+        directive = re.match(r"\s*\.\.\s+code-block::\s*(\S*)", lines[index]) if rst else None
+        if directive:
+            start = index
+            index += 1
+            while index < len(lines) and (not lines[index].strip() or lines[index].lstrip().startswith(":")):
+                index += 1
+            content_start = index
+            while index < len(lines) and (not lines[index].strip() or lines[index].startswith((" ", "\t"))):
+                index += 1
+            import textwrap  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+            token = Token(
+                "fence",
+                "code",
+                0,
+                map=[content_start - 1, index],
+                info=directive[1],
+                content=textwrap.dedent("\n".join(lines[content_start:index])) + "\n",
+            )
+            tokens.append(token)
+            continue
         heading = _rst_heading(lines, index) if rst else None
         if heading is not None:
             title, adornment, count = heading
@@ -199,9 +227,17 @@ def is_historical_span(section: Section, line: int) -> bool:
 
 def parse_document(doc: DocFile, text: str) -> ParsedDoc:
     """Partition physical lines at every heading; map lines to their most specific section."""
+    if len(text) > MAX_DOC_CHARS or any(len(line) > MAX_LINE_CHARS for line in text.splitlines()):
+        raise ValueError("Document exceeds the parser size or 8,192-character line limit; split generated content.")
     if doc.format in {DocFormat.markdown, DocFormat.mdx}:
+        if any(line.count("[") + line.count("(") > MAX_MARKUP_OPENERS for line in text.splitlines()):
+            raise ValueError("Document exceeds the Markdown parser delimiter limit; split densely nested markup.")
+        if doc.format == DocFormat.mdx:
+            from docs_drift.docs.preprocess import strip_mdx  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+            text = strip_mdx(text)
         source, skipped = _skip_front_matter(text)
-        tokens = MarkdownIt("commonmark", {"html": False}).enable("table").parse(source)
+        tokens = MarkdownIt("commonmark", {"html": False, "maxNesting": 20}).enable("table").parse(source)
     else:
         source, skipped = text, 0
         tokens = _simple_tokens(source, rst=doc.format == DocFormat.rst)

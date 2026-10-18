@@ -2,6 +2,9 @@
 
 import fnmatch
 import re
+from typing import Any
+
+from docs_drift.models import ScanResult
 
 _KEY = re.compile(r"\b(?:sk-(?:ant|or-v1)-|ghp_|github_pat_|AKIA|ASIA)[A-Za-z0-9_-]{4,256}")
 _ASSIGNMENT = re.compile(
@@ -42,3 +45,18 @@ def mask_secrets(text: str) -> str:
 def excluded_path(path: str, patterns: list[str]) -> bool:
     defaults = [".env", ".env.*", "**/.env", "**/.env.*", "*.pem", "**/*.pem", "*.key", "**/*.key"]
     return any(fnmatch.fnmatchcase(path, pattern) for pattern in [*defaults, *patterns])
+
+
+def redact_result(result: ScanResult) -> ScanResult:
+    """Return a redacted copy so every report format shares the same secret boundary."""
+
+    def scrub(value: Any) -> Any:
+        if isinstance(value, str):
+            return mask_secrets(value)
+        if isinstance(value, list):
+            return [scrub(v) for v in value]
+        if isinstance(value, dict):
+            return {k: scrub(v) for k, v in value.items()}
+        return value
+
+    return ScanResult.model_validate(scrub(result.model_dump(mode="json")))
