@@ -24,6 +24,13 @@ def project(tmp_path: Path) -> Path:
     return tmp_path
 
 
+@pytest.mark.parametrize("argument", ["/tmp/example", "./output", "data.json", "8080", "https://example.com"])
+def test_positional_values_are_not_invented_subcommands(argument: str, tmp_path: Path) -> None:
+    found = claims(f"```sh\nmyapp {argument} second-value --verbose\n```\n", project(tmp_path))
+    assert not any(item.kind == ClaimKind.cli_command for item in found)
+    assert any(item.kind == ClaimKind.code_command and argument in item.value for item in found)
+
+
 def claims(text: str, root: Path) -> list[Claim]:
     return extract_block_claims(parsed(text), root).claims
 

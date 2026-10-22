@@ -5,6 +5,7 @@ import hashlib
 import pytest
 
 from docs_drift.docs.extract_inline import ExtractionResult, extract_claims
+from docs_drift.docs.preprocess import rst_claims
 from docs_drift.docs.sections import parse_document
 from docs_drift.models import ClaimKind, DocFile, DocFormat
 
@@ -12,6 +13,47 @@ from docs_drift.models import ClaimKind, DocFile, DocFormat
 def extract(text: str, *, path: str = "README.md") -> ExtractionResult:
     doc = DocFile(path=path, content_hash=hashlib.sha256(text.encode()).hexdigest(), format=DocFormat.markdown)
     return extract_claims(parse_document(doc, text))
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "The functions provided by `codec.json` serialize objects.",
+        "Use methods on `client.json` to serialize values.",
+        "The `package.codec.json` module handles encoding.",
+        "The attribute `service.json` contains the provider.",
+    ],
+)
+def test_dotted_api_names_with_file_extensions_are_symbols(sentence: str) -> None:
+    found = extract(sentence).claims
+    assert len(found) == 1
+    assert found[0].kind == ClaimKind.symbol
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "The module reads `settings.json` at startup.",
+        "The file `client.json` contains the configuration.",
+        "The function reads `src/settings.json`.",
+    ],
+)
+def test_real_filenames_remain_file_claims_in_api_prose(sentence: str) -> None:
+    assert extract(sentence).claims[0].kind == ClaimKind.file_path
+
+
+@pytest.mark.parametrize(
+    ("text", "kind"),
+    [
+        ("The functions provided by ``codec.json`` serialize values.", ClaimKind.symbol),
+        ("Use methods on ``client.json`` to serialize values.", ClaimKind.symbol),
+        ("The module reads ``settings.json`` at startup.", ClaimKind.file_path),
+    ],
+)
+def test_rst_literals_use_the_same_api_context(text: str, kind: ClaimKind) -> None:
+    doc = DocFile(path="api.rst", content_hash=hashlib.sha256(text.encode()).hexdigest(), format=DocFormat.rst)
+    claims = rst_claims(parse_document(doc, text))
+    assert len(claims) == 1 and claims[0].kind == kind
 
 
 @pytest.mark.parametrize(

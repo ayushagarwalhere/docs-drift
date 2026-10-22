@@ -70,6 +70,22 @@ publication. Inputs are passed through environment variables, never interpolated
 into shell source. Reports go to a runner temporary directory: HTML, JSON, SARIF,
 and Markdown, plus the Actions job summary. Output: `report-directory`.
 
+For gradual adoption, pass a reviewed `baseline` path relative to `repo`.
+`min-confidence` optionally overrides the repository threshold; `max-findings`
+defaults to zero allowed qualifying new findings. `fail-on-drift: 'false'` is
+report-only mode. Invalid input or a missing selected baseline fails before the
+scan; a changed verdict for a baselined claim requires review again.
+
+Full findings remain in generated `scan.*` reports.
+The generated artifacts `new.json`, `new.sarif` and `new.md` contain the new-drift subset.
+The generated `gate.json` artifact records the policy, revision, counts, status and redacted warnings.
+Scalar outputs are `gate-status`,
+`new-drift`, `qualifying-new-drift` and `baseline-drift`. Artifacts and outputs are
+written before a failing drift gate exits, so artifact upload should use
+`if: always()`. A passing gate does not prove documentation correctness.
+See [organization adoption](ORGANIZATIONS.md) for multi-repository scanning,
+review and operating guidance.
+
 The Action never posts PR comments, accepts model/API keys, or calls a model.
 It uses no write token. Do not use `pull_request_target` to check out PR code with
 secrets/write permissions. Fork PR checks need only read permissions. JSON/HTML

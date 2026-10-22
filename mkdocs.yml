@@ -35,6 +35,7 @@ nav:
       - DD003: rules/DD003.md
       - DD004: rules/DD004.md
   - Integrations:
+      - Organization adoption: ORGANIZATIONS.md
       - GitHub Action: github-action.md
       - Pre-commit and CI: ci.md
       - VS Code: vscode.md
@@ -44,6 +45,7 @@ nav:
       - Graph schema: graph.md
       - LLM mode: llm-mode.md
   - Trust:
+      - Product maturity: PRODUCT.md
       - Security: SECURITY.md
       - Benchmark: benchmark.md
       - Limitations: LIMITATIONS.md

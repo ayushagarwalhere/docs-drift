@@ -82,7 +82,12 @@ class Group(TyperGroup):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(buffer.getvalue(), encoding="utf-8", newline="\n")
             return value
-        except (click.ClickException, Exit, Abort):
+        except Exit:
+            if capture and buffer.getvalue():
+                # A failed --quiet check must still explain its findings.
+                sys.stdout.write(buffer.getvalue())
+            raise
+        except (click.ClickException, Abort):
             raise
         except Exception as exc:
             if ctx.parent is not None:

@@ -123,8 +123,13 @@ def source_files(  # noqa: PLR0912, PLR0915 - bounded file validation before par
         try:
             raw = subprocess.run(command, capture_output=True, check=True, env=env, timeout=5).stdout
             paths = [Path(os.fsdecode(item)) for item in raw.split(b"\0") if item]
-        except (OSError, subprocess.SubprocessError):
-            paths = [path.relative_to(root) for path in root.rglob("*") if path.is_file()]
+        except (OSError, subprocess.SubprocessError) as exc:
+            # Losing Git's tracked-file boundary must not turn a checkout scan
+            # into an unbounded traversal of ignored build/cache/test trees.
+            raise OSError(
+                "Git could not list tracked source files. Check Git availability, repository ownership and "
+                "permissions, then retry. The scan stopped instead of indexing ignored or generated files."
+            ) from exc
     else:
         paths = [path.relative_to(root) for path in root.rglob("*") if path.is_file()]
     skip = {

@@ -14,6 +14,9 @@ from zipfile import ZipFile
 TAG = re.compile(r"v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))(?:-rc\.(?P<rc>[1-9]\d*))?")
 MAX_RECORDING_BYTES = 1_000_000
 REQUIRED = (
+    "policy.py",
+    "portfolio.py",
+    "report/portfolio.html",
     "index/queries/typescript.scm",
     "index/queries/javascript.scm",
     "graph/queries/evidence_path.cypher",

@@ -19,7 +19,7 @@ jobs:
       - run: uv sync --locked --all-extras
       - run: uv run pytest tests/test_hardening.py tests/test_benchmark.py
       - run: uv run mkdocs build --strict
-      - run: uv run docs-drift check --repo . --quiet
+      - run: uv run docs-drift check --repo . --no-color
   publish:
     needs: build
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.DOCS_DRIFT_PAGES_ENABLED == 'true'

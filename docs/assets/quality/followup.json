@@ -1,0 +1,162 @@
+{
+  "selection": "Previously documented selected false positives; not an independent accuracy benchmark",
+  "general_accuracy_claim": false,
+  "rows": [
+    {
+      "repository": "flask",
+      "head_sha": "d086db856be187255b8ec61ef409357393020f32",
+      "claims_extracted": 299,
+      "before_gate": {
+        "schema_version": 1,
+        "head_sha": "d086db856be187255b8ec61ef409357393020f32",
+        "policy": {
+          "min_confidence": 0.6,
+          "max_findings": 0,
+          "fail_on_drift": false
+        },
+        "baseline_used": false,
+        "claims_extracted": 299,
+        "unverifiable_findings": 2,
+        "total_drift": 256,
+        "baseline_drift": 0,
+        "new_drift": 256,
+        "qualifying_new_drift": 93,
+        "below_threshold_new_drift": 163,
+        "status": "report_only",
+        "warnings": []
+      },
+      "after_gate": {
+        "schema_version": 1,
+        "head_sha": "d086db856be187255b8ec61ef409357393020f32",
+        "policy": {
+          "min_confidence": 0.6,
+          "max_findings": 0,
+          "fail_on_drift": false
+        },
+        "baseline_used": false,
+        "claims_extracted": 299,
+        "unverifiable_findings": 52,
+        "total_drift": 206,
+        "baseline_drift": 0,
+        "new_drift": 206,
+        "qualifying_new_drift": 90,
+        "below_threshold_new_drift": 116,
+        "status": "report_only",
+        "warnings": []
+      },
+      "selected_findings": [
+        {
+          "value": "flask.json",
+          "line": 228,
+          "kind": "symbol",
+          "verdict": "unverifiable",
+          "confidence": 0.3
+        },
+        {
+          "value": "app.json",
+          "line": 229,
+          "kind": "symbol",
+          "verdict": "unverifiable",
+          "confidence": 0.3
+        }
+      ]
+    },
+    {
+      "repository": "express",
+      "head_sha": "0dee2c52c7c873498f8ed7d8ee4ddd0a04d3ada8",
+      "claims_extracted": 2,
+      "before_gate": {
+        "schema_version": 1,
+        "head_sha": "0dee2c52c7c873498f8ed7d8ee4ddd0a04d3ada8",
+        "policy": {
+          "min_confidence": 0.6,
+          "max_findings": 0,
+          "fail_on_drift": false
+        },
+        "baseline_used": false,
+        "claims_extracted": 3,
+        "unverifiable_findings": 1,
+        "total_drift": 1,
+        "baseline_drift": 0,
+        "new_drift": 1,
+        "qualifying_new_drift": 0,
+        "below_threshold_new_drift": 1,
+        "status": "report_only",
+        "warnings": [
+          "Git history is shallow and may be truncated; use checkout fetch-depth: 0."
+        ]
+      },
+      "after_gate": {
+        "schema_version": 1,
+        "head_sha": "0dee2c52c7c873498f8ed7d8ee4ddd0a04d3ada8",
+        "policy": {
+          "min_confidence": 0.6,
+          "max_findings": 0,
+          "fail_on_drift": false
+        },
+        "baseline_used": false,
+        "claims_extracted": 2,
+        "unverifiable_findings": 1,
+        "total_drift": 0,
+        "baseline_drift": 0,
+        "new_drift": 0,
+        "qualifying_new_drift": 0,
+        "below_threshold_new_drift": 0,
+        "status": "report_only",
+        "warnings": [
+          "Git history is shallow and may be truncated; use checkout fetch-depth: 0."
+        ]
+      },
+      "selected_findings": [
+        {
+          "value": "express /tmp/foo",
+          "line": 102,
+          "kind": "code_command",
+          "verdict": "unverifiable",
+          "confidence": 0.15
+        }
+      ]
+    },
+    {
+      "repository": "rich-cli",
+      "head_sha": "46f4d2469097be395558768714a5f07ebccf1412",
+      "claims_extracted": 54,
+      "before_gate": null,
+      "after_gate": {
+        "schema_version": 1,
+        "head_sha": "46f4d2469097be395558768714a5f07ebccf1412",
+        "policy": {
+          "min_confidence": 0.6,
+          "max_findings": 0,
+          "fail_on_drift": false
+        },
+        "baseline_used": false,
+        "claims_extracted": 54,
+        "unverifiable_findings": 0,
+        "total_drift": 2,
+        "baseline_drift": 0,
+        "new_drift": 2,
+        "qualifying_new_drift": 0,
+        "below_threshold_new_drift": 2,
+        "status": "report_only",
+        "warnings": []
+      },
+      "selected_findings": [
+        {
+          "value": "--line-number",
+          "line": 61,
+          "kind": "cli_flag",
+          "verdict": "missing",
+          "confidence": 0.5
+        },
+        {
+          "value": "--p",
+          "line": 180,
+          "kind": "cli_flag",
+          "verdict": "missing",
+          "confidence": 0.5
+        }
+      ]
+    }
+  ]
+}

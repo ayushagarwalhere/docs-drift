@@ -1,5 +1,29 @@
 [
   {
+    "scan_id": "example-judge",
+    "name": "One stale claim (synthetic fixture)",
+    "repo_url": "synthetic:judge-fixture",
+    "file": "judge-fixture.json",
+    "kind": "fixture",
+    "verified": false,
+    "note": "SYNTHETIC FIXTURE / precomputed static scan. One intentionally stale claim; not a real-world accuracy result. Review the proposed replacement before editing. Rebuild and inspect the two commits with scripts/build_judge_demo.py."
+  },
+  {
+    "scan_id": "example-rich-cli-reviewed",
+    "name": "rich-cli reviewed case",
+    "repo_url": "https://github.com/Textualize/rich-cli",
+    "file": "rich-cli-reviewed.json",
+    "kind": "public",
+    "sha": "46f4d2469097be395558768714a5f07ebccf1412",
+    "verified": false,
+    "reviewer": "Codex (agent-assisted; not independent human labels)",
+    "note": "Two runtime-reproduced option defects; see /case-study. Precomputed snapshot.",
+    "verified_values": [
+      "--line-number",
+      "--p"
+    ]
+  },
+  {
     "scan_id": "example-py-cli",
     "name": "py-cli demo",
     "repo_url": "https://github.com/docs-drift/py-cli-demo",

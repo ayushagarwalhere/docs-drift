@@ -7,10 +7,31 @@ inputs:
   fail-on-drift:
     description: Fail the step on findings at default confidence.
     default: 'true'
+  baseline:
+    description: Optional reviewed baseline JSON path relative to repo. Missing or invalid files fail the action.
+    default: ''
+  min-confidence:
+    description: Optional confidence threshold from 0 to 1; defaults to repository configuration.
+    default: ''
+  max-findings:
+    description: Allowed number of qualifying new drift findings before the gate fails.
+    default: '0'
 outputs:
   report-directory:
     description: Runner-local HTML, JSON, SARIF and Markdown report directory.
     value: ${{ steps.scan.outputs.report-directory }}
+  gate-status:
+    description: passed, failed or report_only. A pass is not proof of documentation correctness.
+    value: ${{ steps.scan.outputs.gate-status }}
+  new-drift:
+    description: New drift count before confidence filtering.
+    value: ${{ steps.scan.outputs.new-drift }}
+  qualifying-new-drift:
+    description: New drift findings at or above the gate confidence threshold.
+    value: ${{ steps.scan.outputs.qualifying-new-drift }}
+  baseline-drift:
+    description: Existing drift accepted by the selected baseline; retained in full reports.
+    value: ${{ steps.scan.outputs.baseline-drift }}
 runs:
   using: composite
   steps:
@@ -26,5 +47,8 @@ runs:
       env:
         SCAN_REPO: ${{ inputs.repo }}
         FAIL_ON_DRIFT: ${{ inputs.fail-on-drift }}
+        SCAN_BASELINE: ${{ inputs.baseline }}
+        SCAN_MIN_CONFIDENCE: ${{ inputs.min-confidence }}
+        SCAN_MAX_FINDINGS: ${{ inputs.max-findings }}
         ACTION_SOURCE: ${{ github.action_path }}
       run: '"$RUNNER_TEMP/docs-drift-action/bin/python" "$ACTION_SOURCE/scripts/action_runner.py"'

@@ -310,6 +310,7 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
                     if target_claim:
                         claims.append(target_claim)
             positional: list[str] = []
+            positional_seen = False
             command_start = 1
             program = tokens[0].casefold()
             if (
@@ -344,11 +345,17 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
                         claims.append(item)
                     if "=" not in value and index + 1 < len(tokens) and not tokens[index + 1].startswith("-"):
                         index += 1
-                elif not positional and value not in {"run", "exec"}:
-                    positional.append(value)
-                    item = _claim(parsed, ClaimKind.cli_command, value, value, line, 1, Extraction.code_block, counts)
-                    if item:
-                        claims.append(item)
+                elif not positional_seen and value not in {"run", "exec"}:
+                    positional_seen = True
+                    # Paths, URLs and numeric arguments are not subcommand names.
+                    # Keep them in the complete command for separate validation.
+                    if re.fullmatch(r"[A-Za-z][\w-]*", value):
+                        positional.append(value)
+                        item = _claim(
+                            parsed, ClaimKind.cli_command, value, value, line, 1, Extraction.code_block, counts
+                        )
+                        if item:
+                            claims.append(item)
                 index += 1
     return claims
 

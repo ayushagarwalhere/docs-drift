@@ -70,7 +70,9 @@ def main() -> None:
     parser.add_argument("--real", nargs="*")
     args = parser.parse_args()
     EXAMPLES.mkdir(parents=True, exist_ok=True)
-    manifest = []
+    manifest_path = EXAMPLES / "manifest.json"
+    previous = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else []
+    manifest = [item for item in previous if item.get("kind") == "public" and (EXAMPLES / item["file"]).exists()]
     for name in ("py-cli", "fastapi-svc", "node-tool", "clean-repo"):
         repo = Path("tests/fixtures/repos") / name
         url = f"https://github.com/docs-drift/{name}-demo"

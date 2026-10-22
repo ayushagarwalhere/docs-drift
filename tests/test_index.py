@@ -1,6 +1,7 @@
 """Static index tests: repository files are parsed as data and never imported or run."""
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -9,7 +10,7 @@ import docs_drift.index as index_module
 from docs_drift.config import Config
 from docs_drift.ids import make_symbol_id
 from docs_drift.index import build_index, clear_cache
-from docs_drift.index.base import CodeIndex, language_for, normalize_name
+from docs_drift.index.base import CodeIndex, language_for, normalize_name, source_files
 from docs_drift.index.routes_common import normalize_route
 from docs_drift.models import Symbol, SymbolKind
 
@@ -20,6 +21,23 @@ def _repo(tmp_path: Path, files: dict[str, str]) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
     return tmp_path
+
+
+def test_git_listing_failure_never_falls_back_to_untracked_tree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / ".git").mkdir()
+
+    def denied(*args: object, **kwargs: object) -> None:
+        raise subprocess.CalledProcessError(128, "git")
+
+    def unexpected(*args: object, **kwargs: object) -> None:
+        pytest.fail("A failed Git listing must not traverse ignored filesystem trees.")
+
+    monkeypatch.setattr("docs_drift.index.base.subprocess.run", denied)
+    monkeypatch.setattr(Path, "rglob", unexpected)
+    with pytest.raises(OSError, match="Git could not list tracked source files"):
+        source_files(tmp_path, [])
 
 
 def test_lookup_is_exact_and_route_normalization_is_stable(tmp_path: Path) -> None:

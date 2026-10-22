@@ -1,6 +1,7 @@
 """Public demo boundary, lifecycle, expiry, fallback and rendering contracts."""
 
 import asyncio
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -11,11 +12,14 @@ from fastapi.testclient import TestClient
 from docs_drift.config import Config
 from docs_drift.models import ScanResult
 from docs_drift.scanning import run_scan
+from docs_drift.web import jobs
 from docs_drift.web.app import create_app
+from docs_drift.web.cleanup import remove_workspace
 from docs_drift.web.jobs import Job, LocalQueue, Store
 from docs_drift.web.settings import Settings
 from docs_drift.web.validation import validate_repository
 from docs_drift.web.worker import public_result
+from scripts import smoke
 
 
 @pytest.mark.parametrize(
@@ -82,9 +86,17 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
     app = create_app(Settings(data_dir=tmp_path / "data"), test_runner=runner)
     with TestClient(app) as client:
         landing = client.get("/")
-        assert landing.status_code == 200 and "Your README says" in landing.text
+        assert landing.status_code == 200 and "Inspect the real case" in landing.text
+        assert "pipx install docs-drift" not in landing.text
+        case = client.get("/case-study")
+        assert case.status_code == 200 and "567f6c84" in case.text
+        assert "False positive" in case.text
+        reviewed = client.get("/api/scans/example-rich-cli-reviewed/result.json")
+        assert reviewed.status_code == 200
+        assert reviewed.json()["head_sha"] == "46f4d2469097be395558768714a5f07ebccf1412"
         assert 'href="https://github.com/ayushagarwalhere/docs-drift"' in landing.text
-        assert 'href="https://pypi.org/project/docs-drift/"' in landing.text
+        assert 'href="https://pypi.org/project/docs-drift/"' not in landing.text
+        assert "PyPI unpublished" in landing.text
         assert len(landing.content) < 300_000
         assert "frame-ancestors 'none'" in landing.headers["content-security-policy"]
         assert landing.headers["x-content-type-options"] == "nosniff"
@@ -93,7 +105,11 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
         assert len(examples) >= 4
         for example in examples:
             assert client.get("/scan/" + example["scan_id"]).status_code == 200
-        submitted = client.post("/api/scans", json={"repo_url": "https://github.com/acme/test"})
+        submitted = client.post(
+            "/api/scans",
+            json={"repo_url": "https://github.com/acme/test"},
+            headers={"origin": "http://127.0.0.1:8080"},
+        )
         assert submitted.status_code == 202
         ident = submitted.json()["scan_id"]
         assert "data-scan-id" in client.get("/scan/" + ident).text
@@ -104,11 +120,77 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
         assert "&lt;script&gt;alert(1)&lt;/script&gt;" in report.text
         assert "sha256-" in report.headers["content-security-policy"]
         assert client.get(f"/api/scans/{ident}/result.json").json()["schema_version"] == 1
+        review = client.get(f"/api/scans/{ident}/report.md")
+        assert review.status_code == 200
+        assert review.headers["content-type"].startswith("text/markdown")
+        assert review.headers["content-disposition"] == 'attachment; filename="documentation-review.md"'
+        assert "not an applicable patch" in review.text
+        assert f"http://127.0.0.1:8080/scan/{ident}" in review.text
+        assert "<script>alert(1)</script>" not in review.text
+        assert review.headers["cache-control"] == "no-store"
         graph = client.get(f"/api/scans/{ident}/graph").json()
         assert len(graph["nodes"]) <= 1000
         assert "placeholder" in client.get("/built-with-voice").text.lower()
         assert client.get("/healthz").json()["status"] == "ok"
     assert not list((tmp_path / "data/work").iterdir())
+
+
+def test_review_download_requires_an_existing_finished_scan(tmp_path: Path) -> None:
+    app = create_app(Settings(data_dir=tmp_path / "data", live_enabled=False))
+    with TestClient(app) as client:
+        app.state.store.jobs["pending"] = Job("pending", "https://github.com/acme/test")
+        assert client.get("/api/scans/pending/report.md").status_code == 409
+        assert client.get("/api/scans/not-a-scan/report.md").status_code == 404
+
+
+def test_shutdown_waits_for_in_progress_workspace_cleanup(
+    tmp_path: Path, result: ScanResult, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    started, release = threading.Event(), threading.Event()
+    original_remove = remove_workspace
+
+    def blocked_remove(root: Path, workspace: Path) -> None:
+        started.set()
+        assert release.wait(timeout=5)
+        original_remove(root, workspace)
+
+    async def runner(job: Job, workspace: Path) -> None:
+        (workspace / "temporary").write_text("scan artifact")
+        job.result = result
+
+    async def exercise() -> None:
+        settings = Settings(data_dir=tmp_path)
+        queue = LocalQueue(settings, Store(settings), test_runner=runner)
+        queue.submit(validate_repository("https://github.com/example/tool"))
+        try:
+            assert await asyncio.to_thread(started.wait, 5)
+            closing = asyncio.create_task(queue.close())
+            await asyncio.sleep(0)
+            assert not closing.done()
+        finally:
+            release.set()
+        await closing
+        assert not list(queue.work.iterdir())
+
+    monkeypatch.setattr(jobs, "remove_workspace", blocked_remove)
+    asyncio.run(exercise())
+
+
+def test_deployment_smoke_exercises_examples_and_completed_scan(tmp_path: Path, result: ScanResult) -> None:
+    async def runner(job: Job, workspace: Path) -> None:
+        job.result = result
+
+    app = create_app(Settings(data_dir=tmp_path), test_runner=runner)
+    with TestClient(app) as client:
+
+        def request(base: str, path: str, payload: dict[str, str] | None = None) -> tuple[bytes, Any]:
+            response = client.request("POST" if payload else "GET", path, json=payload)
+            response.raise_for_status()
+            return response.content, response.headers
+
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(smoke, "request", request)
+            smoke.smoke("http://testserver")
 
 
 def test_limits_timeout_failure_and_cleanup(tmp_path: Path) -> None:

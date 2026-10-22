@@ -4,6 +4,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from docs_drift import __version__
@@ -37,7 +38,7 @@ def test_help_renders() -> None:
         "sarif",
         "html",
     ):
-        assert text in result.output
+        assert text in Text.from_ansi(result.output).plain
 
 
 def test_init_and_graph_are_implemented(tmp_path: Path) -> None:
@@ -183,6 +184,7 @@ def test_check_confidence_threshold_and_fail_on(tmp_path: Path) -> None:
         ["--repo", str(tmp_path), "check", "--fail-on", "drift", "--min-confidence", "0.4", "--quiet"],
     )
     assert strict.exit_code == 1
+    assert "--missing" in Text.from_ansi(strict.output).plain
     invalid = CliRunner().invoke(app, ["--repo", str(tmp_path), "check", "--fail-on", "nothing"])
     assert invalid.exit_code == 2
 
@@ -197,7 +199,7 @@ def test_invalid_format_rejected() -> None:
 def test_configuration_error_is_actionable(tmp_path: Path) -> None:
     result = CliRunner().invoke(app, ["--config", str(tmp_path / "missing.toml"), "scan"])
     assert result.exit_code == 2
-    assert "Fix the file or path" in " ".join(result.output.replace("│", "").split())
+    assert "Fix the file or path" in " ".join(Text.from_ansi(result.output).plain.replace("│", "").split())
     assert "Traceback" not in result.output
 
 
@@ -206,4 +208,4 @@ def test_default_repo_is_current_directory(tmp_path: Path, monkeypatch: pytest.M
     (tmp_path / ".docs-drift.toml").write_text("min_confidence = 5\n", encoding="utf-8")
     result = CliRunner().invoke(app, ["scan"])
     assert result.exit_code == 2
-    assert "Correct the listed fields" in " ".join(result.output.replace("│", "").split())
+    assert "Correct the listed fields" in " ".join(Text.from_ansi(result.output).plain.replace("│", "").split())

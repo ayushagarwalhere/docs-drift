@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 from typer.testing import CliRunner
 
+from docs_drift.baseline import save_baseline
 from docs_drift.cli import app
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import scan_claims
@@ -18,6 +19,7 @@ from docs_drift.web.git import JobError
 from docs_drift.web.settings import Settings
 from scripts import action_runner, build_public_docs
 from tests.fixtures.build_fixtures import build_fixtures
+from tests.test_models import result as empty_result
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -69,7 +71,13 @@ def test_action_writes_parseable_reports_and_restores_cache_policy(
     else:
         action_runner.main()
     assert not CACHE_DISABLED.get()
-    output = tmp_path / "docs-drift-reports"
+    output = Path(
+        next(
+            line.split("=", 1)[1]
+            for line in (tmp_path / "output.txt").read_text().splitlines()
+            if line.startswith("report-directory=")
+        )
+    )
     assert json.loads((output / "scan.json").read_text())["schema_version"] == 1
     assert json.loads((output / "scan.sarif").read_text())["version"] == "2.1.0"
     assert "<html" in (output / "scan.html").read_text(encoding="utf-8")
@@ -82,6 +90,86 @@ def test_action_rejects_workspace_escape(tmp_path: Path, monkeypatch: pytest.Mon
     monkeypatch.setenv("SCAN_REPO", "../elsewhere")
     with pytest.raises(ValueError, match="inside"):
         action_runner.main()
+
+
+def test_action_baseline_preserves_full_report_and_publishes_gate_outputs(
+    repo: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    scan = run_scan(repo, Config())
+    save_baseline(repo / "reviewed-baseline.json", scan.findings)
+    monkeypatch.setattr(action_runner, "run_scan", lambda *args, **kwargs: scan)
+    for key, value in {
+        "GITHUB_WORKSPACE": str(repo),
+        "RUNNER_TEMP": str(tmp_path),
+        "GITHUB_OUTPUT": str(tmp_path / "output.txt"),
+        "GITHUB_STEP_SUMMARY": str(tmp_path / "summary.md"),
+        "SCAN_BASELINE": "reviewed-baseline.json",
+    }.items():
+        monkeypatch.setenv(key, value)
+    try:
+        action_runner.main()
+        directory = Path(
+            next(
+                line.split("=", 1)[1]
+                for line in (tmp_path / "output.txt").read_text().splitlines()
+                if line.startswith("report-directory=")
+            )
+        )
+        gate = json.loads((directory / "gate.json").read_text())
+        assert gate["status"] == "passed"
+        assert gate["baseline_drift"] > 0
+        assert json.loads((directory / "new.json").read_text())["findings"] == []
+        assert len(json.loads((directory / "scan.json").read_text())["findings"]) == len(scan.findings)
+        assert "gate-status=passed" in (tmp_path / "output.txt").read_text()
+        assert "baseline accepted" in (tmp_path / "summary.md").read_text()
+    finally:
+        (repo / "reviewed-baseline.json").unlink()
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        ("SCAN_BASELINE", "../outside.json"),
+        ("SCAN_BASELINE", "missing.json"),
+        ("SCAN_MIN_CONFIDENCE", "nan"),
+        ("SCAN_MAX_FINDINGS", "-1"),
+        ("FAIL_ON_DRIFT", "tru"),
+    ],
+)
+def test_action_invalid_adoption_policy_never_scans(
+    repo: Path, monkeypatch: pytest.MonkeyPatch, key: str, value: str
+) -> None:
+    monkeypatch.setenv("GITHUB_WORKSPACE", str(repo))
+    monkeypatch.setenv(key, value)
+
+    def unexpected(*args: object, **kwargs: object) -> None:
+        pytest.fail("Invalid policy must fail before the scan starts.")
+
+    monkeypatch.setattr(action_runner, "run_scan", unexpected)
+    with pytest.raises(ValueError):
+        action_runner.main()
+
+
+def test_multiple_action_steps_keep_independent_report_directories(
+    repo: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(action_runner, "run_scan", lambda *args, **kwargs: empty_result())
+    for key, value in {
+        "GITHUB_WORKSPACE": str(repo),
+        "RUNNER_TEMP": str(tmp_path),
+        "GITHUB_OUTPUT": str(tmp_path / "output.txt"),
+        "GITHUB_STEP_SUMMARY": str(tmp_path / "summary.md"),
+    }.items():
+        monkeypatch.setenv(key, value)
+    action_runner.main()
+    action_runner.main()
+    directories = [
+        Path(line.split("=", 1)[1])
+        for line in (tmp_path / "output.txt").read_text().splitlines()
+        if line.startswith("report-directory=")
+    ]
+    assert len(set(directories)) == 2
+    assert all((path / "gate.json").is_file() and (path / "scan.html").is_file() for path in directories)
 
 
 @pytest.mark.parametrize("failure", [None, "clone", "unexpected"])

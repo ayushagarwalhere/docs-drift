@@ -1,9 +1,21 @@
 # docs-drift
 
+Self-hosted documentation drift checks for maintainers: scan local repositories,
+review source evidence, and gate newly introduced drift in CI. Organizations can
+scan multiple checkouts into one dashboard with `docs-drift portfolio`.
+[Organization adoption](docs/ORGANIZATIONS.md) · [Product maturity](docs/PRODUCT.md).
+
 ## Judges start here
 
-- **Public demo:** pending deployment approval; no public URL is claimed yet.
-- **Video:** pending owner recording and upload; target 1:53 with captions.
+**Smallest offline demo:** [exact local run steps and one synthetic claim](docs/JUDGE-DEMO.md).
+Open `/scan/example-judge` in the local app to inspect the source, rename commit,
+and proposed documentation fix. Fixture results are not real-world accuracy measurements.
+
+- **Public demo:** AWS deployment deferred by owner. Run the app locally on port 8080; no public URL is claimed. [AWS handoff](docs/AWS-HANDOFF.md).
+- **Real case:** [reproduced rich-cli failure, source and commit](docs/REAL-CASE.md).
+- **Try immediately:** the local app includes a repo URL scanner and precomputed real sample, with no sign-in or API key.
+- **Interface:** monochrome themes, scroll-driven 3D evidence layers, motion controls and searchable reports; [UI verification](docs/UI-REVIEW.md).
+- **Video:** pending owner recording and upload; target 1:50 with captions; [updated shot list](docs/FLOW-RECORDING.md).
 - **Source:** [GitHub repository](https://github.com/ayushagarwalhere/docs-drift).
 - **Evidence:** [benchmark results](benchmark/RESULTS.md),
   [measured limitations](docs/RESULTS.md), and [submission checklist](SUBMISSION.md).
@@ -19,10 +31,10 @@ uv run --all-extras docs-drift scan --repo .
 Release preparation: [owner's publish gates](RELEASING.md). Public installs and
 URLs must be verified after approval; local checks do not prove a published release.
 
-**Find the lines in your docs that your code no longer supports, and the commit that broke each one.**
+**Find documentation statements your code no longer supports, with source evidence and available Git history.**
 
 [![CI](https://img.shields.io/badge/CI-configured-blue)](.github/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/docs-drift.svg)](https://pypi.org/project/docs-drift/)
+**Package status:** PyPI unpublished (404 verified 22 October 2026); use the source quick start.
 [![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
 
@@ -35,15 +47,22 @@ precision and recall are **pending human labeling**, not inferred from fixtures.
 
 ![HTML evidence graph from the actual py-cli fixture](docs/assets/graph-view.png)
 
-## Why (illustrative fixture)
+## A real failure, reproduced during this build
 
-**PERSONALISE: replace this paragraph with your own experience.** A new contributor
-copies the README's first command and it fails. In this synthetic example, the
-README still says `--port`, while the code now accepts `--listen`. docs-drift
-connects the stale statement, current source and the change that explains it.
+To render rich-cli's README with line numbers, we followed its documented
+`--line-number` option. It exited 2: "No such option." Source declares
+`--line-numbers`, which exited 0. docs-drift locates README:61; manual Git
+inspection identifies documentation commit `567f6c84`. The scanner does not
+attribute a breaking commit for this finding. This is an agent-assisted build
+investigation, not an invented account of the owner's earlier work.
+[Exact snapshot, commands, source and review](docs/REAL-CASE.md).
 
-The fixture shown above is deliberately synthetic; it is not a public accuracy
-measurement. Static matching is partial, so inspect evidence before accepting a fix.
+The four-finding saved sample includes **two confirmed defects and two false
+positives**. A fresh scan flags only the defective options. This selected,
+agent-assisted review is not an independent human accuracy measurement.
+
+The `--port` / `--listen` images above are synthetic fixtures, excluded from the
+real case and review sample.
 
 For beginners contributing to documentation, an evidence-backed finding can be a
 concrete first contribution. Maintainers can use the same checks to keep docs
@@ -73,7 +92,7 @@ Or build the CLI container locally (Docker must be running):
 docker build -t docs-drift:local . && docker run --rm -v "$PWD:/repo" docs-drift:local scan --repo /repo
 ```
 
-Try it in your browser: the public demo URL is pending hosting approval. Locally,
+Try it in your browser: AWS hosting is deferred by the owner. Locally,
 start `uv run python -m docs_drift.web` and open `http://127.0.0.1:8080`; set
 `DOCS_DRIFT_ALLOWED_ORIGIN` to that exact origin before submitting a scan.
 
@@ -222,10 +241,14 @@ replay mode sends nothing. The public demo and composite Action are rule-only.
 
 ## Built with voice
 
-**AUTHOR TO WRITE / PERSONALISE:** describe your real hands-free workflow with
-Wispr Flow for the No Hands challenge, your usage card and dictated prompts.
-[How I built it ? placeholder](docs/built-with-voice.md). No story or usage figures
-have been invented.
+The owner supplied original Flow usage cards, including **31,351 total words**,
+**276 words/minute**, **11 apps**, and a **1-day streak**, plus a separate card
+showing **26,412 total words**. These are account-level figures, not docs-drift
+word counts. [Actual cards and provenance](docs/built-with-voice.md).
+
+The specific dictated prompts, build revisions and Flow-use recording still need
+owner evidence. [Concrete 1:50 recording plan](docs/FLOW-RECORDING.md). No personal
+workflow or recording has been invented.
 
 ## Contributing and licence
 

@@ -1,4 +1,34 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Find drift between documentation and code, with evidence and introducing commits."><title>{% block title %}docs-drift · Keep your docs honest{% endblock %}</title><link rel="stylesheet" href="/static/report.css"><link rel="stylesheet" href="/static/demo.css"><script src="/static/demo.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a>
-<header class="sitehead"><a class="wordmark" href="/" aria-label="docs-drift home"><span class="logo">◈</span> docs-drift</a><nav aria-label="Main navigation"><a href="{{ settings.project_url }}">GitHub ↗</a><a href="https://pypi.org/project/docs-drift/">PyPI ↗</a><a href="/built-with-voice">Built with voice</a><button id="theme" aria-label="Toggle color theme">◐ Theme</button></nav></header>
-{% block content %}{% endblock %}
-<footer><span>Built hands-free with <a href="/built-with-voice">Wispr Flow</a> for the No Hands challenge.<br><span class="muted">Author's build story and usage figures will be added before submission.</span></span><span>Build {{ settings.build_sha[:8] }} · Static analysis, no repository code execution.</span></footer></body></html>
+<!doctype html>
+<html lang="en" data-theme="dark" data-motion="off">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Find stale documentation. Inspect the exact line, source evidence and available Git history. Try docs-drift without an account or API key.">
+  <meta name="theme-color" content="#080808">
+  <title>{% block title %}docs-drift — Code moves. Docs drift.{% endblock %}</title>
+  <link rel="stylesheet" href="/static/report.css">
+  <link rel="stylesheet" href="/static/demo.css">
+  <script src="/static/demo.js" defer></script>
+</head>
+<body class="app-body">
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><i></i></div>
+  <header class="sitehead">
+    <a class="wordmark" href="/" aria-label="docs-drift home"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span>docs<span class="wordmark-dash">-</span>drift<span class="wordmark-period">.</span></a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/#scan">Scanner</a><a href="/#how">How it works</a><a href="/case-study">Real case</a><a href="/built-with-voice">Flow evidence</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="utility-button" id="motion" aria-pressed="false" title="Toggle scroll and perspective effects">Motion off</button>
+      <button class="utility-button" id="theme" aria-label="Switch to light theme">Light <span aria-hidden="true">◐</span></button>
+      <a class="nav-source" href="{{ settings.project_url }}" aria-label="docs-drift on GitHub">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  {% block content %}{% endblock %}
+  <footer class="sitefooter">
+    <a class="wordmark" href="/">docs-drift.</a>
+    <p>Source first. Evidence always. <span>Human review matters.</span></p>
+    <div><a href="{{ settings.project_url }}">Source ↗</a><a href="/built-with-voice">Flow evidence</a><span class="build-id">Build {{ settings.build_sha[:8] }}</span></div>
+  </footer>
+</body>
+</html>

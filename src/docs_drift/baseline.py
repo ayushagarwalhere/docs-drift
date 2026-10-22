@@ -5,9 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from docs_drift.models import DecidedBy, Finding, Verdict
+from docs_drift.safe_files import metadata_text
 
 
 class BaselineEntry(BaseModel):
@@ -35,7 +36,12 @@ def finding_id(finding: Finding) -> str:
 
 def load_baseline(path: Path) -> FindingBaseline:
     try:
-        return FindingBaseline.model_validate_json(path.read_text(encoding="utf-8"))
+        return FindingBaseline.model_validate_json(metadata_text(path))
+    except ValidationError:
+        # Pydantic's default diagnostics can echo claim text from the input file.
+        raise ValueError(
+            f"Invalid baseline JSON or schema at {path}. Regenerate it from a reviewed scan with baseline update."
+        ) from None
     except OSError as exc:
         raise ValueError(f"Cannot read baseline {path}: {exc}. Check the path and permissions.") from exc
 
@@ -59,5 +65,6 @@ def save_baseline(path: Path, findings: list[Finding]) -> None:
 
 
 def new_findings(findings: list[Finding], baseline: FindingBaseline) -> list[Finding]:
-    known = {entry.finding_id for entry in baseline.findings}
-    return [item for item in findings if item.is_drift and finding_id(item) not in known]
+    # A changed verdict must be reviewed again even when the claim stayed put.
+    known = {(entry.finding_id, entry.verdict) for entry in baseline.findings}
+    return [item for item in findings if item.is_drift and (finding_id(item), item.verdict) not in known]

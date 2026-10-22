@@ -9,7 +9,7 @@ from pathlib import Path
 class Settings:
     data_dir: Path = Path(".docs-drift/web-data")
     max_concurrent: int = 2
-    allowed_origin: str = "http://127.0.0.1:8000"
+    allowed_origin: str = "http://127.0.0.1:8080"
     rate_limit: int = 5
     rate_window: int = 600
     ttl: int = 86400
@@ -37,7 +37,7 @@ class Settings:
             data_dir=Path(os.environ.get("DOCS_DRIFT_DATA_DIR", ".docs-drift/web-data")),
             max_concurrent=integer("DOCS_DRIFT_MAX_CONCURRENT", 2, 2),
             allowed_origin=os.environ.get(
-                "DOCS_DRIFT_ALLOWED_ORIGIN", os.environ.get("RENDER_EXTERNAL_URL", "http://127.0.0.1:8000")
+                "DOCS_DRIFT_ALLOWED_ORIGIN", os.environ.get("RENDER_EXTERNAL_URL", "http://127.0.0.1:8080")
             ).rstrip("/"),
             rate_limit=integer("DOCS_DRIFT_RATE_LIMIT", 5, 100),
             clone_timeout=integer("DOCS_DRIFT_CLONE_TIMEOUT", 60, 60),

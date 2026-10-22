@@ -6,7 +6,7 @@ import math
 import sys
 import time
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from io import TextIOWrapper
 from pathlib import Path
@@ -479,7 +479,7 @@ def check(
                     "warnings": [*result.warnings, *history_warnings],
                 }
             ),
-            options,
+            replace(options, quiet=False) if failures else options,
             show_all=fail_on == "any",
             show_low_confidence=True,
         )
@@ -807,6 +807,33 @@ def clear_index_cache(ctx: typer.Context) -> None:
     """Remove this repository's cached static index."""
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     typer.echo("Index cache cleared." if clear_cache(options.repo) else "No index cache found.")
+
+
+@app.command(cls=Command)
+def portfolio(
+    ctx: typer.Context,
+    manifest: Annotated[Path, typer.Option("--manifest", help="TOML repository manifest, relative to --repo.")],
+    report_dir: Annotated[Path, typer.Option("--report-dir", help="Report directory outside all scanned checkouts.")],
+    report_only: Annotated[
+        bool, typer.Option("--report-only", help="Collect reports without failing on drift.")
+    ] = False,
+) -> None:
+    """Scan up to 100 local checkouts and generate an organization dashboard."""
+    from docs_drift.portfolio import scan_portfolio  # noqa: PLC0415 - load only for portfolio scans.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    manifest_path = manifest if manifest.is_absolute() else options.repo / manifest
+    destination = report_dir if report_dir.is_absolute() else options.repo / report_dir
+    try:
+        result = scan_portfolio(options.repo, manifest_path, destination, report_only=report_only)
+    except (OSError, ValueError) as exc:
+        raise typer.BadParameter(str(exc), param_hint="--manifest / --report-dir") from exc
+    for repository in result.repositories:
+        counts = f"; {repository.gate.new_drift} new drift" if repository.gate else ""
+        typer.echo(f"{repository.name}: {repository.status}{counts}")
+    typer.echo(f"Dashboard: {destination.resolve() / 'index.html'}")
+    if result.exit_code:
+        raise typer.Exit(code=result.exit_code)
 
 
 app.add_typer(cache_app, name="cache")

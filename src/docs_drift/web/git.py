@@ -3,6 +3,7 @@
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import time
 from datetime import UTC, datetime, timedelta
@@ -83,7 +84,9 @@ def kill_process(process: subprocess.Popen[bytes]) -> None:
 
 
 def git(args: list[str], root: Path, settings: Settings, deadline: float, *, stdin: bytes | None = None) -> bytes:
-    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+    creationflags = 0
+    if sys.platform == "win32":
+        creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
     command = [
         "git",
         "-c",

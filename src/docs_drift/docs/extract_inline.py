@@ -81,6 +81,23 @@ def _environment(value: str) -> str | None:
     return value
 
 
+def _explicit_api_reference(value: str, sentence: str) -> bool:
+    """Disambiguate dotted API names using their own local grammatical context."""
+    if "." not in value or not _IDENTIFIER.fullmatch(value):
+        return False
+    quoted = r"[`'\"]*" + re.escape(value) + r"[`'\"]*"
+    role = r"(?:module|attribute|property|object|instance)"
+    return bool(
+        re.search(r"\b" + role + r"\s+(?:named\s+)?" + quoted, sentence, re.I)
+        or re.search(quoted + r"\s+" + role + r"\b", sentence, re.I)
+        or re.search(
+            r"\b(?:functions?|methods?)\s+(?:provided\s+by|available\s+on|in|on|of|from)\s+" + quoted,
+            sentence,
+            re.I,
+        )
+    )
+
+
 def _classify(  # noqa: PLR0911
     value: str, *, api_reference: bool = False, sentence: str = ""
 ) -> tuple[ClaimKind, str, float] | None:
@@ -110,6 +127,8 @@ def _classify(  # noqa: PLR0911
         return ClaimKind.cli_flag, name, 0.9 if name.startswith("--") else 0.65
     if value.startswith(("http://", "https://", "www.")):
         return None
+    if _explicit_api_reference(value, sentence):
+        return ClaimKind.symbol, value, 0.8
     if re.search(r"\b(?:setting|config(?:uration)?\s+key|field)\b", sentence, re.IGNORECASE) and re.fullmatch(
         r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", value
     ):

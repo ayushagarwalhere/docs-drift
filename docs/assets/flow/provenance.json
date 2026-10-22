@@ -1,0 +1,17 @@
+{
+  "cards": [
+    {
+      "file": "flow-highlights-2026-10-22.png",
+      "sha256": "0a99115c9cc10b00bb1bbf31cdd03d5faeedc51b50a1b51de82ddb04a4947ddc",
+      "received_date": "2026-10-22",
+      "capture_date": "not independently established"
+    },
+    {
+      "file": "usage-card-supplied.png",
+      "sha256": "985a5422a8d252f52e8450b16afa4bee57da007a19cc065683a7e1725fb21df7",
+      "received_date": "2026-10-22",
+      "capture_date": "not independently established"
+    }
+  ],
+  "scope": "Account-level Flow usage; no project-only attribution or weekly upload receipt inferred."
+}

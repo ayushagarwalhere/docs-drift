@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import os
 import re
 import subprocess
@@ -13,7 +14,7 @@ from pathlib import Path
 
 from docs_drift.config import HistoryConfig
 from docs_drift.history_cache import QueryCache
-from docs_drift.limits import MAX_GIT_OUTPUT
+from docs_drift.limits import MAX_GIT_OUTPUT, MAX_LINE_CHARS
 from docs_drift.models import CommitRef, Finding
 
 _META = re.compile(r"^@@@([0-9a-f]{40,64})\x1f([0-9a-f]{4,64})\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f(.*)$")
@@ -35,6 +36,32 @@ _SOURCE_GLOBS = (
     "justfile",
 )
 _COMMAND_TIMEOUT_SECONDS = 12
+
+
+def _rename_shape(line: str, name: re.Pattern[str]) -> str:
+    normalized = name.sub("__DOCS_DRIFT_RENAMED__", line[1:].strip())
+    if len(normalized) > MAX_LINE_CHARS:
+        return normalized
+    try:
+        statements = ast.parse(normalized).body
+    except (SyntaxError, ValueError, RecursionError):
+        return normalized
+    if len(statements) != 1:
+        return normalized
+    statement = statements[0]
+    if isinstance(statement, (ast.Assign, ast.AnnAssign)):
+        targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+        if (
+            len(targets) == 1
+            and isinstance(targets[0], ast.Name)
+            and targets[0].id == "__DOCS_DRIFT_RENAMED__"
+            and isinstance(statement.value, ast.Constant)
+        ):
+            # A field can be renamed and have its literal default changed in
+            # the same edit. Preserve target/type structure, not the value.
+            statement.value = ast.Constant(value="__DOCS_DRIFT_DEFAULT__")
+            return ast.dump(statement, include_attributes=False)
+    return normalized
 
 
 @dataclass(frozen=True)
@@ -212,7 +239,7 @@ class GitHistory:
                     f"--max-count={self.config.max_commits}",
                     "-p",
                     "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
-                    *(["-G", f"[\"']{re.escape(old_name)}[\"']"] if old_name.startswith("/") else ["-S", old_name]),
+                    *(["-G", f"[\"']{re.escape(old_name)}[\"']"] if old_name.startswith("/") else [f"-S{old_name}"]),
                     self._revision_range,
                     "--",
                     *_SOURCE_GLOBS,
@@ -270,12 +297,24 @@ class GitHistory:
         old_name: str, new_names: tuple[str, ...], commit: CommitRef, file_name: str, lines: list[str]
     ) -> HistoryEvidence | None:
         added = [line for line in lines if line.startswith("+") and not line.startswith("+++")]
+        old_pattern = re.compile(rf"(?<![\w]){re.escape(old_name)}(?![\w])")
+        removed_shapes = {
+            _rename_shape(line, old_pattern)
+            for line in lines
+            if line.startswith("-") and not line.startswith("---") and old_pattern.search(line)
+        }
         added_text = "\n".join(added)
         for candidate in new_names:
             if candidate == old_name or candidate not in added_text:
                 continue
             candidate_pattern = re.compile(rf"(?<![\w]){re.escape(candidate)}(?![\w])")
-            if any(candidate_pattern.search(line) for line in added):
+            # Sharing a large diff hunk does not establish a replacement. Require
+            # matching text or a matching assignment with a changed literal
+            # default; otherwise retain only removal attribution.
+            if any(
+                candidate_pattern.search(line) and _rename_shape(line, candidate_pattern) in removed_shapes
+                for line in added
+            ):
                 excerpt = "\n".join([line for line in lines if line.startswith(("-", "+"))][:8])
                 return HistoryEvidence(old_name, candidate, commit, file_name, excerpt)
         return None

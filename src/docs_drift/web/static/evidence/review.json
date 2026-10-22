@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-22",
+  "reviewer": "Codex; source inspection and runtime reproduction, no independent human review",
+  "selection": "All four non-ok/non-unverifiable findings from saved rich-cli.json",
+  "snapshot": "46f4d2469097be395558768714a5f07ebccf1412",
+  "scanner_commit": "3e0b885bdeaf0cd24e3a27efee0d6621f2ef9b9a",
+  "doc_commit": "567f6c848ee5efa8eef9d6c96ffa3c23b802da4f",
+  "automatic_introduced_by": null,
+  "sample_size": 4,
+  "confirmed_defects": 2,
+  "false_positives": 2,
+  "rows": [
+    {
+      "line": 61,
+      "value": "--line-number",
+      "review": "confirmed defect",
+      "source_line": 358
+    },
+    {
+      "line": 180,
+      "value": "--p",
+      "review": "confirmed defect",
+      "source_line": 250
+    },
+    {
+      "line": 89,
+      "value": ".md",
+      "review": "false positive: extension prose",
+      "source_line": 514
+    },
+    {
+      "line": 116,
+      "value": ".json",
+      "review": "false positive: extension prose",
+      "source_line": 516
+    }
+  ],
+  "fresh_scan_drift": [
+    "--line-number",
+    "--p"
+  ],
+  "recall": "not measured",
+  "human_benchmark": "unchanged; pending labels"
+}

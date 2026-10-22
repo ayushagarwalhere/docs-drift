@@ -49,6 +49,13 @@ def _symbol(  # noqa: PLR0913
     )
 
 
+def test_unresolved_qualified_reference_is_not_a_proven_missing_declaration() -> None:
+    index = CodeIndex(files_by_language={"python": 1}, coverage={"symbol:python": "partial"})
+    finding = match_claims([_claim(ClaimKind.symbol, "service.json")], index, Path("."))[0]
+    assert finding.verdict == Verdict.unverifiable
+    assert "instance attributes" in finding.reasons[0]
+
+
 def test_alias_and_scoped_flag_matching() -> None:
     index = CodeIndex(
         symbols=[

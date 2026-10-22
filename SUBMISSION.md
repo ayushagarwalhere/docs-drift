@@ -1,3 +1,11 @@
+<!-- Current evidence update: 22 October 2026 -->
+Current build evidence: [real reproduced case](docs/REAL-CASE.md),
+[supplied Flow cards](docs/built-with-voice.md), [AWS handoff](docs/AWS-HANDOFF.md),
+[updated 1:50 shot list](docs/FLOW-RECORDING.md). The cards are included locally;
+Flow-use clip, actual dictated prompts, independent human labels, PyPI publication,
+public deployment and event upload remain incomplete. Earlier schedule/checklist
+entries below are plans, not completed evidence.
+
 # No Hands challenge submission pack
 
 Deadline supplied by the owner: **Friday 30 October 2026, 23:59 IST**
@@ -6,7 +14,7 @@ Deadline supplied by the owner: **Friday 30 October 2026, 23:59 IST**
 
 ## Owner checklist
 
-- [ ] Working public demo URL: **PENDING deployment approval**. It opens without
+- [ ] Working public demo URL: **DEFERRED by owner for AWS deployment**. It opens without
       sign-in. Link the actual GitHub repository and PyPI project from the demo.
 - [ ] On a physical laptop, open a fresh private/incognito window; load the demo,
       open one example, scan one live public repo, select a finding and its graph.

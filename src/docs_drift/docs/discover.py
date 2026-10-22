@@ -138,7 +138,12 @@ def discover_docs(repo: Path, config: Config) -> list[DocFile]:
     if patterns == Config().docs:
         from docs_drift.workspaces import docs_patterns  # noqa: PLC0415 - optional dependency or shared pipeline import.
 
-        patterns = [*patterns, *docs_patterns(root)]
+        try:
+            patterns = [*patterns, *docs_patterns(root)]
+        except OSError as exc:
+            # Documentation-only discovery can still use its bounded walk.
+            # Full scans will reject the unavailable source index separately.
+            _warn(f"Cannot inspect documentation-site markers: {exc}")
     includes, excludes = _globs(patterns), _globs(config.exclude)
     paths = _tracked_paths(root)
     candidates = _walk(root, root) if paths is None else iter(paths)

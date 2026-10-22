@@ -51,4 +51,4 @@ jobs:
           python-version: "3.11"
           enable-cache: true
       - run: uv sync --locked --all-extras
-      - run: uv run docs-drift check --repo . --quiet
+      - run: uv run docs-drift check --repo . --no-color

@@ -1,19 +1,25 @@
-# How I built it
+# Wispr Flow evidence
 
-**AUTHOR TO WRITE — PERSONALISE THIS PAGE.**
+The owner supplied these original cards on 22 October 2026. The Flow Highlights
+filename includes that date; an image filename alone does not independently
+establish its capture date. Hashes are in [provenance.json](assets/flow/provenance.json).
 
-## Workflow
+![Actual supplied Flow Highlights: 31,351 total words, 276 words per minute, 11 apps, one-day streak](assets/flow/flow-highlights-2026-10-22.png)
 
-Your dictated account of using Wispr Flow for the No Hands challenge.
+![Actual supplied card: 26,412 total words dictated](assets/flow/usage-card-supplied.png)
 
-## What worked / what did not
+These totals describe Flow account usage. No project-only count, elapsed time,
+productivity gain or weekly upload history is inferred from them.
 
-Your experience; no invented anecdotes.
+## Build workflow evidence still needed
 
-## Usage card
+The cards are present. The owner's specific dictated requirements, prompts,
+revisions, and a recording showing Flow in use have not yet been supplied.
+There is no verified transcript to quote. The original build-story placeholder
+has been replaced with this evidence status, rather than a fabricated first-person
+narrative. [Capture plan and under-two-minute shot list](FLOW-RECORDING.md).
 
-Your real usage-card figures, not estimated numbers.
-
-## Real dictated prompts
-
-One or two prompts you choose to share, with secrets removed.
+A genuine requirement/revision can be dictated into this chat, then tied to the
+resulting implementation change. Save the exact prompt and original short clip.
+The final submission also needs the public project/demo URL, video URL and the
+usage-card attachment; local files do not prove event upload or acceptance.

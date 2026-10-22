@@ -1,0 +1,26 @@
+[
+  {
+    "command": "rich README.md --line-number",
+    "exit_code": 2,
+    "stderr": "Usage: rich [OPTIONS] <PATH or TEXT or '-'>\nTry 'rich --help' for help.\n\nError: No such option '--line-number'. (Did you mean one of: '--lexer', '--line-numbers'?)\n",
+    "stdout_excerpt": ""
+  },
+  {
+    "command": "rich README.md --line-numbers",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_excerpt": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551                                  Rich-CLI                                   \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+  },
+  {
+    "command": "rich Hello --p",
+    "exit_code": 2,
+    "stderr": "Usage: rich [OPTIONS] <PATH or TEXT or '-'>\nTry 'rich --help' for help.\n\nError: No such option '--p'. (Did you mean one of: '--help', '--panel', '--print'?)\n",
+    "stdout_excerpt": ""
+  },
+  {
+    "command": "rich Hello -p",
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_excerpt": "Hello\n"
+  }
+]

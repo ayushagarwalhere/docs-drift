@@ -33,10 +33,18 @@ def rst_claims(parsed: ParsedDoc) -> list[Claim]:
             value = match[2] or match[3]
             kind = ClaimKind.env_var if match[1] == "envvar" else ClaimKind.cli_flag if value.startswith("-") else None
             if kind is None:
-                from docs_drift.docs.extract_inline import _classify  # noqa: PLC0415 - optional dependency or shared pipeline import.
+                from docs_drift.docs.extract_inline import (  # noqa: PLC0415 - shared lexical rules.
+                    _classify,
+                    _explicit_api_reference,
+                )
 
+                # Share explicit API disambiguation without broadening unrelated
+                # RST literals into Markdown-only configuration/prose heuristics.
                 classified = _classify(value)
-                kind = classified[0] if classified else None
+                if _explicit_api_reference(value, line):
+                    kind = ClaimKind.symbol
+                elif classified:
+                    kind = classified[0]
             section = parsed.line_to_section.get(line_no)
             if kind is None or section is None:
                 continue

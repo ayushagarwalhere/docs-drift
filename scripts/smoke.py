@@ -11,7 +11,7 @@ HEADERS = ("Content-Security-Policy", "X-Content-Type-Options", "Referrer-Policy
 
 def request(base: str, path: str, payload: dict[str, str] | None = None) -> tuple[bytes, Any]:
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(base + path, data=data, headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(base + path, data=data, headers={"Content-Type": "application/json", "Origin": base})
     with urllib.request.urlopen(req, timeout=30) as response:
         for header in HEADERS:
             assert response.headers.get(header), f"Missing {header} on {path}"
@@ -21,7 +21,7 @@ def request(base: str, path: str, payload: dict[str, str] | None = None) -> tupl
 
 def smoke(base: str) -> None:
     landing, _ = request(base, "/")
-    assert b"Your README says" in landing
+    assert b"Inspect the real case" in landing
     print("PASS landing and security headers", flush=True)
     examples = json.loads(request(base, "/api/examples")[0])
     ident = next(e["scan_id"] for e in examples if e["scan_id"] == "example-py-cli")

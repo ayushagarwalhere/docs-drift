@@ -22,10 +22,18 @@ docs-drift explain claim_7aee9594e82a --repo tests/fixtures/repos/py-cli --forma
 `-v` adds confidence and stage timings. `--no-color` disables ANSI styling and
 hyperlinks. Piped terminal output never contains escape sequences. Interactive
 scans show docs, index, match, and history progress on stderr. Unexpected failures
-write `.docs-drift/last-error.log`; only `--debug` displays a traceback. Review logs
+write the generated debug log `.docs-drift/last-error.log`; only `--debug` displays a traceback. Review logs
 before attaching them to an issue because they contain local paths.
 
 ## Formats
+
+`portfolio --manifest organization.toml --report-dir reports --repo WORKSPACE`
+scans explicitly listed local checkouts into one static dashboard. Add
+`--report-only` to collect findings without enforcing drift budgets. Scan errors
+still exit 2. Each checkout uses its own configuration and optional reviewed
+baseline. See [organization adoption](ORGANIZATIONS.md) for the manifest and
+operating limits. Portfolio artifacts use `--report-dir`, not the single-report
+`--output` destination.
 
 `scan`, `check`, and `graph` use one `render(scan_result, format, options) -> str`
 interface. `explain --format FORMAT` renders the selected finding. `index --format
@@ -47,7 +55,7 @@ Markdown normally uses diff blocks; `RenderOptions(pr_mode=True)` enables GitHub
 suggestion blocks for a PR integration. The truncation note links to
 `RenderOptions.artifact_url`, defaulting to `scan.html`; upload that artifact with
 the Markdown report. The HTML report hides author names unless `--show-authors`
-is supplied, follows the OS theme, and supports a theme toggle and j/k/Enter.
+is supplied, uses a dark initial theme, remembers the chosen theme, and supports a theme toggle, search and j/k/Enter.
 Graph and evidence data are escaped, and no network requests are needed.
 
 Cytoscape.js **3.30.4** is vendored under MIT with its upstream license. Its

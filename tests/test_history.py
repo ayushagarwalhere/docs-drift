@@ -53,6 +53,17 @@ def test_non_git_repository_returns_warning(tmp_path: Path) -> None:
     assert match.warning and "isn't a git repository" in match.warning
 
 
+def test_unrelated_addition_in_same_hunk_is_not_a_rename(tmp_path: Path) -> None:
+    _git(tmp_path, "init", "-q")
+    _commit(tmp_path, 'print("tool --help")\n', "2026-01-01T00:00:00+00:00")
+    sha = _commit(tmp_path, 'parser.add_argument("--repo")\n', "2026-01-02T00:00:00+00:00")
+
+    match = GitHistory(tmp_path).search("--help", ("--repo",))
+
+    assert match.commit is not None and match.commit.sha == sha
+    assert match.rename is None
+
+
 def test_document_blame_is_utc_cached_and_email_is_opt_in(tmp_path: Path) -> None:
     _git(tmp_path, "init", "-q")
     (tmp_path / "README.md").write_text("# Usage\nUse the tool.\n")

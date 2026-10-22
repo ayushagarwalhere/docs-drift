@@ -31,6 +31,12 @@ LOG.propagate = False
 STAGES = {"queued": 0, "cloning": 10, "indexing": 35, "matching": 60, "history": 80, "done": 100, "failed": 100}
 
 
+def _worker_process_options() -> dict[str, Any]:
+    if sys.platform == "win32":
+        return {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+    return {"start_new_session": True}
+
+
 @dataclass
 class Job:
     scan_id: str
@@ -224,7 +230,14 @@ class LocalQueue:
                 finally:
                     # Only trusted UUID workspaces are removed; child symlinks are not followed.
                     if workspace.parent.resolve() == self.work and not workspace.is_symlink():
-                        await asyncio.to_thread(remove_workspace, self.work, workspace)
+                        cleanup = asyncio.create_task(asyncio.to_thread(remove_workspace, self.work, workspace))
+                        try:
+                            await asyncio.shield(cleanup)
+                        except asyncio.CancelledError:
+                            # Shutdown must wait for deletion already running in
+                            # a thread; cancelling its await does not stop it.
+                            await cleanup
+                            raise
                 LOG.info(
                     json.dumps(
                         {
@@ -263,9 +276,7 @@ class LocalQueue:
 
     async def worker(self, job: Job, workspace: Path) -> None:
 
-        options = (
-            {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
-        )
+        options = _worker_process_options()
         env = git_environment(workspace)
         # Preserve trusted package import configuration, not credentials.
         env["PYTHONPATH"] = str(Path(__file__).parents[2])

@@ -261,6 +261,12 @@ def _match_one(claim: Claim, index: CodeIndex, repo: Path) -> Finding:  # noqa: 
     if confidence_state == "none":
         verdict, confidence = Verdict.unverifiable, 0.2
         reason = f"Cannot verify {claim.kind.value} {claim.value}; index coverage for this language is unavailable."
+    elif claim.kind == ClaimKind.symbol and "." in claim.value and confidence_state == "partial":
+        verdict, confidence = Verdict.unverifiable, 0.3
+        reason = (
+            f"Cannot resolve qualified reference {claim.value} with the partial static index. "
+            "Imports, module aliases and instance attributes may supply it; absence is not proof of drift."
+        )
     elif confidence_state == "partial":
         verdict, confidence = Verdict.missing, 0.5
     else:

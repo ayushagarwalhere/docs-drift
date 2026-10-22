@@ -19,7 +19,7 @@ uv run --all-extras docs-drift scan --repo .
 Release preparation: [owner's publish gates](releasing.md). Public installs and
 URLs must be verified after approval; local checks do not prove a published release.
 
-**Find the lines in your docs that your code no longer supports, and the commit that broke each one.**
+**Find documentation statements your code no longer supports, with source evidence and available Git history.**
 
 [![CI](https://img.shields.io/badge/CI-configured-blue)](github-action.md)
 [![PyPI](https://img.shields.io/pypi/v/docs-drift.svg)](https://pypi.org/project/docs-drift/)

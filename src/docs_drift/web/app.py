@@ -237,6 +237,24 @@ def create_app(settings: Settings | None = None, *, test_runner: Any = None) -> 
             raise HTTPException(409, "The report is not ready yet.")
         return render(job.result, "html", RenderOptions(share_id=ident, build_sha=settings.build_sha))
 
+    @app.get("/api/scans/{ident}/report.md")
+    async def review_report(ident: str) -> Response:
+        job = job_for(ident)
+        if not job.result:
+            raise HTTPException(409, "The review is not ready yet.")
+        report_url = f"{settings.allowed_origin}/scan/{ident}"
+        introduction = (
+            "# Documentation review draft\n\n"
+            "Inspect each finding before changing documentation. This summary is not an applicable patch "
+            "or an independent accuracy evaluation. Unverifiable claims remain unresolved.\n\n"
+            f"[Open the evidence report]({report_url}) · Revision `{job.result.head_sha}`\n\n"
+        )
+        return Response(
+            introduction + render(job.result, "markdown", RenderOptions(artifact_url=report_url)),
+            media_type="text/markdown",
+            headers={"Content-Disposition": 'attachment; filename="documentation-review.md"'},
+        )
+
     @app.get("/", response_class=HTMLResponse)
     async def landing(request: Request) -> Response:
         return templates.TemplateResponse(request, "landing.html", context(request))
@@ -251,6 +269,10 @@ def create_app(settings: Settings | None = None, *, test_runner: Any = None) -> 
     @app.get("/built-with-voice", response_class=HTMLResponse)
     async def built(request: Request) -> Response:
         return templates.TemplateResponse(request, "voice.html", context(request))
+
+    @app.get("/case-study", response_class=HTMLResponse)
+    async def case_study(request: Request) -> Response:
+        return templates.TemplateResponse(request, "case.html", context(request))
 
     @app.get("/static/cytoscape.min.js")
     async def cytoscape() -> FileResponse:

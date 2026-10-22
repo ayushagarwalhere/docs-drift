@@ -1,10 +1,13 @@
 """Static, read-token-only composite Action runner; never posts comments or calls a model."""
 
 import os
+import uuid
 from pathlib import Path
 
+from docs_drift.baseline import load_baseline
 from docs_drift.config import load_config
 from docs_drift.history_cache import CACHE_DISABLED
+from docs_drift.policy import GatePolicy, evaluate_gate
 from docs_drift.report import RenderOptions, render
 from docs_drift.scanning import run_scan
 
@@ -14,22 +17,59 @@ def main() -> None:
     repo = (workspace / os.getenv("SCAN_REPO", ".")).resolve()
     if not repo.is_relative_to(workspace):
         raise ValueError("Repository input must stay inside the checked-out workspace.")
-    output = Path(os.environ["RUNNER_TEMP"]) / "docs-drift-reports"
+    config = load_config(repo)
+    fail = os.getenv("FAIL_ON_DRIFT", "true")
+    if fail not in {"true", "false"}:
+        raise ValueError("fail-on-drift must be true or false.")
+    policy = GatePolicy(
+        min_confidence=float(os.getenv("SCAN_MIN_CONFIDENCE", "").strip() or config.min_confidence),
+        max_findings=int(os.getenv("SCAN_MAX_FINDINGS", "0")),
+        fail_on_drift=fail == "true",
+    )
+    baseline = None
+    if selected := os.getenv("SCAN_BASELINE", "").strip():
+        path = repo / selected
+        if Path(selected).is_absolute() or not path.resolve().is_relative_to(repo):
+            raise ValueError("Baseline input must be relative to the selected repository and stay inside it.")
+        baseline = load_baseline(path)
+    # Multiple scanner steps in one job must not overwrite each other's evidence.
+    output = Path(os.environ["RUNNER_TEMP"]) / "docs-drift-reports" / uuid.uuid4().hex
     output.mkdir(parents=True, exist_ok=True)
     token = CACHE_DISABLED.set(True)
     try:
-        result = run_scan(repo, load_config(repo), no_cache=True)
+        result = run_scan(repo, config, no_cache=True)
     finally:
         CACHE_DISABLED.reset(token)
     for format, suffix in [("html", "html"), ("json", "json"), ("sarif", "sarif"), ("markdown", "md")]:
         (output / ("scan." + suffix)).write_text(render(result, format, RenderOptions(pr_mode=True)), encoding="utf-8")
+    evaluation = evaluate_gate(result, policy, baseline)
+    summary = evaluation.summary
+    (output / "gate.json").write_text(summary.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    new_result = result.model_copy(update={"findings": evaluation.new_findings, "baselined": summary.baseline_drift})
+    for format, suffix in [("json", "json"), ("sarif", "sarif"), ("markdown", "md")]:
+        (output / ("new." + suffix)).write_text(
+            render(new_result, format, RenderOptions(pr_mode=True)), encoding="utf-8"
+        )
     with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
         stream.write("report-directory=" + output.as_posix() + "\n")
+        for name, value in {
+            "gate-status": summary.status,
+            "new-drift": summary.new_drift,
+            "qualifying-new-drift": summary.qualifying_new_drift,
+            "baseline-drift": summary.baseline_drift,
+        }.items():
+            stream.write(f"{name}={value}\n")
     with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as stream:
-        stream.write(render(result, "markdown"))
-    if os.getenv("FAIL_ON_DRIFT", "true") == "true" and any(
-        f.is_drift and f.confidence >= result.config_used.min_confidence for f in result.findings
-    ):
+        stream.write(
+            f"# Documentation gate: {summary.status}\n\n"
+            f"New drift: **{summary.new_drift}**; qualifying: **{summary.qualifying_new_drift}**; "
+            f"baseline accepted: **{summary.baseline_drift}**. "
+            f"Allowed qualifying findings: **{policy.max_findings}**; confidence: **{policy.min_confidence:g}**.\n\n"
+            "A passing gate is not proof that documentation is correct. Full findings, unverifiable claims "
+            "and scan warnings remain in `scan.*`; the new-drift subset is in `new.*`.\n\n"
+        )
+        stream.write(render(new_result, "markdown"))
+    if summary.status == "failed":
         raise SystemExit(1)
 
 
