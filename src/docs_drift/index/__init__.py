@@ -37,7 +37,7 @@ from docs_drift.index.python_symbols import _module_name  # noqa: E402
 from docs_drift.index.tasks import TaskIndexer as _TaskIndexer  # noqa: E402, F401
 
 INDEX_SCHEMA = 1
-INDEXER_VERSION = f"{__version__}:5"
+INDEXER_VERSION = f"{__version__}:6"
 
 
 def _fingerprints(repo: Path, files: Sequence[Path]) -> dict[str, str]:

@@ -74,3 +74,38 @@ Suggested commit message: `fix: repair cross-platform CI and self-scan evidence`
   `.docs-drift/ci-dist/`. Nothing was uploaded or published.
 - Generated reports from that local validation: `.docs-drift/ci-diagnosis/final-tests.xml`;
   generated report for coverage: `.docs-drift/coverage.json`.
+
+## 24 October 2026: release preflight after the source push
+
+The remote main branch was independently confirmed at commit
+9d681362137598daecf1a26bc7d5d5bf19749be1. GitHub's public jobs API reports:
+
+- Both Ubuntu Python jobs and history-secret scanning passed.
+- Documentation build and CI dogfood failed in the own-repository drift check.
+- Both Windows Python jobs failed in their pytest step. Public annotations expose
+  only the exit code; authenticated logs were unavailable in this session.
+
+Sources: [CI run](https://github.com/ayushagarwalhere/docs-drift/actions/runs/40009880915)
+and [Documentation run](https://github.com/ayushagarwalhere/docs-drift/actions/runs/40009880991).
+
+A separate checkout containing only committed files reproduced ten qualifying
+findings. Local generated output references had been formatted as repository file
+claims, while the workflow CLI's factory registration prevented its Typer options
+and review group from being recognized statically. Typer's default help option
+was also missing from the static declarations.
+
+The proposed fixes declare the workflow Typer application and commands at module
+scope while retaining runtime command behavior, derive help options only from
+statically known Typer settings, invalidate old index caches, and describe ignored
+local artifacts as generated output examples. No confidence threshold, fixture
+answer key or blanket suppression was changed.
+
+Regression tests cover the real workflow command/option declarations and Typer's
+default, disabled, custom and dynamically configured help behavior. A patched
+checkout without local generated reports now has zero qualifying drift. All
+692 tests pass locally on Windows/Python 3.13 with a neutral Git configuration;
+lint, formatting, strict typing, MkDocs and Actionlint also pass.
+
+These local fixes have not been committed or pushed. The remote Windows pytest
+failure is not reproduced or explained by this evidence. Its FAILED test names
+and traceback are still needed; do not tag the release while remote CI is red.

@@ -7,22 +7,27 @@ The owner subsequently confirmed that pending publishers were added on both
 TestPyPI and PyPI. This records owner-reported setup; the private account settings
 have not been independently inspected. On 24 October 2026 the owner also
 confirmed all four GitHub environments, themselves as required reviewer, and
-the version-tag rules. Source review and push approval are the current step.
+the version-tag rules. Repairing remote CI is the current step.
 
-## Current step: review and approve the source push
+## Current step: repair CI before creating the release tag
 
-Local source remains uncommitted on main after `4a0a6b0`. The local RC rehearsal
-passed 685 installed-wheel tests, metadata/content checks, pipx installation and
-scan, lint/types/docs checks, dependency audit and secret scans. These are local
-results, not a successful public release workflow.
+The owner pushed main at commit 9d681362137598daecf1a26bc7d5d5bf19749be1;
+GitHub's public branch API independently confirmed that revision. The source push
+is complete. No release tag or package upload has been performed.
 
-Proposed commit: **Prepare docs-drift 0.1.0 release and organization workflows**.
-It includes the organization CLI/Action workflows, release automation and tests,
-user-facing release notes, and owner-reported Wispr dictation with provenance.
-Review the source changes before confirming the commit and push to main.
-A main-branch push publishes source and runs CI; the release workflow requires a
-separate version-tag push. Keep publishing disabled until the RC tag step.
-No source or version tag has been pushed during this walkthrough.
+Both Ubuntu jobs and history-secret scanning passed. Documentation and dogfood
+failed their own-repository check; both Windows jobs failed their pytest step.
+A clean checkout reproduced ten self-scan findings. Proposed local fixes clarify
+generated-output references and make workflow commands/options and Typer help
+settings visible to static indexing. The patched checkout has zero qualifying
+drift; 692 local tests and the unchanged coverage gates pass.
+
+The remote Windows failure traceback is still needed; local success does not
+explain those failures. See [CI diagnosis](docs/CI-DIAGNOSIS.md). Keep publishing
+disabled and do not create or push an RC tag while remote CI is red.
+
+Proposed fix commit: **Fix clean-checkout self-scans and static Typer help evidence**.
+The fixes remain uncommitted; review and push require the owner's confirmation.
 
 ## GitHub review gates: owner reports completed
 

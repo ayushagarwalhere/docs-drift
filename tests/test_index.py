@@ -23,6 +23,26 @@ def _repo(tmp_path: Path, files: dict[str, str]) -> Path:
     return tmp_path
 
 
+@pytest.mark.parametrize(
+    ("settings", "expected"),
+    [
+        ("", {"--help"}),
+        ("add_help_option=False", set()),
+        ("context_settings={'help_option_names': ['-h', '--assist']}", {"-h", "--assist"}),
+        ("context_settings={'help_option_names': []}", set()),
+        ("context_settings=dynamic_settings", set()),
+        ("add_help_option=dynamic_flag", set()),
+    ],
+)
+def test_typer_help_defaults_respect_disabled_custom_and_dynamic_settings(
+    tmp_path: Path, settings: str, expected: set[str]
+) -> None:
+    repo = _repo(tmp_path, {"cli.py": f"import typer\napp = typer.Typer({settings})\n"})
+    symbols = build_index(repo, Config(), no_cache=True).symbols
+    actual = {s.name for s in symbols if s.kind == SymbolKind.cli_flag} & {"--help", "-h", "--assist"}
+    assert actual == expected
+
+
 def test_git_listing_failure_never_falls_back_to_untracked_tree(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

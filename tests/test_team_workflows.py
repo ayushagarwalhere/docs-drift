@@ -8,9 +8,11 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+from docs_drift import workflow_cli
 from docs_drift.cli import app
 from docs_drift.collaboration import fix_branch, pr_comparison, static_scan, support_history, write_pr_report
 from docs_drift.config import Config
+from docs_drift.index import build_index
 from docs_drift.ownership import coverage_report, ownership
 from docs_drift.policy import GatePolicy, evaluate_gate
 from docs_drift.review import ReviewKind, load_reviews, record_review, suppressed_ids
@@ -20,6 +22,16 @@ from scripts import action_runner
 
 def git(repo: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True, text=True).stdout.strip()
+
+
+def test_workflow_registration_exposes_real_command_and_option_source_evidence(tmp_path: Path) -> None:
+    (tmp_path / "workflows.py").write_bytes(Path(workflow_cli.__file__).read_bytes())
+    symbols = build_index(tmp_path, Config(), no_cache=True).symbols
+    commands = {s.name for s in symbols if s.kind == "cli_command"}
+    assert {"pr", "coverage", "timeline", "review", "record", "list", "fix-branch"} <= commands
+    flags = {(s.name, s.qualified_name.split(".")[-2]) for s in symbols if s.kind == "cli_flag"}
+    assert ("--important", "coverage") in flags
+    assert ("--branch", "fix-branch") in flags and ("--destination", "fix-branch") in flags
 
 
 def commit(repo: Path, message: str) -> str:

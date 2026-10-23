@@ -78,14 +78,19 @@ The smoke repository initially lacked a cache ignore rule; its normal scan made
 the checkout unclean, and fix-branch correctly refused it. Adding a local ignore
 rule to that synthetic fixture allowed the intended clean-checkout test.
 
-Local evidence:
+Local evidence was generated in ignored output directories; these are local run
+outputs, not files shipped in a fresh source checkout:
 
-- `.docs-drift/team-wheel-smoke/verification.json`: explicitly synthetic history
-  and proposal commit, with all workflow checks passed.
-- `.docs-drift/team-wheel-smoke/review-final/pr.html`: installed-wheel PR report.
-- `.docs-drift/team-wheel-smoke/pr-desktop-verified.png` and
-  `pr-mobile-verified.png`: local Edge rendering checks at 1280px and 375px.
-  The mobile layout uses a scrollable coverage table without page overflow.
+```text
+.docs-drift/team-wheel-smoke/verification.json
+.docs-drift/team-wheel-smoke/review-final/pr.html
+.docs-drift/team-wheel-smoke/pr-desktop-verified.png
+.docs-drift/team-wheel-smoke/pr-mobile-verified.png
+```
+
+The JSON labels the synthetic history and proposal commit. The HTML is the
+installed-wheel PR report. Screenshots record local Edge rendering at 1280px and
+375px; the mobile layout uses a scrollable coverage table without page overflow.
 
 The last changes after the full suite are documentation and responsive HTML/CSS;
 the affected workflow/report tests and rendering checks are repeated separately.

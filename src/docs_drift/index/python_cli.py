@@ -21,6 +21,27 @@ def _keyword(call: ast.Call, name: str) -> ast.expr | None:
     return next((item.value for item in call.keywords if item.arg == name), None)
 
 
+def _typer_help_flags(call: ast.Call) -> list[str]:
+    enabled = _keyword(call, "add_help_option")
+    if enabled is not None and not (isinstance(enabled, ast.Constant) and enabled.value is True):
+        return []
+    settings = _keyword(call, "context_settings")
+    if settings is None:
+        return ["--help"]
+    try:
+        context = ast.literal_eval(settings)
+    except (ValueError, TypeError):
+        return []
+    if context is None:
+        context = {}
+    if not isinstance(context, dict):
+        return []
+    names = context.get("help_option_names")
+    if names is None:
+        return ["--help"]
+    return [name for name in names if isinstance(name, str) and name.startswith("-")] if isinstance(names, list) else []
+
+
 class PythonCLIIndexer:
     name = "python-cli"
     languages = frozenset({"python"})
@@ -182,6 +203,19 @@ def _decorator_cli(  # noqa: PLR0912 - distinct static Click and Typer declarati
             and isinstance(item.value, ast.Call)
             and ast.unparse(item.value.func).endswith("Typer")
         ):
+            for flag in _typer_help_flags(item.value):
+                result.append(
+                    _symbol(
+                        repo,
+                        path,
+                        SymbolKind.cli_flag,
+                        f"{module}.root.{flag}",
+                        item.lineno,
+                        name=flag,
+                        framework="typer",
+                        derived=True,
+                    )
+                )
             completion = _keyword(item.value, "add_completion")
             if completion is None or (isinstance(completion, ast.Constant) and completion.value is True):
                 for flag in ("--install-completion", "--show-completion"):

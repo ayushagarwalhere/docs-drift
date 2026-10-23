@@ -33,6 +33,7 @@ All notable user-facing changes are recorded here, following
 
 ### Changed
 
+- Static Typer checks respect default and explicitly configured help options.
 - Markdown explanations are presented as review text; applicable changes use
   exact-span patches rather than token-only whole-line suggestions.
 

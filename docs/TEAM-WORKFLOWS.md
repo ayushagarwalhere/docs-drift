@@ -30,7 +30,7 @@ Fetch the base commit, then compare it with the current checkout:
 docs-drift pr --base origin/main --report-dir ../docs-review
 ```
 
-Open `../docs-review/pr.html`. Artifacts include documentation lines, source
+Open the generated HTML report in that output directory. Artifacts include documentation lines, source
 evidence from the base and head, available attributed commits, ownership,
 coverage, Markdown, workflow annotations, JSON and an exact-span `fix.patch`.
 The directory must be new so previous review evidence is preserved.
@@ -56,8 +56,8 @@ For the composite Action, check out the PR head with full history and set
 
 Replace the source placeholder with a reviewed commit. No public moving release
 tag is asserted here. Use `permissions: contents: read`; no write token or model
-is required. The Action emits line annotations and saves `pr/` alongside full
-`scan.*`, `new.*` and `gate.json`. Explicit `reviews` inputs must exist and remain
+is required. The Action emits line annotations and saves the PR artifacts alongside the full
+scan reports, new-finding reports and gate summary. Explicit `reviews` inputs must exist and remain
 inside the selected repository. A missing base revision fails visibly.
 
 ## Reviewer feedback
