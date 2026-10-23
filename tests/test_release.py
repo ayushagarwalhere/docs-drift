@@ -18,13 +18,20 @@ from docs_drift.models import ScanResult
 from docs_drift.scanning import run_scan
 from scripts import check_readme_links, dogfood, verify_install
 from scripts.demo_setup import prepare
-from scripts.release import check_archives, notes, tag_version
+from scripts.release import check_archives, notes, requires_release_candidate, tag_version
 from scripts.submission_reminders import reminders
 
 
 @pytest.mark.parametrize(("tag", "expected"), [("v0.1.0", "0.1.0"), ("v0.1.0-rc.1", "0.1.0rc1")])
 def test_tag_version(tag: str, expected: str) -> None:
     assert tag_version(tag) == expected
+
+
+@pytest.mark.parametrize(
+    ("tag", "required"), [("v0.1.0", True), ("v0.1.0-rc.1", False), ("v0.1.1", False), ("v0.2.0", False)]
+)
+def test_first_stable_requires_rc_but_later_versions_are_one_tag_away(tag: str, required: bool) -> None:
+    assert requires_release_candidate(tag) is required
 
 
 @pytest.mark.parametrize("tag", ["v0", "submission-2026-10-30", "v0.1.0-rc.0", "0.1.0", "v1.0.0;echo bad"])

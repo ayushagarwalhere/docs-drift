@@ -62,7 +62,8 @@ def test_default_history_and_pr_mode(scans: dict[str, ScanResult]) -> None:
     assert default.introduced_by is not None
     assert "worker" in default.introduced_by.summary.casefold()
     assert any("-" in e.text and "+" in e.text for e in default.evidence)
-    assert "```suggestion" in render(result, "markdown", RenderOptions(pr_mode=True))
+    assert "```text" in render(result, "markdown", RenderOptions(pr_mode=True))
+    assert "```suggestion" not in render(result, "markdown", RenderOptions(pr_mode=True))
 
 
 def test_nasty_content_and_truncation(scans: dict[str, ScanResult]) -> None:

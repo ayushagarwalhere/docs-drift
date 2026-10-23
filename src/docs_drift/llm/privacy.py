@@ -47,16 +47,17 @@ def excluded_path(path: str, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatchcase(path, pattern) for pattern in [*defaults, *patterns])
 
 
+def redact_value(value: Any) -> Any:
+    """Mask nested metadata without changing its JSON structure."""
+    if isinstance(value, str):
+        return mask_secrets(value)
+    if isinstance(value, list):
+        return [redact_value(v) for v in value]
+    if isinstance(value, dict):
+        return {k: redact_value(v) for k, v in value.items()}
+    return value
+
+
 def redact_result(result: ScanResult) -> ScanResult:
     """Return a redacted copy so every report format shares the same secret boundary."""
-
-    def scrub(value: Any) -> Any:
-        if isinstance(value, str):
-            return mask_secrets(value)
-        if isinstance(value, list):
-            return [scrub(v) for v in value]
-        if isinstance(value, dict):
-            return {k: scrub(v) for k, v in value.items()}
-        return value
-
-    return ScanResult.model_validate(scrub(result.model_dump(mode="json")))
+    return ScanResult.model_validate(redact_value(result.model_dump(mode="json")))

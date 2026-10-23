@@ -6,11 +6,7 @@ All notable user-facing changes are recorded here, following
 
 ## [Unreleased]
 
-### Added
-
-- Release candidate preparation for 0.1.0; publication is pending.
-
-## [0.1.0] - 2026-10-18
+## [0.1.0] - 2026-10-24
 
 ### Added
 
@@ -28,6 +24,18 @@ All notable user-facing changes are recorded here, following
 - Reproducible public-repository benchmark samples for human review, plus docs
   and configuration reference. Real-world precision and recall remain unmeasured.
 - Package version in CLI and JSON reports, separate from JSON schema version 1.
+- PR comparisons with documentation lines, source evidence, available commit
+  attribution, workflow annotations and reviewable documentation patches.
+- Source-scoped human feedback with reasons and conservative reopening when
+  supporting source changes; full findings remain available for review.
+- Bounded static support history, CODEOWNERS routing, documentation coverage
+  reports and verified local fix branches that leave final approval to a person.
+
+### Changed
+
+- Markdown explanations are presented as review text; applicable changes use
+  exact-span patches rather than token-only whole-line suggestions.
+
 
 Changelogs are ignored by default. Historical examples such as `--port` may stay
 in this file without being treated as current usage instructions.

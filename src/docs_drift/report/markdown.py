@@ -40,7 +40,7 @@ def render(result: ScanResult, options: RenderOptions) -> str:
         block = f"\n## {escape(f.claim.doc_path)}\n" if previous != f.claim.doc_path else ""
         block += f"\n**{escape(f.verdict)} · line {f.claim.line}** {escape(f.claim.raw_text)}\n\n"
         block += (
-            fence(f.suggestion or f.reasons[0], "suggestion")
+            fence(f.suggestion or f.reasons[0], "text")
             if options.pr_mode
             else fence(f"- {f.claim.raw_text}\n+ {f.suggestion or f.reasons[0]}", "diff")
         )

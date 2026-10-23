@@ -13,5 +13,22 @@
       "capture_date": "not independently established"
     }
   ],
-  "scope": "Account-level Flow usage; no project-only attribution or weekly upload receipt inferred."
+  "scope": "Account-level Flow usage; no project-only attribution or weekly upload receipt inferred.",
+  "project_dictation": {
+    "file": "dictated-release-request-2026-10-23.txt",
+    "sha256": "b700463e2931af754fe4e1df0afd1a8f0aeed39fed7b044e872ea03643e309c4",
+    "received_date": "2026-10-23",
+    "source": "Owner-supplied text in the coding session",
+    "input_method": "Wispr Flow, explicitly reported by the owner",
+    "independent_audio_or_video_verification": false,
+    "recording": "not supplied",
+    "transcription": "Wording preserved as supplied, including recognition errors; line endings and trailing whitespace normalized.",
+    "resulting_changes": [
+      ".github/workflows/release.yml",
+      "scripts/release.py",
+      "RELEASING.md",
+      "CHANGELOG.md",
+      "docs/built-with-voice.md"
+    ]
+  }
 }

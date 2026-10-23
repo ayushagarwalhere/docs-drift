@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+from importlib.resources import files
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -19,11 +20,22 @@ from tests.fixtures.build_fixtures import build_fixtures
 
 def test_real_case_downloads_and_documentation_share_the_verified_patch() -> None:
     root = Path(__file__).resolve().parents[1]
-    assets = root / "src/docs_drift/web/static/evidence"
+    assets = files("docs_drift").joinpath("web/static/evidence")
     for name in ("rich-cli-correction.patch", "correction-verification.json"):
         assert (assets / name).read_bytes() == (root / "docs/assets/quality" / name).read_bytes()
     proof = json.loads((assets / "correction-verification.json").read_text())
     assert proof["patch_sha256"] == hashlib.sha256((assets / "rich-cli-correction.patch").read_bytes()).hexdigest()
+
+
+def test_owner_reported_dictation_has_original_wording_and_explicit_recording_status() -> None:
+    root = Path(__file__).resolve().parents[1] / "docs/assets/flow"
+    proof = json.loads((root / "provenance.json").read_text())["project_dictation"]
+    original = (root / proof["file"]).read_bytes()
+    assert hashlib.sha256(original).hexdigest() == proof["sha256"]
+    assert b"pipx install dogstrip" in original and b"i am giving this prompt through wispr" in original
+    assert not proof["independent_audio_or_video_verification"]
+    voice = files("docs_drift").joinpath("web/templates/voice.html").read_text()
+    assert "owner-reported dictation" in voice and "No audio/video was supplied" in voice
 
 
 def test_web_example_rebuild_preserves_real_snapshot_and_fixture_labels(

@@ -3,7 +3,6 @@
 import hashlib
 import json
 import os
-import subprocess
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
@@ -38,44 +37,15 @@ from docs_drift.index.python_symbols import _module_name  # noqa: E402
 from docs_drift.index.tasks import TaskIndexer as _TaskIndexer  # noqa: E402, F401
 
 INDEX_SCHEMA = 1
-INDEXER_VERSION = f"{__version__}:4"
-MIN_INDEX_RECORD_FIELDS = 2
-
-
-def _blob_hashes(repo: Path, files: Sequence[Path]) -> tuple[dict[str, str], set[str]]:
-    env = {key: value for key, value in os.environ.items() if not key.upper().startswith("GIT_")}
-    env["GIT_OPTIONAL_LOCKS"] = "0"
-    base = ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", f"core.hooksPath={os.devnull}"]
-    try:
-        indexed = subprocess.run(
-            [*base, "ls-files", "-s", "-z"], capture_output=True, check=True, env=env, timeout=5
-        ).stdout
-        modified = subprocess.run(
-            [*base, "ls-files", "-m", "-z"], capture_output=True, check=True, env=env, timeout=5
-        ).stdout
-    except (OSError, subprocess.SubprocessError):
-        return {}, {path.relative_to(repo).as_posix() for path in files}
-    hashes = {}
-    for record in indexed.split(b"\0"):
-        if b"\t" not in record:
-            continue
-        metadata, raw_path = record.split(b"\t", 1)
-        pieces = metadata.split()
-        if len(pieces) >= MIN_INDEX_RECORD_FIELDS:
-            hashes[os.fsdecode(raw_path)] = pieces[1].decode("ascii", errors="ignore")
-    return hashes, {os.fsdecode(path) for path in modified.split(b"\0") if path}
+INDEXER_VERSION = f"{__version__}:5"
 
 
 def _fingerprints(repo: Path, files: Sequence[Path]) -> dict[str, str]:
-    tracked, modified = _blob_hashes(repo, files)
-    result = {}
-    for path in files:
-        relative = path.relative_to(repo).as_posix()
-        if relative in tracked and relative not in modified:
-            result[relative] = "git:" + tracked[relative]
-        else:
-            result[relative] = "worktree:" + hashlib.sha256(path.read_bytes()).hexdigest()
-    return result
+    # Git's ls-files -m can invoke repository clean filters while refreshing stat
+    # data. Hash bounded source bytes directly; cached parsing still remains useful.
+    return {
+        path.relative_to(repo).as_posix(): "worktree:" + hashlib.sha256(path.read_bytes()).hexdigest() for path in files
+    }
 
 
 def _read_cache(path: Path) -> dict[str, object] | None:

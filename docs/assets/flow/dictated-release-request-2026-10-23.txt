@@ -1,0 +1,17 @@
+Release to pi pi and versioning. Prepare and run the first public release. The goal: `pipx install dogstrip` works for anyone, and every later release is one tag away. Versioning: semantic versioning, starting at 0.1.0. The single source of truth is the version in pi project.toml or hatch vcs from git tags. Recommend one and justify it. I lean towards hatch-vcs, so the tag is in the version. Docs-hash-drift/--version, and the JSON report both carry the version. The JSON schema version is separate from the package version.  Change log: keep change log.md in a change log format within the unreleased section. Write the 0.1.0 entry summarizing the features, the user-facing changes, and none of the internal churn. Note that docs drift ignores change logs by default, so our own change log can mention old flags.  Trillion: that's correct.  PKPI, PIPI trusted publishing:
+- right.github/workflows/release.yaml
+- triggered on v* tag
+- builds the sdist and wheel with `uv build`
+- run the test against the built wheel in a clean environment, not the secure source tree, to catch packaging mistakes like missing templates or query files
+- check the metadata with `twine check`
+- publishes to PIPI with trusted publishing via OIDC
+- PIPI/gh-action-pypi-publish with no API token stored anywhere
+- creates a GitHub release with the change log section as the body and attaches the wheel, the sdist, and an example HTML report
+- first publish to test pypi with the -rc tag to verify the whole
+ Write in the releasing.md the exact steps I need to take in the PIPI web UI to configure the trusted publisher:
+- project name
+- owner
+- repo
+- repo file name
+- environment name
+ I have to do that by myself, so describe it precisely....Walk me through the release step by step, stopping before any action that publishes something. I'll confirm each publish myself.  i am giving this prompt through wispr

@@ -48,3 +48,9 @@ and Markdown are redacted at serialization; repository caches are not trusted.
 ![Generated PR report preview, not a submitted GitHub comment](assets/pr-comment-preview.png)
 
 This image is a preview of the generated Markdown, not proof of a posted comment.
+
+## PR comparisons and scoped reviews
+
+Set optional `base-ref` to a fetched PR base SHA and `reviews` to a committed
+review-decision file. Full scan reports are retained; new PR artifacts and annotations
+carry source evidence. See [team workflows](TEAM-WORKFLOWS.md) for setup and limits.

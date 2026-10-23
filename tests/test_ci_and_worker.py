@@ -243,6 +243,9 @@ def test_public_docs_generator_keeps_reference_and_navigation_artifacts(
 ) -> None:
     for name in ("README.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE", "SECURITY.md"):
         (tmp_path / name).write_bytes((ROOT / name).read_bytes())
+    (tmp_path / "docs").mkdir()
+    voice = tmp_path / "docs/built-with-voice.md"
+    voice.write_text("# Owner-authored dictation evidence\nOriginal supplied requirement.\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     build_public_docs.main()
     docs = tmp_path / "docs"
@@ -254,3 +257,4 @@ def test_public_docs_generator_keeps_reference_and_navigation_artifacts(
         docs / "configuration.md"
     ).read_text(encoding="utf-8")
     assert "MIT" in (docs / "license.md").read_text()
+    assert "Original supplied requirement." in voice.read_text()

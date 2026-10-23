@@ -29,10 +29,10 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, subprocess
-          from scripts.release import tag_version
+          from scripts.release import requires_release_candidate, tag_version
           tag = os.environ['RELEASE_TAG']
           version = tag_version(tag)
-          if 'rc' not in version:
+          if requires_release_candidate(tag):
               raw = subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/workflows/release.yml/runs?head_sha={os.environ["GITHUB_SHA"]}&status=success&event=push'])
               runs = json.loads(raw)['workflow_runs']
               candidates = subprocess.check_output(['git','tag','--points-at','HEAD'],text=True).splitlines()
@@ -50,7 +50,7 @@ jobs:
                   if verified:
                       break
               if not verified:
-                  raise SystemExit('Stable release requires a successful RC Release workflow at this exact commit.')
+                  raise SystemExit('First stable release requires a successful RC Release workflow at this exact commit.')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f'version={version}\nrc={str("rc" in version).lower()}\n')
           PY

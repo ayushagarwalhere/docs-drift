@@ -15,6 +15,13 @@ from zipfile import ZipFile
 TAG = re.compile(r"v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))(?:-rc\.(?P<rc>[1-9]\d*))?")
 MAX_RECORDING_BYTES = 1_000_000
 REQUIRED = (
+    "collaboration.py",
+    "git_safety.py",
+    "review.py",
+    "ownership.py",
+    "snapshots.py",
+    "workflow_cli.py",
+    "report/workflow.html",
     "policy.py",
     "portfolio.py",
     "report/portfolio.html",
@@ -49,6 +56,11 @@ def tag_version(tag: str) -> str:
     if not match:
         raise ValueError("Use v0.1.0 or v0.1.0-rc.1; moving v0 and submission tags are not releases.")
     return match["version"] + ("rc" + match["rc"] if match["rc"] else "")
+
+
+def requires_release_candidate(tag: str) -> bool:
+    """Bootstrap 0.1.0 through TestPyPI; later stable tags can release directly."""
+    return tag_version(tag) == "0.1.0"
 
 
 def notes(changelog: str, version: str) -> str:

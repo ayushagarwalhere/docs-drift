@@ -14,7 +14,9 @@ def render(result: ScanResult, options: RenderOptions) -> str:
     return "".join(
         f"::{'error' if f.verdict == 'invalid_command' else 'warning'} "
         f"file={escape(f.claim.doc_path, True)},line={f.claim.line},col={f.claim.column}::"
-        f"{escape(message(f))}\n"
+        f"{escape(message(f))} "
+        f"{escape('; '.join(f'{e.file}:{e.line}: {e.text}' for e in f.evidence)[:2000])} "
+        f"{escape('commit ' + f.introduced_by.sha if f.introduced_by else 'commit attribution unavailable')}\n"
         for f in ordered(result)
         if f.is_drift
     )

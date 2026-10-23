@@ -3,6 +3,7 @@
 Self-hosted documentation drift checks for maintainers: scan local repositories,
 review source evidence, and gate newly introduced drift in CI. Organizations can
 scan multiple checkouts into one dashboard with `docs-drift portfolio`.
+[PR reviews, feedback, history, ownership and fix branches](docs/TEAM-WORKFLOWS.md).
 [Organization adoption](docs/ORGANIZATIONS.md) · [Product maturity](docs/PRODUCT.md).
 
 The product hypothesis is repeatable CI checks of exact documentation contracts
@@ -35,7 +36,7 @@ uv run --all-extras docs-drift scan --repo .
 ```
 
 Release preparation: [owner's publish gates](RELEASING.md). Public installs and
-URLs must be verified after approval; local checks do not prove a published release.
+URLs must be verified after publication; local checks do not prove a published release.
 
 **Find documentation statements your code no longer supports, with source evidence and available Git history.**
 
@@ -45,7 +46,7 @@ URLs must be verified after approval; local checks do not prove a published rele
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
 
 Alpha software: source installation works before the first package is published.
-The PyPI page becomes available after the owner approves publication; the hosted
+The PyPI page becomes available after authenticated publication; the hosted
 demo and video remain explicitly pending above. Real-world
 precision and recall are **pending human labeling**, not inferred from fixtures.
 

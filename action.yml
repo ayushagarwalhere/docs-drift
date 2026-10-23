@@ -10,6 +10,12 @@ inputs:
   baseline:
     description: Optional reviewed baseline JSON path relative to repo. Missing or invalid files fail the action.
     default: ''
+  base-ref:
+    description: Optional fetched base commit/ref for new or changed PR drift comparisons. Fetch full history.
+    default: ''
+  reviews:
+    description: Optional source-scoped review JSON path relative to repo.
+    default: ''
   min-confidence:
     description: Optional confidence threshold from 0 to 1; defaults to repository configuration.
     default: ''
@@ -47,6 +53,8 @@ runs:
       env:
         SCAN_REPO: ${{ inputs.repo }}
         FAIL_ON_DRIFT: ${{ inputs.fail-on-drift }}
+        SCAN_BASE_REF: ${{ inputs.base-ref }}
+        SCAN_REVIEWS: ${{ inputs.reviews }}
         SCAN_BASELINE: ${{ inputs.baseline }}
         SCAN_MIN_CONFIDENCE: ${{ inputs.min-confidence }}
         SCAN_MAX_FINDINGS: ${{ inputs.max-findings }}

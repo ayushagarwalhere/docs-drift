@@ -11,15 +11,36 @@ establish its capture date. Hashes are in [provenance.json](assets/flow/provenan
 These totals describe Flow account usage. No project-only count, elapsed time,
 productivity gain or weekly upload history is inferred from them.
 
-## Build workflow evidence still needed
+## Owner-reported project dictation: release preparation
 
-The cards are present. The owner's specific dictated requirements, prompts,
-revisions, and a recording showing Flow in use have not yet been supplied.
-There is no verified transcript to quote. The original build-story placeholder
-has been replaced with this evidence status, rather than a fabricated first-person
-narrative. [Capture plan and under-two-minute shot list](FLOW-RECORDING.md).
+On 23 October 2026 the owner supplied a release requirement in this coding session
+and explicitly wrote, "i am giving this prompt through wispr". The
+[original supplied text](assets/flow/dictated-release-request-2026-10-23.txt) is
+preserved with its recognition errors and a SHA256 hash in
+[provenance.json](assets/flow/provenance.json). This is owner-reported dictation;
+no original audio/video was supplied for independent verification.
 
-A genuine requirement/revision can be dictated into this chat, then tied to the
-resulting implementation change. Save the exact prompt and original short clip.
-The final submission also needs the public project/demo URL, video URL and the
-usage-card attachment; local files do not prove event upload or acceptance.
+> Prepare and run the first public release.
+>
+> Walk me through the release step by step, stopping before any action that publishes something.
+
+The requirement maps to the existing tag-derived version in `pyproject.toml`,
+release workflow and [publishing guide](releasing.md). Follow-up changes refresh
+the 0.1.0 user-facing notes, preserve the first TestPyPI RC requirement, allow
+later stable releases from a single tag, and read packaged test assets from the
+installed wheel. This is a release-preparation revision, not evidence that all
+existing release infrastructure was created by this dictation.
+
+The package and command are interpreted as `docs-drift`; "dogstrip" and other
+recognition errors remain in the original text. A recording showing Flow input
+and the final under-two-minute submission video remain pending.
+[Capture plan and shot list](FLOW-RECORDING.md).
+
+## Organization workflow requirement
+
+The owner requested package distribution, PR checks, scoped feedback, history,
+ownership coverage and fix branches in the coding session on 23 October 2026.
+The resulting [team workflows](TEAM-WORKFLOWS.md) are available for inspection.
+The input method of that request is unverified; it is not labeled a dictated
+transcript. The supplied account cards above remain the available Flow evidence.
+A project-specific dictation recording is still pending owner capture.

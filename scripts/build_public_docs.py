@@ -320,6 +320,8 @@ def main() -> None:
     docs = Path("docs")
     docs.mkdir(exist_ok=True)
     for name, text in PAGES.items():
+        if name == "built-with-voice.md" and (docs / name).exists():
+            continue  # Preserve owner-authored dictation and provenance.
         (docs / name).write_text(text, encoding="utf-8")
     (docs / "configuration.md").write_text(render_reference(), encoding="utf-8")
     (docs / "CHANGELOG.md").write_text(Path("CHANGELOG.md").read_text(encoding="utf-8"), encoding="utf-8")

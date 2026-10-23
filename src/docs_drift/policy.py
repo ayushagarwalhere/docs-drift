@@ -32,6 +32,7 @@ class GateSummary(BaseModel):
     new_drift: int
     qualifying_new_drift: int
     below_threshold_new_drift: int
+    reviewed_drift: int = 0
     status: Literal["passed", "failed", "report_only"]
     warnings: list[str]
 
@@ -42,11 +43,16 @@ class GateEvaluation:
     new_findings: list[Finding]
 
 
-def evaluate_gate(result: ScanResult, policy: GatePolicy, baseline: FindingBaseline | None = None) -> GateEvaluation:
+def evaluate_gate(
+    result: ScanResult, policy: GatePolicy, baseline: FindingBaseline | None = None, suppressed: set[str] | None = None
+) -> GateEvaluation:
     """Only qualifying *new* drift counts toward the explicitly allowed budget."""
     drift = [finding for finding in result.findings if finding.is_drift]
     new = drift if baseline is None else new_findings(drift, baseline)
-    qualifying = sum(finding.confidence >= policy.min_confidence for finding in new)
+    suppressed = suppressed or set()
+    qualifying = sum(
+        finding.confidence >= policy.min_confidence and finding.claim.claim_id not in suppressed for finding in new
+    )
     status: Literal["passed", "failed", "report_only"] = "report_only"
     if policy.fail_on_drift:
         status = "failed" if qualifying > policy.max_findings else "passed"
@@ -66,7 +72,8 @@ def evaluate_gate(result: ScanResult, policy: GatePolicy, baseline: FindingBasel
             baseline_drift=len(drift) - len(new),
             new_drift=len(new),
             qualifying_new_drift=qualifying,
-            below_threshold_new_drift=len(new) - qualifying,
+            below_threshold_new_drift=sum(f.confidence < policy.min_confidence for f in new),
+            reviewed_drift=sum(f.claim.claim_id in suppressed for f in new),
             status=status,
             warnings=warnings,
         ),

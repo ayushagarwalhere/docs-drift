@@ -3,10 +3,72 @@
 Status: preparation only. No package, tag, image, GitHub Release, Marketplace
 listing or hosting resource has been published by this release preparation.
 Stop at every **PUBLISH GATE** below. The owner confirms each one.
+The owner subsequently confirmed that pending publishers were added on both
+TestPyPI and PyPI. This records owner-reported setup; the private account settings
+have not been independently inspected. On 24 October 2026 the owner also
+confirmed all four GitHub environments, themselves as required reviewer, and
+the version-tag rules. Source review and push approval are the current step.
+
+## Current step: review and approve the source push
+
+Local source remains uncommitted on main after `4a0a6b0`. The local RC rehearsal
+passed 685 installed-wheel tests, metadata/content checks, pipx installation and
+scan, lint/types/docs checks, dependency audit and secret scans. These are local
+results, not a successful public release workflow.
+
+Proposed commit: **Prepare docs-drift 0.1.0 release and organization workflows**.
+It includes the organization CLI/Action workflows, release automation and tests,
+user-facing release notes, and owner-reported Wispr dictation with provenance.
+Review the source changes before confirming the commit and push to main.
+A main-branch push publishes source and runs CI; the release workflow requires a
+separate version-tag push. Keep publishing disabled until the RC tag step.
+No source or version tag has been pushed during this walkthrough.
+
+## GitHub review gates: owner reports completed
+
+Open [repository environments](https://github.com/ayushagarwalhere/docs-drift/settings/environments).
+Create these four environments, whose names match the release workflow:
+`testpypi`, `pypi`, `ghcr`, and `github-release`.
+
+For each environment:
+
+1. Enable **Required reviewers**, add **ayushagarwalhere**, and save the rule.
+2. Leave **Prevent self-review** unchecked so the owner can approve runs they trigger.
+3. Select **Selected branches and tags**, then add a **Tag** rule matching **v***.
+4. Disable administrator bypass if that option is shown, and save protection rules.
+
+Keep `DOCS_DRIFT_RELEASE_PUBLISH_ENABLED` unset for now. Report that the four
+environments have been saved with reviewers. The next gate is review and
+confirmation of the real source commit and RC tag push; no push or publication
+has been performed during this walkthrough.
+
+See [GitHub's environment setup guide](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments).
+
+## Publisher setup: owner reports completed
+
+1. Open [TestPyPI account publishing](https://test.pypi.org/manage/account/publishing/),
+   sign in, choose **Add a new pending publisher**, then **GitHub**.
+2. Enter project `docs-drift`, owner `ayushagarwalhere`, repository `docs-drift`,
+   workflow filename **release.yml**, environment `testpypi`, and add it.
+3. Repeat at [PyPI account publishing](https://pypi.org/manage/account/publishing/)
+   with environment `pypi`. The other fields are identical. Enter the filename exactly as shown in the publisher table below, without
+   its directory path.
+4. Complete the GitHub environment review gates described below, keeping
+   `DOCS_DRIFT_RELEASE_PUBLISH_ENABLED` unset for now.
+5. Report that setup is complete. Preparation can proceed locally; the next
+   external action will be a separately confirmed source/tag push. Creating a
+   pending publisher does not upload a package or reserve its name.
+
+The package and executable are `docs-drift`. The supplied dictated requirement
+contained recognition errors such as "dogstrip"; they are retained in the
+[dictation evidence](docs/built-with-voice.md), rather than used to rename the project.
 
 ## Version policy
 
-Use **hatch-vcs**. A full SemVer tag is the single source of truth:
+Use **hatch-vcs**, which is already configured in `pyproject.toml` through
+`dynamic = ["version"]` and `source = "vcs"`. This keeps the immutable source tag
+and built package version aligned, without a second version string to update.
+A full SemVer tag is the single source of truth:
 `v0.1.0-rc.1` becomes Python package `0.1.0rc1`; `v0.1.0` becomes `0.1.0`.
 Minor/patch releases follow SemVer; describe breaking pre-1.0 changes explicitly.
 Moving `v0` and `submission-2026-10-30` tags do not determine package versions.
@@ -139,7 +201,8 @@ The VSIX is never sent to the Marketplace. Install it locally using Extensions
 ## Stable release
 
 Do not change source between the successful RC and the stable tag. The workflow
-checks that a successful RC Release run exists at that exact commit. If anything
+checks that a successful RC Release run exists at that exact commit for the
+first stable version, `v0.1.0`. If anything
 changes, make a new numbered RC and repeat validation.
 After explicit owner approval, tag that same commit:
 
@@ -163,8 +226,11 @@ git push origin refs/tags/v0 --force
 ```
 
 This intentionally moves v0; do not force-update any full release tag. Consumers
-needing immutable builds should pin the full commit SHA. Later releases repeat
-the RC/stable tag flow; there is no manual version-file edit or artifact upload.
+needing immutable builds should pin the full commit SHA. Later stable releases are one version tag away after the reviewed changelog
+and source are committed: for example, `v0.1.1` starts the same build, wheel-only
+tests, OIDC publish and installation checks, with the same owner approval gates.
+They do not require a preceding RC. An RC remains an optional rehearsal for later
+versions. There is no manual version-file edit or artifact upload.
 
 ## Judging freeze: 30 October through 6 November 2026 inclusive
 

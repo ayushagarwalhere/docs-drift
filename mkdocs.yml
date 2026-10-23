@@ -35,6 +35,7 @@ nav:
       - DD003: rules/DD003.md
       - DD004: rules/DD004.md
   - Integrations:
+      - Team workflows: TEAM-WORKFLOWS.md
       - Organization adoption: ORGANIZATIONS.md
       - Maintainer pilot: MAINTAINER-PILOT.md
       - GitHub Action: github-action.md

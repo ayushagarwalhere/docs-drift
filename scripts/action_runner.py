@@ -5,10 +5,12 @@ import uuid
 from pathlib import Path
 
 from docs_drift.baseline import load_baseline
+from docs_drift.collaboration import pr_comparison, write_pr_report
 from docs_drift.config import load_config
 from docs_drift.history_cache import CACHE_DISABLED
 from docs_drift.policy import GatePolicy, evaluate_gate
 from docs_drift.report import RenderOptions, render
+from docs_drift.review import load_reviews, suppressed_ids
 from docs_drift.scanning import run_scan
 
 
@@ -40,9 +42,20 @@ def main() -> None:
         result = run_scan(repo, config, no_cache=True)
     finally:
         CACHE_DISABLED.reset(token)
+    gate_result = result
+    book = None
+    if selected := os.getenv("SCAN_REVIEWS", "").strip():
+        path = repo / selected
+        if Path(selected).is_absolute() or not path.resolve().is_relative_to(repo):
+            raise ValueError("Reviews must stay inside the selected repository.")
+        book = load_reviews(path)
+    if base := os.getenv("SCAN_BASE_REF", "").strip():
+        result, gate_result, comparison = pr_comparison(repo, config, base)
+        write_pr_report(gate_result, comparison, output / "pr", book, full_result=result)
+    suppressed = suppressed_ids(result, book) if book else set()
     for format, suffix in [("html", "html"), ("json", "json"), ("sarif", "sarif"), ("markdown", "md")]:
         (output / ("scan." + suffix)).write_text(render(result, format, RenderOptions(pr_mode=True)), encoding="utf-8")
-    evaluation = evaluate_gate(result, policy, baseline)
+    evaluation = evaluate_gate(gate_result, policy, baseline, suppressed)
     summary = evaluation.summary
     (output / "gate.json").write_text(summary.model_dump_json(indent=2) + "\n", encoding="utf-8")
     new_result = result.model_copy(update={"findings": evaluation.new_findings, "baselined": summary.baseline_drift})
@@ -50,6 +63,10 @@ def main() -> None:
         (output / ("new." + suffix)).write_text(
             render(new_result, format, RenderOptions(pr_mode=True)), encoding="utf-8"
         )
+    annotations = gate_result.model_copy(
+        update={"findings": [f for f in evaluation.new_findings if f.claim.claim_id not in suppressed]}
+    )
+    print(render(annotations, "github"), end="")
     with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
         stream.write("report-directory=" + output.as_posix() + "\n")
         for name, value in {

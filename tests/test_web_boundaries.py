@@ -3,6 +3,7 @@
 import asyncio
 import json
 import time
+from importlib.resources import files
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -23,7 +24,7 @@ from docs_drift.web.worker import execute
 
 
 def fixture_result() -> ScanResult:
-    return ScanResult.model_validate_json(Path("src/docs_drift/web/examples/py-cli.json").read_text())
+    return ScanResult.model_validate_json(files("docs_drift").joinpath("web/examples/py-cli.json").read_text())
 
 
 def test_all_page_states_and_empty(tmp_path: Path) -> None:

@@ -433,6 +433,7 @@ def check(
     baseline: Annotated[
         Path | None, typer.Option("--baseline", help="Fail only for drifts absent from this baseline.")
     ] = None,
+    reviews: Annotated[Path | None, typer.Option(help="Source-scoped human review decisions.")] = None,
     quiet: Annotated[bool, typer.Option("--quiet", help="Print nothing unless the check fails.")] = False,
     llm: Annotated[bool, typer.Option("--llm")] = False,
     llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
@@ -461,7 +462,14 @@ def check(
         except ValueError as exc:
             raise typer.BadParameter(str(exc), param_hint="--baseline") from exc
     threshold = options.config.min_confidence if min_confidence is None else min_confidence
-    qualifying = [item for item in findings if item.confidence >= threshold]
+    from docs_drift.review import load_reviews, suppressed_ids  # noqa: PLC0415
+
+    suppressed = suppressed_ids(result, load_reviews(options.repo / reviews)) if reviews else set()
+    if suppressed:
+        history_warnings.append(
+            f"{len(suppressed)} source-scoped reviewed findings excluded from the gate; retained below."
+        )
+    qualifying = [item for item in findings if item.confidence >= threshold and item.claim.claim_id not in suppressed]
     if fail_on == "drift":
         failures = [item for item in qualifying if item.is_drift]
     elif fail_on == "missing":
@@ -856,3 +864,8 @@ def lsp(ctx: typer.Context) -> None:
 
     options: CLIOptions = ctx.ensure_object(CLIOptions)
     start(options.repo, options.config)
+
+
+from docs_drift.workflow_cli import register as register_workflows  # noqa: E402
+
+register_workflows(app)
