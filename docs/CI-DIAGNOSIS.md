@@ -2,7 +2,7 @@
 
 Inspected authenticated job logs for main commit
 `3e0b885bdeaf0cd24e3a27efee0d6621f2ef9b9a`, the revision in the screenshot.
-Raw logs stay in the ignored local `.docs-drift/ci-diagnosis/` directory.
+Generated logs stay in the ignored local `.docs-drift/ci-diagnosis/` directory.
 
 | Check | Actual failure | Fix |
 | --- | --- | --- |
@@ -72,5 +72,5 @@ Suggested commit message: `fix: repair cross-platform CI and self-scan evidence`
   baseline, threshold reduction or fixture-key change was introduced.
 - Wheel and sdist build and pass the release content contract. Local artifacts:
   `.docs-drift/ci-dist/`. Nothing was uploaded or published.
-- Exact test results: `.docs-drift/ci-diagnosis/final-tests.xml`;
-  coverage: `.docs-drift/coverage.json`.
+- Generated reports from that local validation: `.docs-drift/ci-diagnosis/final-tests.xml`;
+  generated report for coverage: `.docs-drift/coverage.json`.

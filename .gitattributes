@@ -1,3 +1,3 @@
 * text=auto eol=lf
-# Unified patches may contain literal CRLF context from the target document.
-*.patch -text
+# Unified patches preserve CRLF and single-space blank context from the target document.
+*.patch -text whitespace=-blank-at-eol,cr-at-eol

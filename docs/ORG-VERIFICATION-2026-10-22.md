@@ -24,8 +24,8 @@ implied, and GitHub's hosted matrix was not rerun by these local commands.
   invalid and was not counted as a successful composite validation.
 - Wheel and source archive built locally; `scripts.release.check_archives`
   passed. Release resource checks now require the portfolio template and modules.
-- The self-check, run as the checkout owner, exited **0** and wrote
-  `.docs-drift/org-dogfood-final.json`. Running as the sandbox user first caused
+- The self-check, run as the checkout owner, exited **0**.
+  Its generated report is `.docs-drift/org-dogfood-final.json`. Running as the sandbox user first caused
   Git's ownership check to reject the checkout. Its old fallback traversed ignored
   generated trees; the process was stopped and tracked-source discovery now
   fails explicitly instead. No global Git trust exception was added.

@@ -59,7 +59,7 @@ def verify(repo: Path, output: Path) -> dict[str, object]:
         raise ValueError("Use a new output directory; existing evidence is never overwritten.")
     archive = subprocess.check_output(["git", "-C", str(repo), "archive", "--format=zip", PIN])
     with tempfile.TemporaryDirectory(prefix="docs-drift-real-case-") as directory:
-        root = Path(directory)
+        root = Path(directory).resolve()
         with ZipFile(io.BytesIO(archive)) as snapshot:
             if any(not (root / name).resolve().is_relative_to(root) for name in snapshot.namelist()):
                 raise ValueError("Archive contains a path outside the snapshot.")

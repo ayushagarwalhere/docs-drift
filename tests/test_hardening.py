@@ -71,6 +71,23 @@ def test_table_description_is_not_a_literal_default() -> None:
     assert all(c.expected_default is None for c in result.claims)
 
 
+def test_validation_docs_do_not_require_local_artifacts_in_a_clean_checkout(tmp_path: Path) -> None:
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    for name in ("CI-DIAGNOSIS.md", "ORG-PILOT-2026-10-22.md", "ORG-VERIFICATION-2026-10-22.md"):
+        (docs / name).write_text((ROOT / "docs" / name).read_text(encoding="utf-8"), encoding="utf-8")
+    result = run_scan(tmp_path, Config(), history=False, no_cache=True)
+    artifacts = [f for f in result.findings if f.claim.kind == "file_path" and f.claim.value.startswith(".docs-drift/")]
+    assert {
+        ".docs-drift/ci-diagnosis/",
+        ".docs-drift/ci-diagnosis/final-tests.xml",
+        ".docs-drift/coverage.json",
+        ".docs-drift/org-pilot-corrected/index.html",
+        ".docs-drift/org-dogfood-final.json",
+    } <= {f.claim.value for f in artifacts}
+    assert all(not f.is_drift for f in artifacts), [(f.claim.value, f.verdict) for f in artifacts]
+
+
 def test_same_name_packages_do_not_duplicate_findings(tmp_path: Path) -> None:
     (tmp_path / "pyproject.toml").write_text('[project]\nname="same"\n')
     (tmp_path / "package.json").write_text('{"name":"same"}')

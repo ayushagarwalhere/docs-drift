@@ -2,6 +2,8 @@
 
 import io
 import json
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -68,3 +70,20 @@ def test_unexpected_snapshots_fail_without_creating_evidence(
     with pytest.raises(ValueError):
         case.verify(tmp_path, tmp_path / "evidence")
     assert not (tmp_path / "evidence").exists()
+
+
+def test_snapshot_root_is_resolved_before_checking_archive_members(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot_root = tmp_path / "snapshot"
+    nested = snapshot_root / "nested"
+    nested.mkdir(parents=True)
+
+    @contextmanager
+    def temporary_directory(*, prefix: str) -> Iterator[str]:
+        yield str(nested / "..")
+
+    monkeypatch.setattr("scripts.verify_real_case.tempfile.TemporaryDirectory", temporary_directory)
+    monkeypatch.setattr("scripts.verify_real_case.subprocess.check_output", lambda args: archive())
+    result = case.verify(tmp_path, tmp_path / "evidence")
+    assert result["git_apply_check"] == "passed"
