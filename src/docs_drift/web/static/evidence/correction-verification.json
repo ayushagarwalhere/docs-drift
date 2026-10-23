@@ -1,0 +1,28 @@
+{
+  "source_revision": "46f4d2469097be395558768714a5f07ebccf1412",
+  "snapshot_archive_sha256": "30405bbe47df1e9e99ba0fbfdcd1d12b1bdc24dbfe405529adeb5aabd9814d46",
+  "original_readme_sha256": "d7cd11fb6f4b51abe61689104b594098d3500dd4eb12e1873a24fca6e6789dd7",
+  "corrected_readme_sha256": "5ae4eac764ce5960188cad6147f1e2b784d489843f8719e312d51823219ad7c2",
+  "patch_sha256": "0ddffb95bd17a062a35682ee6f21b2d5d36f949248421dcccf5d2e9b83fe02db",
+  "git_apply_check": "passed",
+  "review": "Two agent-reviewed edits; not automatic fixes, human labels, or an upstream submission.",
+  "target_code_executed": false,
+  "history_used": false,
+  "rows": [
+    {
+      "line": 61,
+      "old": "--line-number",
+      "new": "--line-numbers",
+      "before": "missing",
+      "after": "ok"
+    },
+    {
+      "line": 180,
+      "old": "--p",
+      "new": "-p",
+      "before": "missing",
+      "after": "ok"
+    }
+  ],
+  "limits": "Only these two option claims are verified; no overall accuracy, recall or runtime claim."
+}

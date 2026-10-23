@@ -40,7 +40,7 @@ organization/
   reports/
 ```
 
-`organization.toml`:
+Example manifest filename `organization.toml`:
 
 ```toml
 schema_version = 1
@@ -65,9 +65,9 @@ From the scanner source environment:
 uv run docs-drift portfolio --repo /path/to/organization --manifest organization.toml --report-dir reports --report-only
 ```
 
-Open `reports/index.html`. It links to the run's immutable JSON summary and each
-checkout's complete HTML report. Each repository also has `scan.json`,
-`scan.sarif` and `gate.json`. Remove `--report-only` to enforce the policy.
+Open the generated report `reports/index.html`, which links to the run's immutable
+JSON summary and each checkout's complete HTML report. Per-repository generated files:
+`scan.json`, `scan.sarif` and `gate.json`. Remove `--report-only` to enforce the policy.
 Exit codes: **0** means completed within the chosen policy, **1** means at least
 one drift gate failed, **2** means invalid input or at least one scan error.
 Scan errors remain errors even in report-only mode; the other scans continue.
@@ -119,6 +119,11 @@ out of scan environments. These practices follow
 [GitHub's secure-use guidance](https://docs.github.com/en/actions/reference/security/secure-use).
 
 ## Operate an organizational pilot
+
+Use the [maintainer review workflow](MAINTAINER-PILOT.md) to freeze each scan,
+prepare blank human labels and record actual review burden and willingness to
+retain report-only CI. It reuses the existing benchmark label criteria and does
+not automatically enable enforcement.
 
 1. Choose a maintainer and two repositories with supported frameworks.
 2. Review a declared sample including false positives and unverifiable findings;

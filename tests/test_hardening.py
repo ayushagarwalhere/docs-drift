@@ -47,7 +47,23 @@ Never commit `.env` or `.env.*`.
 The generated `output/report.json` is created on demand.
 Use `src/app.py` to find the implementation.
 """)
-    assert [c.value for c in result.claims if c.kind == "file_path"] == ["src/app.py"]
+    assert [(c.value, c.qualifier) for c in result.claims if c.kind == "file_path"] == [
+        ("output/report.json", "non-checkout-path"),
+        ("src/app.py", None),
+    ]
+
+
+def test_generated_debug_log_is_not_required_to_exist(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text(
+        "Failures write the generated debug log `.docs-drift/last-error.log`.\n\n"
+        "Use `src/missing.py` to find the implementation.\n"
+    )
+    result = run_scan(tmp_path, Config())
+    log = next(f for f in result.findings if f.claim.value == ".docs-drift/last-error.log")
+    assert log.verdict == "unverifiable"
+    assert not log.is_drift
+    source = next(f for f in result.findings if f.claim.value == "src/missing.py")
+    assert source.verdict == "missing"
 
 
 def test_table_description_is_not_a_literal_default() -> None:

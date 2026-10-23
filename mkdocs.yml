@@ -36,6 +36,7 @@ nav:
       - DD004: rules/DD004.md
   - Integrations:
       - Organization adoption: ORGANIZATIONS.md
+      - Maintainer pilot: MAINTAINER-PILOT.md
       - GitHub Action: github-action.md
       - Pre-commit and CI: ci.md
       - VS Code: vscode.md

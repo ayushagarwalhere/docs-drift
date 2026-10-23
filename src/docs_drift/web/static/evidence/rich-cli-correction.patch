@@ -1,0 +1,20 @@
+--- a/README.md
++++ b/README.md
+@@ -58,7 +58,7 @@
+ 
+ ![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax1.png)
+ 
+-Add the `--line-number` or `-n` switch to enable line numbers. Add `--guides` or `-g` to enable indentation guides.
++Add the `--line-numbers` or `-n` switch to enable line numbers. Add `--guides` or `-g` to enable indentation guides.
+ 
+ ```
+ rich loop.py -n -g
+@@ -177,7 +177,7 @@
+ 
+ ## Rich Printing
+ 
+-If you add the `--print` or `--p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
++If you add the `--print` or `-p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
+ 
+ ```
+ rich "Hello, [bold magenta]World[/]!" --print

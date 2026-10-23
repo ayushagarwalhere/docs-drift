@@ -43,7 +43,7 @@ git -C rich-cli show 567f6c848ee5efa8eef9d6c96ffa3c23b802da4f -- README.md
 ```
 
 The index lookup ranks `--line-numbers` first (90.0 fuzzy-search score) at
-`src/rich_cli/__main__.py:357`, the decorator opening above the declaration on
+upstream source `src/rich_cli/__main__.py:357`, the decorator opening above the declaration on
 line 358. That score is a search similarity, not a probability of correctness.
 
 ## Small review sample, including false positives
@@ -76,3 +76,25 @@ Raw runtime observations and both scans are packaged with the public sample.
 
 The README's `--port` / `--listen` example remains a synthetic fixture. It is not
 part of this review or the real incident.
+
+## Reviewed correction verified on 23 October 2026
+
+The [applicable patch](assets/quality/rich-cli-correction.patch)
+passes `git apply --check` on an archive of the exact pin above. Applied only to a
+temporary snapshot, it changes the two bad options. A new static scan retains
+both corrected claims and resolves each to its source declaration with verdict
+`ok`. Disappearance from extraction alone is not counted as a successful fix.
+
+[Verification and hashes](assets/quality/correction-verification.json)
+record the original/corrected README, archive and patch identities. Reproduce from
+the scanner source checkout with a local rich-cli clone containing that commit:
+
+```sh
+uv run python -m scripts.verify_real_case --repo /path/to/rich-cli --out /path/to/new-correction-evidence
+```
+
+The verifier archives the fixed revision; it does not edit the supplied checkout,
+execute target code, or infer a rename. These are two explicitly agent-reviewed
+edits, not automatic fixes, independent human labels, overall accuracy results,
+or an upstream submission. The existing command-execution observations above
+are separate evidence and were not rerun by this static verifier.

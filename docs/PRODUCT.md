@@ -46,6 +46,11 @@ gate path in real repositories. Track review burden and accepted corrections.
 Document ownership/triage and false-positive reporting. No upstream adoption or
 acceptance is implied by inspecting a public repository.
 
+The [maintainer pilot](MAINTAINER-PILOT.md) now prepares a frozen local review
+pack and records self-reported feedback without prefilled labels or an inferred
+adoption claim. Independent maintainer participation and retained CI runs are
+still required to validate product demand.
+
 ## Subsequent product work
 
 The [initial Flask/Express trial](ORG-PILOT-2026-10-22.md) found three false

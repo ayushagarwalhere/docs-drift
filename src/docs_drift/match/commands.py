@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shlex
 import tomllib
 from configparser import ConfigParser
@@ -60,7 +61,33 @@ def _tokens(claim: Claim) -> list[str]:
         return []
 
 
-def validate_command(claim: Claim, index: CodeIndex, repo: Path) -> Finding:  # noqa: PLR0911, PLR0912
+def _unknown_tokens(tokens: list[str], command_names: set[str], flag_names: set[str]) -> list[str]:
+    subcommand = None
+    unknown: list[str] = []
+    previous_option = False
+    for token in tokens:
+        if token == "--":
+            # Subsequent values are positional data even when they start with '-'.
+            break
+        if token.startswith("-"):
+            flag = token.split("=", 1)[0]
+            if flag not in flag_names:
+                unknown.append(flag)
+            previous_option = "=" not in token
+        elif token in command_names:
+            subcommand = token
+            previous_option = False
+        elif subcommand is None and token not in {"--", "-"}:
+            # Paths, numbers and option values are not evidence of an unknown command.
+            # Without option arity metadata, abstain from interpreting an option's next value.
+            if command_names and not previous_option and re.fullmatch(r"[A-Za-z][\w-]*", token):
+                unknown.append(token)
+                subcommand = token
+            previous_option = False
+    return unknown
+
+
+def validate_command(claim: Claim, index: CodeIndex, repo: Path) -> Finding:  # noqa: PLR0911
     """Validate one command only when its root is independently tied to this project."""
     tokens = _tokens(claim)
     base_evidence = [Evidence(file=claim.doc_path, line=claim.line, text=claim.raw_text)]
@@ -140,20 +167,7 @@ def validate_command(claim: Claim, index: CodeIndex, repo: Path) -> Finding:  # 
     flag_names = {
         name for symbol in index.by_kind.get(SymbolKind.cli_flag, []) for name in (symbol.name, *symbol.aliases)
     }
-    subcommand = None
-    unknown: list[str] = []
-    for token in tokens[executable_index + 1 :]:
-        if token.startswith("-"):
-            flag = token.split("=", 1)[0]
-            if flag not in flag_names:
-                unknown.append(flag)
-        elif token in command_names:
-            subcommand = token
-        elif subcommand is None and token not in {"--", "-"}:
-            # The first non-option after the executable is a CLI command when the code exposed any commands.
-            if command_names:
-                unknown.append(token)
-                subcommand = token
+    unknown = _unknown_tokens(tokens[executable_index + 1 :], command_names, flag_names)
     if unknown:
         offset = claim.value.find(unknown[0])
         return Finding(

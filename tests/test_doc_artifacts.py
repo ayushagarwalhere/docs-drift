@@ -1,6 +1,7 @@
 """Generated examples and the demo replay must represent actual scanner output."""
 
 import asyncio
+import hashlib
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -14,6 +15,15 @@ from docs_drift.scanning import run_scan
 from docs_drift.web.validation import Repository
 from scripts import build_doc_assets, build_examples, build_web_examples
 from tests.fixtures.build_fixtures import build_fixtures
+
+
+def test_real_case_downloads_and_documentation_share_the_verified_patch() -> None:
+    root = Path(__file__).resolve().parents[1]
+    assets = root / "src/docs_drift/web/static/evidence"
+    for name in ("rich-cli-correction.patch", "correction-verification.json"):
+        assert (assets / name).read_bytes() == (root / "docs/assets/quality" / name).read_bytes()
+    proof = json.loads((assets / "correction-verification.json").read_text())
+    assert proof["patch_sha256"] == hashlib.sha256((assets / "rich-cli-correction.patch").read_bytes()).hexdigest()
 
 
 def test_web_example_rebuild_preserves_real_snapshot_and_fixture_labels(

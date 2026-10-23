@@ -36,6 +36,7 @@ def rst_claims(parsed: ParsedDoc) -> list[Claim]:
                 from docs_drift.docs.extract_inline import (  # noqa: PLC0415 - shared lexical rules.
                     _classify,
                     _explicit_api_reference,
+                    path_context,
                 )
 
                 # Share explicit API disambiguation without broadening unrelated
@@ -45,6 +46,7 @@ def rst_claims(parsed: ParsedDoc) -> list[Claim]:
                     kind = ClaimKind.symbol
                 elif classified:
                     kind = classified[0]
+                    value = classified[1]
             section = parsed.line_to_section.get(line_no)
             if kind is None or section is None:
                 continue
@@ -57,6 +59,7 @@ def rst_claims(parsed: ParsedDoc) -> list[Claim]:
                     kind=kind,
                     raw_text=line,
                     value=value,
+                    qualifier=path_context(line, value) if kind == ClaimKind.file_path else None,
                     doc_path=parsed.doc.path,
                     line=line_no,
                     column=match.start(2 if match[2] else 3) + 1,

@@ -143,6 +143,17 @@ def test_review_download_requires_an_existing_finished_scan(tmp_path: Path) -> N
         assert client.get("/api/scans/not-a-scan/report.md").status_code == 404
 
 
+def test_real_case_serves_applicable_patch_and_targeted_static_proof(tmp_path: Path) -> None:
+    app = create_app(Settings(data_dir=tmp_path / "data", live_enabled=False))
+    with TestClient(app) as client:
+        assert "/static/evidence/rich-cli-correction.patch" in client.get("/case-study").text
+        correction = client.get("/static/evidence/rich-cli-correction.patch")
+        assert correction.status_code == 200 and "+Add the `--line-numbers`" in correction.text
+        proof = client.get("/static/evidence/correction-verification.json").json()
+        assert proof["git_apply_check"] == "passed" and proof["target_code_executed"] is False
+        assert len(proof["rows"]) == 2 and all(row["after"] == "ok" for row in proof["rows"])
+
+
 def test_shutdown_waits_for_in_progress_workspace_cleanup(
     tmp_path: Path, result: ScanResult, monkeypatch: pytest.MonkeyPatch
 ) -> None:

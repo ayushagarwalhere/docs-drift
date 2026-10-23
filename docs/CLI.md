@@ -53,7 +53,7 @@ terminal width, and structured formats always include low-confidence findings.
 
 Markdown normally uses diff blocks; `RenderOptions(pr_mode=True)` enables GitHub
 suggestion blocks for a PR integration. The truncation note links to
-`RenderOptions.artifact_url`, defaulting to `scan.html`; upload that artifact with
+`RenderOptions.artifact_url`, defaulting to the generated report `scan.html`; upload that artifact with
 the Markdown report. The HTML report hides author names unless `--show-authors`
 is supplied, uses a dark initial theme, remembers the chosen theme, and supports a theme toggle, search and j/k/Enter.
 Graph and evidence data are escaped, and no network requests are needed.

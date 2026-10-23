@@ -78,9 +78,17 @@ def detect_packages(repo: Path, files: list[Path] | None = None) -> list[Package
     patterns.extend(_items(workspace.get("members")))
     patterns.extend(_items(_mapping(_data(repo / "Cargo.toml").get("workspace")).get("members")))
     for pattern in patterns:
-        if not isinstance(pattern, str) or pattern.startswith(("!", "/")) or ".." in PurePosixPath(pattern).parts:
+        if (
+            not isinstance(pattern, str)
+            or not pattern
+            or pattern.startswith(("!", "/"))
+            or ".." in PurePosixPath(pattern).parts
+        ):
             continue
-        for path in repo.glob(pattern):
+        # pnpm's `packages: ['.']` explicitly includes the root; Path.glob('.')
+        # rejects this valid workspace member on supported Python versions.
+        members = [repo] if pattern in {".", "./"} else repo.glob(pattern)
+        for path in members:
             if path.is_dir() and not path.is_symlink() and path.resolve().is_relative_to(repo):
                 relative = path.relative_to(repo).as_posix()
                 roots.setdefault(relative, Package(name=path.name, root=relative, language="unknown"))

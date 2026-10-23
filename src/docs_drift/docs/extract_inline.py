@@ -23,10 +23,10 @@ _FLAG = re.compile(r"^--?[A-Za-z][\w-]*(?:=.*)?$")
 _ENDPOINT = re.compile(r"^(?:(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+)?(/[^\s]*)$", re.IGNORECASE)
 _PATH_PARAM = re.compile(r"\{[^}/]+\}|:[A-Za-z_]\w*|<[A-Za-z_]\w*>")
 # This short extension set avoids treating arbitrary dotted prose as a file path.
-_FILE_EXT = re.compile(r"\.(?:py|pyi|js|jsx|ts|tsx|json|toml|ya?ml|mdx?|rst|txt|env)(?:$|[?#])", re.IGNORECASE)
+_FILE_EXT = re.compile(r"\.(?:py|pyi|js|jsx|ts|tsx|json|toml|ya?ml|mdx?|rst|txt|html?|env)(?:$|[?#])", re.IGNORECASE)
 _IDENTIFIER = re.compile(r"^(?:[A-Za-z_]\w*(?:\(\))?|[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)$")
 _CAMEL_OR_SNAKE = re.compile(r"^(?:[a-z]+(?:_[a-z0-9]+)+|[A-Z][a-zA-Z0-9]+)$")
-_SENTENCE = re.compile(r"[^.!?\n]+(?:[.!?](?=\s|$)|$)")
+_SENTENCE = re.compile(r".+?(?:[.!?](?=\s|$)|$)")
 _DEFAULT = re.compile(
     r"\bdefaults?\s+to\s+`?(?P<to>[^``,;)]+)`?|"
     r"\bdefault\s*(?::|is)\s*`?(?P<colon>[^``,;)]+)`?|"
@@ -66,6 +66,8 @@ class _Candidate:
 
 
 def _environment(value: str) -> str | None:
+    if re.fullmatch(r"[A-Z][A-Z0-9_]+=\S+", value):
+        value = value.partition("=")[0]
     wrapped = _WRAPPED_ENV.fullmatch(value)
     if wrapped:
         return next(part for part in wrapped.groupdict().values() if part is not None)
@@ -113,6 +115,13 @@ def _classify(  # noqa: PLR0911
         return ClaimKind.code_command, value, 0.8
     env = _environment(value)
     if env:
+        # The explicit 'set' extractor already retains its name/value pair.
+        if "=" in value:
+            return (
+                None
+                if re.search(r"\bset\s+`" + re.escape(value) + r"`", sentence, re.I)
+                else (ClaimKind.env_var, env, 0.85)
+            )
         return ClaimKind.env_var, env, 0.95 if env == value else 0.9
     if re.search(r"\bsubcommand\b", sentence, re.IGNORECASE) and re.fullmatch(r"[a-z][\w-]*", value):
         return ClaimKind.cli_command, value, 0.8
@@ -125,22 +134,30 @@ def _classify(  # noqa: PLR0911
         name = value.split("=", 1)[0]
         # A short single-dash option is weaker because prose often uses hyphenated examples.
         return ClaimKind.cli_flag, name, 0.9 if name.startswith("--") else 0.65
-    if value.startswith(("http://", "https://", "www.")):
+    if value.startswith(("http://", "https://", "www.", "#!")):
         return None
+    return _path_or_symbol(value, api_reference=api_reference, sentence=sentence)
+
+
+def _path_or_symbol(value: str, *, api_reference: bool, sentence: str) -> tuple[ClaimKind, str, float] | None:
     if _explicit_api_reference(value, sentence):
         return ClaimKind.symbol, value, 0.8
     if re.search(r"\b(?:setting|config(?:uration)?\s+key|field)\b", sentence, re.IGNORECASE) and re.fullmatch(
         r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", value
     ):
         return ClaimKind.config_key, value, 0.75
+    call = re.fullmatch(r"([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\(.*\)", value)
+    if call:
+        return ClaimKind.symbol, call[1], 0.8 if api_reference else 0.72
     # Known source and documentation extensions distinguish paths from dotted symbols.
+    file_value = re.sub(r":\d+(?::\d+)?$", "", value)
     if (
         not re.search(r"\s|[*?]|^\.[A-Za-z]+$", value)
-        and not re.search(r"\b(?:never commit|do not commit|generated|glob|ignore)\b", sentence, re.I)
-        and (value.startswith(".env.") or "/" in value or _FILE_EXT.search(value))
+        and not re.search(r"\b(?:never commit|do not commit|glob|ignore)\b", sentence, re.I)
+        and (value.startswith(".env.") or "/" in value or _FILE_EXT.search(file_value))
         and not value.startswith(("http://", "https://"))
     ):
-        return ClaimKind.file_path, value, 0.88
+        return ClaimKind.file_path, file_value, 0.88
     # A code command's own target is useful; flags belonging to unrelated tools are not.
     symbol_context = api_reference or re.search(r"\b(?:function|class|method|call|returns?)\b", sentence, re.IGNORECASE)
     # Factory context establishes the role independently of the identifier's verb prefix.
@@ -154,6 +171,34 @@ def _classify(  # noqa: PLR0911
         or (application_factory and _CAMEL_OR_SNAKE.fullmatch(value))
     ):
         return ClaimKind.symbol, value.removesuffix("()"), 0.72 if not api_reference else 0.8
+    return None
+
+
+def path_context(sentence: str, value: str = "") -> str | None:
+    """Retain explicitly illustrative/output paths without asserting checkout existence."""
+    if re.match(r"^[A-Za-z][\w+.-]*://|^@(?:[\w.-]+/|/)", value):
+        return "non-checkout-path"
+    quoted = r"[`'\"]" + re.escape(value) + r"[`'\"]"
+    if value and re.search(
+        r"\b(?:create|generate|write|save)\s+(?:(?:a|an|the|new)\s+)?"
+        r"(?:(?:file|directory|directory tree|folder)\s+)?" + quoted,
+        sentence,
+        re.I,
+    ):
+        return "non-checkout-path"
+    if re.search(
+        r"\b(?:generated(?=\s+`)|generated (?:reports?|files?|artifacts?|(?:debug )?logs?)|output (?:files?|paths?)|"
+        r"example (?:manifest|filename|path)|placeholder|shorthand|upstream source|external repository)\b",
+        sentence,
+        re.I,
+    ):
+        return "non-checkout-path"
+    if (
+        "/" in value
+        and not re.search(r"\.[A-Za-z0-9]{1,8}$", value)
+        and not re.search(r"\b(?:file|directory|folder|path)\b", sentence, re.I)
+    ):
+        return "ambiguous-path"
     return None
 
 
@@ -229,6 +274,10 @@ def _inline_candidates(parsed: ParsedDoc) -> list[_Candidate]:
             qualifier = (
                 _qualifier(section.heading, sentence, section.heading_level) if kind == ClaimKind.cli_flag else None
             )
+            if kind == ClaimKind.file_path:
+                qualifier = path_context(sentence, value)
+                if qualifier is None and line > 1 and parsed.lines[line - 2].rstrip().endswith(":"):
+                    qualifier = path_context(parsed.lines[line - 2], value)
             candidates.append(
                 _Candidate(kind, value, line, column, raw, Extraction.inline_code, confidence, qualifier=qualifier)
             )
@@ -319,7 +368,7 @@ def _table_candidates(parsed: ParsedDoc) -> list[_Candidate]:
             if default and default.startswith("`") and not re.fullmatch(r"`[^`]+`", default):
                 default = None
             default = default.strip("` ") if default else None
-            default = default if default and default.casefold() not in {"none", "n/a", "—", "-"} else None
+            default = default if default and default.casefold() not in {"none", "n/a", "â€”", "-"} else None
             candidates.append(_Candidate(kind, value, line, 1, raw, Extraction.table, 0.88, expected_default=default))
     return candidates
 

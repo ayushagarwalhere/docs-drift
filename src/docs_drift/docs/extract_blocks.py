@@ -328,6 +328,8 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
             index = command_start
             while index < len(tokens):
                 value = tokens[index]
+                if value == "--":
+                    break
                 if value.startswith("-"):
                     flag = value.split("=", 1)[0]
                     item = _claim(

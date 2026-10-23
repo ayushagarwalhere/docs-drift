@@ -228,3 +228,57 @@ def test_duplicate_values_get_distinct_stable_ids() -> None:
     claims = [claim for claim in result.claims if claim.kind == ClaimKind.cli_flag]
     assert len(claims) == 2
     assert claims[0].claim_id != claims[1].claim_id
+
+
+def test_assignment_value_is_not_a_filename_and_keeps_the_env_name() -> None:
+    claims = extract("Run with `PROJECT_OUTPUT=.cache/reports.json` enabled.").claims
+    assert [(claim.kind, claim.value) for claim in claims] == [(ClaimKind.env_var, "PROJECT_OUTPUT")]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Open the generated report `reports/index.html`.",
+        "Example manifest filename `organization.toml`:",
+        "Use `account/project` shorthand.",
+        "The upstream source `src/cli.py:12` declares it.",
+    ],
+)
+def test_non_checkout_paths_are_retained_with_explicit_context(text: str) -> None:
+    claim = extract(text).claims[0]
+    assert claim.kind == ClaimKind.file_path
+    assert claim.qualifier == "non-checkout-path"
+    assert not claim.value.endswith(":12")
+
+
+def test_path_context_survives_dots_and_wrapped_generated_output_paragraphs() -> None:
+    claims = extract("Per-repository generated files:\n`scan.json`, `gate.json` and `report.html`.\n").claims
+    assert claims and all(claim.qualifier == "non-checkout-path" for claim in claims)
+    actual = extract("The file `src/config.py` exists. The module `service.json` serializes data.").claims
+    assert actual[0].kind == ClaimKind.file_path and actual[0].qualifier is None
+    assert actual[1].kind == ClaimKind.symbol
+
+
+@pytest.mark.parametrize(
+    "reference", ["app://announcements", "@vendor/sdk", "@/lib/client", "audio/mpeg", "tools/call"]
+)
+def test_non_filesystem_slash_references_are_not_claimed_to_be_local_files(reference: str) -> None:
+    claim = extract(f"Use `{reference}` for communication.").claims[0]
+    assert claim.qualifier in {"non-checkout-path", "ambiguous-path"}
+
+
+def test_create_instruction_is_an_output_but_existing_file_instruction_is_a_contract() -> None:
+    created = extract("Create `src/new-feature.ts`:").claims[0]
+    actual = extract("The file `src/missing` contains the implementation.").claims[0]
+    assert created.qualifier == "non-checkout-path"
+    assert actual.kind == ClaimKind.file_path and actual.qualifier is None
+
+
+def test_call_arguments_and_shebangs_do_not_become_filenames() -> None:
+    claims = extract("Call `router.push('/dashboard')` to navigate.\nUse `#!/bin/bash` as the interpreter.\n").claims
+    assert [(claim.kind, claim.value) for claim in claims] == [(ClaimKind.symbol, "router.push")]
+
+
+def test_basename_source_location_keeps_the_file_without_line_suffix() -> None:
+    claim = extract("The file `main.py:12` contains the declaration.").claims[0]
+    assert claim.kind == ClaimKind.file_path and claim.value == "main.py"

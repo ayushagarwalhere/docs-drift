@@ -183,33 +183,59 @@ def _reason_candidates(candidates: list[Symbol]) -> str:
     return f"Closest indexed candidates: {listing}."
 
 
-def _match_one(claim: Claim, index: CodeIndex, repo: Path) -> Finding:  # noqa: PLR0912
-    if claim.kind == ClaimKind.file_path:
-        evidence, case_name = _file_match(claim, repo, index)
-        if evidence:
-            return Finding(
-                claim=claim,
-                verdict=Verdict.ok,
-                evidence=evidence,
-                confidence=0.95,
-                reasons=[f"Path {claim.value} exists relative to the repository or documentation."],
-            )
-        if case_name:
-            return Finding(
-                claim=claim,
-                verdict=Verdict.missing,
-                suggestion=case_name,
-                evidence=[_doc_evidence(claim)],
-                confidence=0.8,
-                reasons=[f"Path {claim.value} differs in case from indexed path {case_name}."],
-            )
+def _match_path(claim: Claim, index: CodeIndex, repo: Path) -> Finding:
+    if claim.qualifier == "non-checkout-path":
+        return Finding(
+            claim=claim,
+            verdict=Verdict.unverifiable,
+            evidence=[_doc_evidence(claim)],
+            confidence=0.2,
+            reasons=[
+                "This path is explicitly an example, generated output or external reference. "
+                "Its absence from this checkout does not establish drift."
+            ],
+        )
+    evidence, case_name = _file_match(claim, repo, index)
+    if evidence:
+        return Finding(
+            claim=claim,
+            verdict=Verdict.ok,
+            evidence=evidence,
+            confidence=0.95,
+            reasons=[f"Path {claim.value} exists relative to the repository or documentation."],
+        )
+    if claim.qualifier == "ambiguous-path":
+        return Finding(
+            claim=claim,
+            verdict=Verdict.unverifiable,
+            evidence=[_doc_evidence(claim)],
+            confidence=0.2,
+            reasons=[
+                "A slash alone does not establish a checkout path; this may be a protocol, media type or name. "
+                "Use explicit file/directory context when asserting filesystem existence."
+            ],
+        )
+    if case_name:
         return Finding(
             claim=claim,
             verdict=Verdict.missing,
+            suggestion=case_name,
             evidence=[_doc_evidence(claim)],
             confidence=0.8,
-            reasons=[f"Path {claim.value} does not exist relative to the repository or documentation."],
+            reasons=[f"Path {claim.value} differs in case from indexed path {case_name}."],
         )
+    return Finding(
+        claim=claim,
+        verdict=Verdict.missing,
+        evidence=[_doc_evidence(claim)],
+        confidence=0.8,
+        reasons=[f"Path {claim.value} does not exist relative to the repository or documentation."],
+    )
+
+
+def _match_one(claim: Claim, index: CodeIndex, repo: Path) -> Finding:
+    if claim.kind == ClaimKind.file_path:
+        return _match_path(claim, index, repo)
 
     candidates, weak = _symbol_matches(claim, index)
     if candidates:

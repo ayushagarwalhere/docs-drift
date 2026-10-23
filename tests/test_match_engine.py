@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from docs_drift.cli import _same_env_concept
 from docs_drift.ids import make_claim_id, make_section_id, make_symbol_id
 from docs_drift.index.base import CodeIndex
@@ -103,6 +105,44 @@ def test_file_path_checks_exact_case_and_relative_doc_location(tmp_path: Path) -
     assert relative.verdict == Verdict.ok
     case = match_claims([_claim(ClaimKind.file_path, "docs/SETUP.md")], index, repo)[0]
     assert case.verdict == Verdict.missing and case.suggestion == "docs/setup.md"
+
+
+def test_output_paths_abstain_while_real_missing_paths_still_fail(tmp_path: Path) -> None:
+    index = CodeIndex()
+    example = _claim(ClaimKind.file_path, "reports/index.html", "non-checkout-path")
+    actual = _claim(ClaimKind.file_path, "src/removed.py")
+    findings = match_claims([example, actual], index, tmp_path)
+    assert findings[0].verdict == Verdict.unverifiable
+    assert "absence" in findings[0].reasons[0]
+    assert findings[1].verdict == Verdict.missing and findings[1].confidence >= 0.6
+
+
+def test_ambiguous_slashes_need_evidence_before_a_filesystem_verdict(tmp_path: Path) -> None:
+    index = CodeIndex(source_paths=["src/existing"])
+    claims = [_claim(ClaimKind.file_path, value, "ambiguous-path") for value in ("tools/call", "src/existing")]
+    findings = match_claims(claims, index, tmp_path)
+    assert findings[0].verdict == Verdict.unverifiable and "slash alone" in findings[0].reasons[0]
+    assert findings[1].verdict == Verdict.ok
+
+
+@pytest.mark.parametrize("argument", ["/tmp/foo", "./output", "input.json", "8080", "https://example.com"])
+def test_complete_command_does_not_reclassify_positional_data_as_subcommands(tmp_path: Path, argument: str) -> None:
+    root = _symbol(SymbolKind.cli_command, "express", "express.main")
+    claim = _claim(ClaimKind.code_command, f"express {argument}")
+    finding = match_claims([claim], CodeIndex(symbols=[root]), tmp_path)[0]
+    assert finding.verdict == Verdict.ok
+
+
+def test_command_option_values_and_end_of_options_are_not_invented_flags(tmp_path: Path) -> None:
+    root = _symbol(SymbolKind.cli_command, "tool", "tool.main")
+    flag = _symbol(SymbolKind.cli_flag, "--output", "tool.main.--output")
+    index = CodeIndex(symbols=[root, flag])
+    for text in ("tool --output destination", "tool -- --not-an-option"):
+        assert match_claims([_claim(ClaimKind.code_command, text)], index, tmp_path)[0].verdict == Verdict.ok
+    bad = match_claims([_claim(ClaimKind.code_command, "tool --typo")], index, tmp_path)[0]
+    assert bad.verdict == Verdict.invalid_command
+    bad_command = match_claims([_claim(ClaimKind.code_command, "tool typo")], index, tmp_path)[0]
+    assert bad_command.verdict == Verdict.invalid_command
 
 
 def test_documented_default_compares_with_authoritative_code_default() -> None:

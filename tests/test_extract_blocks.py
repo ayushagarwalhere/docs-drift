@@ -31,6 +31,12 @@ def test_positional_values_are_not_invented_subcommands(argument: str, tmp_path:
     assert any(item.kind == ClaimKind.code_command and argument in item.value for item in found)
 
 
+def test_end_of_options_keeps_option_shaped_positional_data_out_of_flag_claims(tmp_path: Path) -> None:
+    found = claims("```sh\nmyapp -- --literal-file\n```\n", project(tmp_path))
+    assert not any(item.kind == ClaimKind.cli_flag for item in found)
+    assert any(item.kind == ClaimKind.code_command for item in found)
+
+
 def claims(text: str, root: Path) -> list[Claim]:
     return extract_block_claims(parsed(text), root).claims
 

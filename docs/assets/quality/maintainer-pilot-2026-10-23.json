@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-23",
+  "review": "Unlabeled local development pilot; not an accuracy benchmark or adoption evidence.",
+  "initial_failure": "Prism.ai initial scan failed on pnpm root workspace member; fixed and rerun in a new preserved run.",
+  "repos": [
+    {
+      "repo_url": "https://github.com/dakshhhhh-ops/nova",
+      "head_sha": "392802dc0bf6d29ee5e60c4a5c47c6e337f7b14a",
+      "shallow_history": false,
+      "qualifying_population": 5,
+      "selected": 5,
+      "claims_extracted": 168,
+      "unverifiable": 74,
+      "below_threshold_drift": 25,
+      "scan_seconds_excluding_clone": 2.2954064999939874,
+      "documents": 9,
+      "symbols": 1092,
+      "warnings": 0,
+      "human_labels": 0,
+      "precision": null,
+      "recall": null,
+      "maintainer_feedback": "pending",
+      "scanner_source_sha256": "f0aad91584a272225b6d30900ac16e09de9b46736f95f39cd1bb7920a7fd5a15",
+      "scanner_commit": "774ecf468f568a2777e57f9f015a462fb23429ca",
+      "scanner_dirty": true
+    },
+    {
+      "repo_url": "https://github.com/harshbpathak/prism.ai",
+      "head_sha": "0a6cfbfe7f364894cdb3952f5377eeb17509ae37",
+      "shallow_history": false,
+      "qualifying_population": 30,
+      "selected": 25,
+      "claims_extracted": 198,
+      "unverifiable": 29,
+      "below_threshold_drift": 64,
+      "scan_seconds_excluding_clone": 12.67025670001749,
+      "documents": 21,
+      "symbols": 1197,
+      "warnings": 264,
+      "human_labels": 0,
+      "precision": null,
+      "recall": null,
+      "maintainer_feedback": "pending",
+      "scanner_source_sha256": "f0aad91584a272225b6d30900ac16e09de9b46736f95f39cd1bb7920a7fd5a15",
+      "scanner_commit": "774ecf468f568a2777e57f9f015a462fb23429ca",
+      "scanner_dirty": true
+    }
+  ]
+}

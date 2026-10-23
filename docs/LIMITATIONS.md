@@ -31,6 +31,21 @@ documentation drift. Syntax errors, minified sources, oversized files and
 ambiguous default subjects produce explicit warnings; these are incomplete
 coverage, not evidence that the documentation is wrong.
 
+Explicitly generated outputs, example manifest filenames, shorthand and upstream
+source paths are retained as unverifiable references rather than required local
+files. Local prose context is heuristic: authors should identify external and
+illustrative references clearly. Shell examples are checked as static tokens;
+positional arguments, option arity and runtime behavior are not proved. Tokens
+after the shell end-of-options marker are positional data.
+
+Custom URI schemes, scoped package names and import aliases are not required
+checkout filenames. Slash-separated names without a filename extension or
+explicit file/directory context require positive filesystem evidence; otherwise
+they remain unverifiable. This avoids treating protocol messages and media types
+as missing files. Creation instructions describe output files rather than files
+that must already exist. Unsupported alias resolution and plans still require
+review; these heuristics do not establish general precision or recall.
+
 TSX currently uses the TypeScript grammar. Valid JSX can therefore trigger syntax
 recovery warnings; recognizable text declarations are retained. Warning counts
 must not be described as counts of syntax defects in the scanned projects.

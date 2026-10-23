@@ -60,6 +60,16 @@ def test_workspace_types(  # noqa: PLR0913, PLR0917 - workspace format matrix.
     assert package_for("README.md", packages).root == "."
 
 
+@pytest.mark.parametrize("root_member", [".", "./"])
+def test_pnpm_root_workspace_member_does_not_crash_the_scan(tmp_path: Path, root_member: str) -> None:
+    put(tmp_path, "package.json", '{"name":"root-app","scripts":{"dev":"next dev"}}')
+    put(tmp_path, "pnpm-workspace.yaml", f"packages:\n  - '{root_member}'\n  - ''\n")
+    put(tmp_path, "README.md", "Run `npm run dev`.\n")
+    result = run_scan(tmp_path, Config(), history=False, no_cache=True)
+    assert len(result.packages) == 1 and result.packages[0].name == "root-app"
+    assert any(f.claim.value == "dev" and f.verdict == "ok" for f in result.findings)
+
+
 def test_local_resolution_and_filter(tmp_path: Path) -> None:
     for name, default in [("web", 8000), ("worker", 9000)]:
         put(tmp_path, f"packages/{name}/package.json", json.dumps({"name": name}))

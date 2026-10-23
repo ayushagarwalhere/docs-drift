@@ -1,6 +1,7 @@
 """Validate release tags, archives and installed-wheel tests without publishing."""
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -33,8 +34,11 @@ REQUIRED = (
     "llm/prompts/verify_v1.md",
     "llm/prompts/rewrite_v1.md",
     "web/templates/landing.html",
+    "web/templates/case.html",
     "web/static/demo.js",
     "web/static/demo.css",
+    "web/static/evidence/rich-cli-correction.patch",
+    "web/static/evidence/correction-verification.json",
     "web/examples/py-cli.json",
 )
 
@@ -67,6 +71,10 @@ def check_archives(dist: Path, expected: str | None = None) -> str:
         missing = {"docs_drift/" + name for name in REQUIRED} - names
         if missing:
             raise ValueError(f"Wheel missing runtime resources: {sorted(missing)}")
+        proof = json.loads(wheel.read("docs_drift/web/static/evidence/correction-verification.json"))
+        patch = wheel.read("docs_drift/web/static/evidence/rich-cli-correction.patch")
+        if hashlib.sha256(patch).hexdigest() != proof["patch_sha256"]:
+            raise ValueError("Packaged real-case patch differs from its verification hash.")
         metadata = Parser().parsestr(wheel.read(next(n for n in names if n.endswith(".dist-info/METADATA"))).decode())
         version = str(metadata["Version"])
         if expected and version != expected:

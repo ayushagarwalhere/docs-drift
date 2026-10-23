@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import scan_claims
 
@@ -36,3 +38,29 @@ def test_scan_counts_historical_claims_and_suppresses_historical_finding(tmp_pat
     assert any(claim.value == "--listen" for claim in result.claims)
     assert all(claim.value != "--port" for claim in result.claims)
     assert result.historical_ignored >= 1
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        "Use `--example` here.\nAnd `--second` on a wrapped line.\n",
+        "| Flag | Meaning |\n| --- | --- |\n| `--example` | Example only |\n| `--second` | Example only |\n",
+        "```dotenv\nEXAMPLE_KEY=demo\nSECOND_KEY=demo\n```\n",
+        "~~~dotenv\nEXAMPLE_KEY=demo\nSECOND_KEY=demo\n~~~\n",
+    ],
+)
+def test_block_suppression_is_auditable_and_stops_at_its_boundary(tmp_path: Path, block: str) -> None:
+    (tmp_path / "README.md").write_text(
+        "# Usage\n\n<!-- docs-drift-ignore -->\n\n" + block + "\nUse `--real` after the block.\n"
+    )
+    result = scan_claims(tmp_path, Config())
+    assert [claim.value for claim in result.claims] == ["--real"]
+    assert len(result.suppressed) == 2
+    assert all(item.reason == "docs-drift-ignore" for item in result.suppressed)
+
+
+def test_ignore_directive_does_not_cross_a_heading(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("<!-- docs-drift-ignore -->\n\n## Real reference\nUse `--real`.\n")
+    result = scan_claims(tmp_path, Config())
+    assert [claim.value for claim in result.claims] == ["--real"]
+    assert not result.suppressed

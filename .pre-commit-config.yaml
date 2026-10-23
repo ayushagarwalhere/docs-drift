@@ -8,7 +8,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
+        exclude: '\.patch$'
       - id: trailing-whitespace
+        exclude: '\.patch$'
   - repo: local
     hooks:
       - id: staged-file-guard

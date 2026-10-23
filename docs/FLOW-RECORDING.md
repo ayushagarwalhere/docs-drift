@@ -1,7 +1,7 @@
 # Capture genuine Flow build evidence
 
 Two original cards supplied by the owner on 22 October 2026 are included in
-`docs/assets/flow/`; hashes are recorded in `provenance.json`. They show account
+`docs/assets/flow/`; hashes are recorded in `docs/assets/flow/provenance.json`. They show account
 usage, not project-only totals. Capture dates and prior weekly upload receipts
 are not established by these files.
 

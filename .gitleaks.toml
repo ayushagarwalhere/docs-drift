@@ -11,4 +11,4 @@ description = "Generated claim grouping SHA256, verified by recomputing kind/val
 condition = "AND"
 regexTarget = "line"
 regexes = ['''^\s*"group_key":\s*"[0-9a-f]{64}",?\s*$''']
-paths = ['''^(examples/py-cli\.json|src/docs_drift/web/examples/(py-cli|node-tool|fastapi-svc|clean-repo|rich-cli|files-to-prompt)\.json)$''']
+paths = ['''^(examples/py-cli\.json|src/docs_drift/web/examples/(py-cli|node-tool|fastapi-svc|clean-repo|rich-cli|rich-cli-reviewed|judge-fixture|files-to-prompt)\.json|src/docs_drift/web/static/evidence/(fresh-scan|saved-scan)\.json)$''']

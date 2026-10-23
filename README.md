@@ -5,6 +5,12 @@ review source evidence, and gate newly introduced drift in CI. Organizations can
 scan multiple checkouts into one dashboard with `docs-drift portfolio`.
 [Organization adoption](docs/ORGANIZATIONS.md) · [Product maturity](docs/PRODUCT.md).
 
+The product hypothesis is repeatable CI checks of exact documentation contracts
+for SDK, CLI and API maintainers. Start external repositories in report-only mode:
+real-world precision/recall and maintainer adoption remain unestablished.
+[Run a frozen maintainer review](docs/MAINTAINER-PILOT.md) with blank human labels,
+source evidence and an explicit decision about keeping it in CI.
+
 ## Judges start here
 
 **Smallest offline demo:** [exact local run steps and one synthetic claim](docs/JUDGE-DEMO.md).
