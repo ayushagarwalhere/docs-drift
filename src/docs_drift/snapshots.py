@@ -35,6 +35,8 @@ def materialize_snapshot(repo: Path, revision: str, root: Path) -> str:
         parent = Path(directory)
         archive = parent / "source.zip"
         root.mkdir(parents=True, exist_ok=True)
+        # Compare canonical paths on both sides (Windows TEMP may use an 8.3 alias).
+        root = root.resolve()
         env = {k: v for k, v in os.environ.items() if not k.upper().startswith("GIT_")}
         env.update(
             GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull, GIT_TERMINAL_PROMPT="0", GIT_LFS_SKIP_SMUDGE="1"

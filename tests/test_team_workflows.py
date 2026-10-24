@@ -4,11 +4,12 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 from typer.testing import CliRunner
 
-from docs_drift import workflow_cli
+from docs_drift import snapshots, workflow_cli
 from docs_drift.cli import app
 from docs_drift.collaboration import fix_branch, pr_comparison, static_scan, support_history, write_pr_report
 from docs_drift.config import Config
@@ -16,7 +17,7 @@ from docs_drift.index import build_index
 from docs_drift.ownership import coverage_report, ownership
 from docs_drift.policy import GatePolicy, evaluate_gate
 from docs_drift.review import ReviewKind, load_reviews, record_review, suppressed_ids
-from docs_drift.snapshots import resolve_revision
+from docs_drift.snapshots import materialize_snapshot, resolve_revision
 from scripts import action_runner
 
 
@@ -81,6 +82,38 @@ def test_pr_history_and_review_artifacts(tmp_path: Path) -> None:
     assert timeline["first_observed_drift"] == head
     assert support_history(repo, Config(), changed.claim.claim_id, 1)["last_statically_supported"] is None
     assert not pr_comparison(repo, Config(), head)[1].findings
+
+
+@pytest.mark.parametrize("relative", [False, True])
+def test_snapshot_accepts_noncanonical_destination(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, relative: bool
+) -> None:
+    repo, base, _ = repository(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    root = Path("snapshot") if relative else tmp_path / "alias" / ".." / "snapshot"
+    assert materialize_snapshot(repo, base, root) == base
+    assert "default=4" in (root / "app.py").read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("unsafe", ["../escape.txt", ".git/config", "file:stream", "/absolute.txt"])
+def test_snapshot_still_rejects_unsafe_entries_with_noncanonical_destination(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, unsafe: str
+) -> None:
+    repo, base, _ = repository(tmp_path)
+    archive = tmp_path / "unsafe.zip"
+    with ZipFile(archive, "w") as output:
+        output.writestr("safe.txt", "must not be extracted")
+        output.writestr(unsafe, "unsafe")
+
+    def open_archive(_path: Path) -> ZipFile:
+        return ZipFile(archive)
+
+    monkeypatch.setattr(snapshots, "ZipFile", open_archive)
+    root = tmp_path / "alias" / ".." / "snapshot"
+    with pytest.raises(ValueError, match="unsafe path"):
+        materialize_snapshot(repo, base, root)
+    assert not (root / "safe.txt").exists()
+    assert not (tmp_path / "escape.txt").exists()
 
 
 def test_scoped_review_reopens_on_source_change_and_never_hides_reports(tmp_path: Path) -> None:
