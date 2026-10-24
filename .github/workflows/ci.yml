@@ -39,6 +39,26 @@ jobs:
       - run: uv run python -m scripts.check_coverage
       - run: uv run pre-commit run --all-files
 
+  release-container:
+    name: release container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.13"
+      - run: uv build --wheel
+      - name: Build and verify the release image before publishing
+        run: |
+          docker build -f Dockerfile.release -t docs-drift-release-check .
+          EXPECTED_VERSION=$(uv run docs-drift --version)
+          ACTUAL_VERSION=$(docker run --rm docs-drift-release-check --version)
+          echo "Container version: $ACTUAL_VERSION"
+          test "$ACTUAL_VERSION" = "$EXPECTED_VERSION"
+
   dogfood:
     name: dogfood
     runs-on: ubuntu-latest

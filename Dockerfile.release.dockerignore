@@ -1,0 +1,5 @@
+# The release image installs the verified wheel, not the source checkout.
+**
+!Dockerfile.release
+!dist/
+!dist/*.whl

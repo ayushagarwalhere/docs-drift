@@ -73,6 +73,14 @@ jobs:
           "$RUNNER_TEMP/wheel-env/bin/python" -m pytest --basetemp "$RUNNER_TEMP/wheel-pytest" -q
           "$RUNNER_TEMP/wheel-env/bin/python" -m scripts.demo_setup --output "$RUNNER_TEMP/release-demo"
           cp "$RUNNER_TEMP/release-demo/report.html" "$GITHUB_WORKSPACE/dist/example-report.html"
+      - name: Build and verify the release container before upload
+        env:
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          docker build -f Dockerfile.release -t docs-drift-release-check .
+          ACTUAL_VERSION=$(docker run --rm docs-drift-release-check --version)
+          echo "Container version: $ACTUAL_VERSION"
+          test "$ACTUAL_VERSION" = "$EXPECTED_VERSION"
       - name: Extract release notes
         env:
           RELEASE_TAG: ${{ github.ref_name }}

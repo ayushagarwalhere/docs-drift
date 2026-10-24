@@ -109,3 +109,27 @@ lint, formatting, strict typing, MkDocs and Actionlint also pass.
 These local fixes have not been committed or pushed. The remote Windows pytest
 failure is not reproduced or explained by this evidence. Its FAILED test names
 and traceback are still needed; do not tag the release while remote CI is red.
+
+## 24 October 2026: first RC container build
+
+Commit 7295b37 fixed the Windows snapshot containment check by resolving both
+sides of the comparison. Its Windows and Ubuntu CI jobs passed. The
+[first RC release run](https://github.com/ayushagarwalhere/docs-drift/actions/runs/40044366380)
+then built and uploaded package 0.1.0rc1 to TestPyPI; all 27 indexed installation
+checks passed.
+
+The supplied GHCR log shows successful registry login, followed by a build
+failure at `COPY dist/*.whl`: the shared Docker ignore rules exclude the entire
+distribution directory. No container was pushed by that failed command.
+
+The proposed fix adds a Dockerfile-specific ignore file admitting only the
+release Dockerfile and distribution wheels. A CI job builds that image and
+compares its CLI version with the checkout's package version before publication.
+It does not log into a registry or push an image. The release build also performs
+this smoke check before allowing the package upload. Local Docker execution is
+unavailable because the Docker daemon is not running; the new CI job must verify
+the actual container build after the owner commits and pushes these changes.
+
+Keep v0.1.0-rc.1 immutable. A rerun uses its original files and cannot include
+this fix. After the new commit passes CI, publish v0.1.0-rc.2 from that commit;
+the first stable tag must point at the same commit as a fully successful RC.
