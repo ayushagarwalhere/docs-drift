@@ -34,7 +34,7 @@ jobs:
       EC2_APP_DIR: ${{ vars.EC2_APP_DIR }}
       BASE_URL: ${{ vars.DOCS_DRIFT_BASE_URL }}
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.DEPLOY_SHA }}
           persist-credentials: false
