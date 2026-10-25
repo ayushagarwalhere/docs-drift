@@ -343,14 +343,13 @@ def sync_index(docs: Path) -> None:
         "pyproject.toml": "getting-started.md",
         "](LICENSE)": "](license.md)",
         "CONTRIBUTING.md": "contributing.md",
-        "SUBMISSION.md": "submission.md",
         "RELEASING.md": "releasing.md",
         "benchmark/PROTOCOL.md": "benchmark.md",
         "benchmark/RESULTS.md": "benchmark.md",
     }.items():
         readme = readme.replace(old, new)
     (docs / "index.md").write_text(readme, encoding="utf-8")
-    for source, target in (("RELEASING.md", "releasing.md"), ("SUBMISSION.md", "submission.md")):
+    for source, target in (("RELEASING.md", "releasing.md"),):
         if Path(source).exists():
             (docs / target).write_text(
                 Path(source).read_text(encoding="utf-8").replace("(docs/", "("), encoding="utf-8"

@@ -20,7 +20,7 @@ local checks from checks that require an owner-approved public release.
 | LICENSE, SECURITY.md, CONTRIBUTING.md | PASS | Present in working tree; archive contents checked separately. |
 | Full Git history secret scan | PASS with documented false positives | Gitleaks 8.30.1: original 7 commits clean. Full validation refs (9 commits) clean with a narrow exception for recomputed group_key SHA256 identifiers. All 244 initial matches were verified derived hashes; a positive-control key is still detected. |
 | Uptime monitor active through 6 Nov | BLOCKED, not active | Workflow and date window prepared; needs approved hosting URL, repository variables and an observed successful run. |
-| Private physical phone/laptop checks | OWNER CHECK, not run | Use SUBMISSION.md device checklist; no emulated-device claim. |
+| Private physical phone/laptop checks | OWNER CHECK, not run | Check on a real phone and laptop; no emulated-device claim. |
 | Video duration and captions | OWNER CHECK, not run | Shot list totals 113 s; final exported/uploaded video not yet supplied. |
 | Weekly Insights cards | OWNER CHECK | Actual challenge start date and prior upload receipts still needed. |
 

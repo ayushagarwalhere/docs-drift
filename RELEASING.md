@@ -143,7 +143,7 @@ at the reviewed final commit. Branch protection must also cover workflow changes
 
 ## Local preparation, with no publication
 
-1. Review the real incident, human labels, demo URL and video slots in SUBMISSION.md.
+1. Review the real incident, human labels, demo URL and changelog.
    Keep unfinished items explicitly pending; they block final submission claims,
    not an honest alpha release candidate. Do not replace pending accuracy with
    fixture numbers. Update CHANGELOG.md's

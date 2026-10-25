@@ -127,13 +127,3 @@ for inspection. No model writes or application-code execution are involved.
 
 This is a single CLI command; a hosted GitHub App with an interactive fix button
 and write permissions has not been implemented or claimed.
-
-## Wispr evidence
-
-The existing [Built with voice](built-with-voice.md) page and local app route
-`/built-with-voice` display the supplied account-level Flow cards with provenance.
-They do not establish project-specific usage totals. A project requirement
-dictation and accompanying recording remain owner-supplied evidence; this feature
-request's input method has not been independently established. Use the existing
-[recording guide](FLOW-RECORDING.md) to capture an actual dictated requirement,
-the resulting implementation, and one review workflow. Do not invent a transcript.

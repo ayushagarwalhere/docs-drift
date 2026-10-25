@@ -34,7 +34,6 @@ existing release infrastructure was created by this dictation.
 The package and command are interpreted as `docs-drift`; "dogstrip" and other
 recognition errors remain in the original text. A recording showing Flow input
 and the final under-two-minute submission video remain pending.
-[Capture plan and shot list](FLOW-RECORDING.md).
 
 ## Organization workflow requirement
 
