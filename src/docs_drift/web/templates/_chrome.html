@@ -1,0 +1,41 @@
+{# Shared SVG filters: a lit, bevelled chrome finish for wordmarks and glyphs. #}
+<svg class="dd-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="dd-chrome-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfbfb"/>
+      <stop offset=".32" stop-color="#9a9a9a"/>
+      <stop offset=".5" stop-color="#5f5f5f"/>
+      <stop offset=".62" stop-color="#e2e2e2"/>
+      <stop offset=".82" stop-color="#8c8c8c"/>
+      <stop offset="1" stop-color="#d6d6d6"/>
+    </linearGradient>
+    <filter id="dd-chrome" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur"/>
+      <feSpecularLighting in="blur" surfaceScale="10" specularConstant="1.25" specularExponent="26" lighting-color="#ffffff" result="spec">
+        <feDistantLight azimuth="225" elevation="42"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn"/>
+      <feDiffuseLighting in="blur" surfaceScale="10" diffuseConstant="1.05" lighting-color="#e6e6e6" result="diff">
+        <feDistantLight azimuth="225" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite in="diff" in2="SourceAlpha" operator="in" result="diffIn"/>
+      <feBlend in="SourceGraphic" in2="diffIn" mode="multiply" result="shaded"/>
+      <feComposite in="shaded" in2="specIn" operator="arithmetic" k1="0" k2="1" k3=".9" k4="0" result="lit"/>
+      <feDropShadow in="lit" dx="0" dy="5" stdDeviation="4" flood-color="#000" flood-opacity=".28"/>
+    </filter>
+    <filter id="dd-chrome-sm" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feSpecularLighting in="blur" surfaceScale="7" specularConstant="1.3" specularExponent="24" lighting-color="#ffffff" result="spec">
+        <feDistantLight azimuth="225" elevation="40"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn"/>
+      <feDiffuseLighting in="blur" surfaceScale="7" diffuseConstant="1.05" lighting-color="#e6e6e6" result="diff">
+        <feDistantLight azimuth="225" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite in="diff" in2="SourceAlpha" operator="in" result="diffIn"/>
+      <feBlend in="SourceGraphic" in2="diffIn" mode="multiply" result="shaded"/>
+      <feComposite in="shaded" in2="specIn" operator="arithmetic" k1="0" k2="1" k3=".9" k4="0" result="lit"/>
+      <feDropShadow in="lit" dx="0" dy="6" stdDeviation="5" flood-color="#000" flood-opacity=".3"/>
+    </filter>
+  </defs>
+</svg>

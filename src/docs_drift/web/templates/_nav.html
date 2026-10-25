@@ -1,0 +1,13 @@
+{% from '_macros.html' import arrow %}
+<header class="dd-nav{% if home %} is-home{% endif %}" data-nav data-tone="light">
+  <a class="dd-nav-mark" href="/" aria-label="docs-drift home">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><text x="32" y="50" text-anchor="middle" class="dd-mark-text">d</text></svg>
+  </a>
+  <nav class="dd-nav-links" aria-label="Main navigation">
+    <a href="/#how">How it works</a><a href="/#cases">Cases</a><a href="/case-study">Real case</a><a href="/built-with-voice">Built with voice</a>
+  </nav>
+  <div class="dd-nav-right">
+    <a class="dd-nav-gh" href="{{ settings.project_url }}">GitHub</a>
+    <a class="dd-btn dd-btn-lime" href="/#scan">Scan a repo {{ arrow() }}</a>
+  </div>
+</header>

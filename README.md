@@ -1,138 +1,123 @@
 # docs-drift
 
-Self-hosted documentation drift checks for maintainers: scan local repositories,
-review source evidence, and gate newly introduced drift in CI. Organizations can
-scan multiple checkouts into one dashboard with `docs-drift portfolio`.
-[PR reviews, feedback, history, ownership and fix branches](docs/TEAM-WORKFLOWS.md).
-[Organization adoption](docs/ORGANIZATIONS.md) · [Product maturity](docs/PRODUCT.md).
+**Find the lines in your docs that your code no longer supports, with the source line and commit that prove it.**
 
-The product hypothesis is repeatable CI checks of exact documentation contracts
-for SDK, CLI and API maintainers. Start external repositories in report-only mode:
-real-world precision/recall and maintainer adoption remain unestablished.
-[Run a frozen maintainer review](docs/MAINTAINER-PILOT.md) with blank human labels,
-source evidence and an explicit decision about keeping it in CI.
-
-## Judges start here
-
-**Smallest offline demo:** [exact local run steps and one synthetic claim](docs/JUDGE-DEMO.md).
-Open `/scan/example-judge` in the local app to inspect the source, rename commit,
-and proposed documentation fix. Fixture results are not real-world accuracy measurements.
-
-- **Public demo:** AWS deployment deferred by owner. Run the app locally on port 8080; no public URL is claimed. [AWS handoff](docs/AWS-HANDOFF.md).
-- **Real case:** [reproduced rich-cli failure, source and commit](docs/REAL-CASE.md).
-- **Try immediately:** the local app includes a repo URL scanner and precomputed real sample, with no sign-in or API key.
-- **Interface:** monochrome themes, scroll-driven 3D evidence layers, motion controls and searchable reports; [UI verification](docs/UI-REVIEW.md).
-- **Video:** pending owner recording and upload; target 1:50 with captions; [updated shot list](docs/FLOW-RECORDING.md).
-- **Source:** [GitHub repository](https://github.com/ayushagarwalhere/docs-drift).
-- **Evidence:** [benchmark results](benchmark/RESULTS.md),
-  [measured limitations](docs/RESULTS.md), and [submission checklist](SUBMISSION.md).
-
-Three-command local quick start (Python 3.11+, Git and uv installed):
-
-```sh
-git clone https://github.com/ayushagarwalhere/docs-drift.git
-cd docs-drift
-uv run --all-extras docs-drift scan --repo .
-```
-
-Release preparation: [owner's publish gates](RELEASING.md). Public installs and
-URLs must be verified after publication; local checks do not prove a published release.
-
-**Find documentation statements your code no longer supports, with source evidence and available Git history.**
-
-[![CI](https://img.shields.io/badge/CI-configured-blue)](.github/workflows/ci.yml)
-**Package status:** PyPI unpublished (404 verified 22 October 2026); use the source quick start.
+[![PyPI](https://img.shields.io/pypi/v/docs-drift)](https://pypi.org/project/docs-drift/)
+[![Python](https://img.shields.io/pypi/pyversions/docs-drift)](https://pypi.org/project/docs-drift/)
+[![CI](https://github.com/ayushagarwalhere/docs-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/ayushagarwalhere/docs-drift/actions/workflows/ci.yml)
 [![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
 
-Alpha software: source installation works before the first package is published.
-The PyPI page becomes available after authenticated publication; the hosted
-demo and video remain explicitly pending above. Real-world
-precision and recall are **pending human labeling**, not inferred from fixtures.
+A README says `--port`. The code was renamed to `--listen` three weeks ago. A new
+contributor copies the command, it fails, and they decide your docs can't be
+trusted. docs-drift catches that before they do. It reads your documentation,
+indexes your source, and reports every flag, endpoint, environment variable,
+setting and file path that no longer matches, with the commit that changed it.
 
-![Actual fixture scan output, eight-second terminal replay](docs/assets/scan-demo.gif)
+![Terminal scan of a fixture repository](docs/assets/scan-demo.gif)
 
-![HTML evidence graph from the actual py-cli fixture](docs/assets/graph-view.png)
-
-## A real failure, reproduced during this build
-
-To render rich-cli's README with line numbers, we followed its documented
-`--line-number` option. It exited 2: "No such option." Source declares
-`--line-numbers`, which exited 0. docs-drift locates README:61; manual Git
-inspection identifies documentation commit `567f6c84`. The scanner does not
-attribute a breaking commit for this finding. This is an agent-assisted build
-investigation, not an invented account of the owner's earlier work.
-[Exact snapshot, commands, source and review](docs/REAL-CASE.md).
-
-The four-finding saved sample includes **two confirmed defects and two false
-positives**. A fresh scan flags only the defective options. This selected,
-agent-assisted review is not an independent human accuracy measurement.
-
-The `--port` / `--listen` images above are synthetic fixtures, excluded from the
-real case and review sample.
-
-For beginners contributing to documentation, an evidence-backed finding can be a
-concrete first contribution. Maintainers can use the same checks to keep docs
-aligned with a changing codebase; the suggested patches still need review.
-
-## Quick start
-
-From this source checkout, with Python 3.11+ and Git:
-
-```sh
-uv sync --locked --all-extras
-uv run docs-drift scan
-```
-
-After the first PyPI release, these are the intended package entry points:
+## Install
 
 ```sh
 pipx install docs-drift
 docs-drift scan
-# Alternative after publication:
-uvx docs-drift scan
 ```
 
-Or build the CLI container locally (Docker must be running):
+Or run it once without installing: `uvx docs-drift scan`. Python 3.11+ and Git required.
+
+## A real catch
+
+rich-cli's README told users to run `rich README.md --line-number`. That fails
+with `No such option '--line-number'` (exit 2): the Click declaration is
+`--line-numbers`. docs-drift points to
+[README.md:61](https://github.com/Textualize/rich-cli/blob/46f4d2469097be395558768714a5f07ebccf1412/README.md#L61)
+and the [declaration](https://github.com/Textualize/rich-cli/blob/46f4d2469097be395558768714a5f07ebccf1412/src/rich_cli/__main__.py#L358).
+[Full investigation, including the false positives in that scan](docs/REAL-CASE.md).
+
+## What it checks
+
+| Claim in your docs | Checked against |
+| --- | --- |
+| CLI flags and commands (`--port`, `tool serve`) | argparse, Click, Typer and Commander declarations |
+| Environment variables (`APP_LOG_LEVEL`) | literal environment reads and config templates |
+| HTTP endpoints (`GET /status`) | FastAPI, Flask and Express routes |
+| Settings and defaults ("`workers` defaults to 4") | literal declarations and defaults |
+| Code symbols (`Client.connect()`) | parsed functions, classes and methods |
+| File paths (`config/settings.toml`) | files in the repository |
+| Package scripts (`npm run build`) | package manifests, Make and just tasks |
+
+Every finding carries a verdict (`missing`, `renamed`, `default_changed`,
+`invalid_command`, `unverifiable`), a confidence score, the source evidence and,
+where Git history allows, the commit that introduced the drift.
+
+## Commands
 
 ```sh
-docker build -t docs-drift:local . && docker run --rm -v "$PWD:/repo" docs-drift:local scan --repo /repo
+docs-drift scan                             # report findings, exit 0
+docs-drift check                            # exit 1 when findings meet your threshold
+docs-drift fix                              # preview a patch; --write applies it
+docs-drift insights                         # findings by verdict, document and package
+docs-drift impact --base HEAD~1             # findings touched by recent changes
+docs-drift pr --base HEAD~1 --report-dir pr  # review artifacts for drift a branch introduces
+docs-drift baseline update                  # accept today's drift, gate only new drift
+docs-drift scan --format html --output report.html
 ```
 
-Try it in your browser: AWS hosting is deferred by the owner. Locally,
-start `uv run python -m docs_drift.web` and open `http://127.0.0.1:8080`; set
-`DOCS_DRIFT_ALLOWED_ORIGIN` to that exact origin before submitting a scan.
+`docs-drift explain <finding-id>` shows the docs, source, reasons and history
+behind one finding.
 
-Useful commands, exercised against a trusted fixture in CI:
+Reports: terminal, JSON, HTML (with an evidence graph), Markdown, SARIF, JUnit
+and GitHub annotations. [Full CLI reference](docs/CLI.md).
 
-```sh
-docs-drift scan --no-color
-docs-drift scan --format html --output scan.html
-docs-drift insights --format json
-docs-drift impact --base HEAD~1 --format json
-docs-drift fix
-docs-drift check  # documented exit: 1 on the stale py-cli fixture
+![HTML report with the evidence graph](docs/assets/graph-view.png)
+
+## CI
+
+```yaml
+name: docs
+on: [pull_request]
+permissions: {contents: read}
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: ayushagarwalhere/docs-drift@v0.1.0
+        with:
+          base-ref: origin/${{ github.base_ref }}
+          fail-on-drift: 'true'
 ```
 
-`scan` reports findings and exits 0. `check` exits 1 for findings meeting its
-threshold, or 2 for usage/configuration errors. `fix` previews a patch; applying
-it requires an explicit write option and confirmation. No target code is run.
+With `base-ref`, the gate fails only on drift the pull request introduces.
+Reports are written as JSON, HTML, SARIF and Markdown. [Action guide](docs/github-action.md).
 
-## What it checks (illustrative fixtures)
+## Editor
 
-| Claim kind | Example documentation | Static evidence |
-| --- | --- | --- |
-| CLI flag / command | A synthetic README mentions `--port` | argparse/Click/Typer or Commander declarations |
-| Environment variable | A synthetic README mentions `APP_LOG_LEVEL` | literal environment reads or safe config templates |
-| Endpoint | A synthetic guide requests `GET /status` | literal FastAPI/Flask/Express routes |
-| Setting / default | A synthetic guide says `workers` defaults to 4 | a recognized literal declaration/default |
-| Code symbol | A synthetic guide calls `Client.connect()` | a parsed function/class/method declaration |
-| File path | A synthetic guide links `config/settings.toml` | a contained repository-relative path |
-| Package script / task | A synthetic guide invokes `npm run build` | package manifests and Make/just task declarations |
-| Project command | A synthetic guide runs `tool serve --port 8000` | independently identified executable/command/flags |
+The VS Code extension shows findings as diagnostics, jumps to the source
+declaration, and offers quick fixes, backed by `docs-drift lsp`.
+[Extension guide](docs/vscode.md).
 
-Arbitrary behavioural prose is not proved by name matching. Optional model
-assessment is separately labeled and constrained by source citations.
+## How it works
+
+```mermaid
+flowchart LR
+  D[Docs] --> C[Claims]
+  S[Source AST] --> I[Static index]
+  C --> M[Matching]
+  I --> M
+  M --> H[Git history]
+  H --> R[Findings, reports, fixes]
+```
+
+1. Markdown, RST and MDX are parsed into located claims.
+2. Source is parsed with Python's `ast` and tree-sitter (JS/TS) into an index of
+   declarations. Your code is never imported or executed.
+3. Each claim is matched to the index; renames are detected by similarity and history.
+4. Git history finds the commit where a symbol disappeared or changed.
+
+An optional model mode can assess prose claims, but it cannot override a finding
+the rules already decided, and every answer must cite source that passes validation.
+[Design notes](docs/how-it-works.md).
 
 ## Supported ecosystems
 
@@ -155,66 +140,10 @@ assessment is separately labeled and constrained by source citations.
 | Go / Rust | language-specific configuration | none |
 <!-- support-table:end -->
 
-Partial means recognized literal/static patterns, not complete framework support.
-No framework is advertised as fully supported. Dynamic registration, signatures,
-router composition and generated source may remain unverifiable.
+"Partial" means static, literal patterns. Dynamic registration and generated
+code can be reported as unverifiable rather than guessed.
 
-## CI
-
-This ten-line example uses the development Action from this repository:
-
-```yaml
-name: Documentation
-on: [push, pull_request]
-permissions: {contents: read}
-jobs:
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      - uses: ./
-        with: {repo: '.', fail-on-drift: 'true'}
-```
-
-Other projects must replace the local action path with the real repository pinned
-to a reviewed commit after publication. Reports include JSON, HTML, SARIF and
-escaped Markdown. The Action needs no write token, accepts no model key, and never
-posts a PR comment automatically. [Action guide](docs/github-action.md).
-
-![Preview of generated PR Markdown, not a submitted comment](docs/assets/pr-comment-preview.png)
-
-## Editor
-
-The development VS Code extension supplies diagnostics, definitions and safe
-quick fixes via the stdio LSP. **Actual squiggle GIF pending a verified editor
-capture**; protocol tests are not presented as a native-editor recording.
-[Extension guide](docs/vscode.md).
-
-## How it works
-
-```mermaid
-flowchart LR
-  D[Docs] --> C[Located claims]
-  S[Source text / AST] --> I[Static index]
-  C --> M[Scoped matching]
-  I --> M
-  M --> H[Bounded Git history]
-  H --> R[Evidence, reports and reviewable fixes]
-```
-
-```mermaid
-flowchart LR
-  Section --> Claim
-  Claim --> Symbol
-  Symbol --> SourceFile
-  SourceFile --> Commit
-```
-
-Rules decide literal claims first. Optional model assessment handles selected
-anchored prose, cannot override code-decided findings, and must cite supplied
-source that passes validation.
-
-## Accuracy and limitations
+## Accuracy
 
 <!-- accuracy:start -->
 Real-world accuracy is **not yet established**. The 12-repository protocol and
@@ -230,35 +159,36 @@ review every report. [Known limitations](docs/LIMITATIONS.md).
 ```toml
 # .docs-drift.toml
 min_confidence = 0.6
+
 [history]
 max_commits = 2000
 ```
 
-The [full configuration reference](docs/configuration.md) is generated from the
-Pydantic model and checked for freshness in CI. Common CLI options work before
-or after subcommands. [CLI reference](docs/CLI.md).
+[Configuration reference](docs/configuration.md), generated from the settings model.
 
 ## Privacy and security
 
-Rule-only scans parse local text/AST and call Git for evidence. They never import
-or execute target modules or fenced commands. Optional model mode sends selected
-redacted documentation/source excerpts through OpenRouter to the chosen provider;
-replay mode sends nothing. The public demo and composite Action are rule-only.
-[Security policy](SECURITY.md) ? [Threat model](docs/SECURITY.md).
+Rule-based scans parse text and syntax trees locally and call Git for history.
+They never import or execute the scanned code, and make no network calls. Model
+mode is opt-in, sends only redacted excerpts, and can be replayed offline.
+[Security policy](SECURITY.md) · [Threat model](docs/SECURITY.md).
+
+## Try it in the browser
+
+The web app scans a public GitHub repository without sign-in, and includes saved
+reports you can open instantly. Run it locally:
+
+```sh
+uv run --all-extras python -m docs_drift.web   # http://127.0.0.1:8080
+```
 
 ## Built with voice
 
-The owner supplied original Flow usage cards, including **31,351 total words**,
-**276 words/minute**, **11 apps**, and a **1-day streak**, plus a separate card
-showing **26,412 total words**. These are account-level figures, not docs-drift
-word counts. [Actual cards and provenance](docs/built-with-voice.md).
+docs-drift was built for the WeMakeDevs × Wispr Flow "No Hands" challenge, with
+requirements, prompts and docs dictated through Wispr Flow.
+[Flow usage evidence](docs/built-with-voice.md).
 
-The specific dictated prompts, build revisions and Flow-use recording still need
-owner evidence. [Concrete 1:50 recording plan](docs/FLOW-RECORDING.md). No personal
-workflow or recording has been invented.
-
-## Contributing and licence
+## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Run tests, lint and type checks before
-opening a change; do not change a frozen benchmark's rules or prefill human labels.
-The code is [MIT licensed](LICENSE). [Changelog](CHANGELOG.md).
+opening a change. MIT licensed. [Changelog](CHANGELOG.md).

@@ -1,15 +1,26 @@
 # Wispr Flow evidence
 
-The owner supplied these original cards on 22 October 2026. The Flow Highlights
-filename includes that date; an image filename alone does not independently
-establish its capture date. Hashes are in [provenance.json](assets/flow/provenance.json).
+docs-drift was built for the WeMakeDevs × Wispr Flow "No Hands" challenge, with
+requirements, prompts and docs dictated through Flow. Usage cards are shown as
+supplied; hashes are in [provenance.json](assets/flow/provenance.json).
 
-![Actual supplied Flow Highlights: 31,351 total words, 276 words per minute, 11 apps, one-day streak](assets/flow/flow-highlights-2026-10-22.png)
+## Latest card — 25 October 2026
 
-![Actual supplied card: 26,412 total words dictated](assets/flow/usage-card-supplied.png)
+![Flow Highlights: 5-day streak, 139,355 total words dictated, 222 words per minute, 16 apps](assets/flow/flow-highlights-2026-10-25.png)
 
-These totals describe Flow account usage. No project-only count, elapsed time,
-productivity gain or weekly upload history is inferred from them.
+| Daily streak | Words dictated | Average speed | Apps used |
+| --- | --- | --- | --- |
+| 5 days | 139,355 | 222 wpm | 16 |
+
+## Earlier cards — 22 October 2026
+
+![Flow Highlights: 31,351 total words, 276 words per minute, 11 apps, one-day streak](assets/flow/flow-highlights-2026-10-22.png)
+
+![Card: 26,412 total words dictated](assets/flow/usage-card-supplied.png)
+
+Between the 22 and 25 October cards the account total grew from 31,351 to
+139,355 words. These are account-level totals across all apps, not a
+docs-drift-only word count.
 
 ## Owner-reported project dictation: release preparation
 
@@ -34,7 +45,6 @@ existing release infrastructure was created by this dictation.
 The package and command are interpreted as `docs-drift`; "dogstrip" and other
 recognition errors remain in the original text. A recording showing Flow input
 and the final under-two-minute submission video remain pending.
-[Capture plan and shot list](FLOW-RECORDING.md).
 
 ## Organization workflow requirement
 

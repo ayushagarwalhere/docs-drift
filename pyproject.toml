@@ -118,7 +118,7 @@ pattern = '(\]\()(?!https?://|#)([^)]+)(\))'
 replacement = '\1https://github.com/ayushagarwalhere/docs-drift/blob/main/\2\3'
 
 [tool.hatch.build.targets.sdist]
-include = ["src/", "scripts/", "tests/", "benchmark/", "docs/", "editors/", "examples/", "CHANGELOG.md", "README.md", "RELEASING.md", "SUBMISSION.md", "CONTRIBUTING.md", "SECURITY.md", "LICENSE", "pyproject.toml", "uv.lock", "justfile", ".gitattributes", ".pre-commit-config.yaml"]
+include = ["src/", "scripts/", "tests/", "benchmark/", "docs/", "editors/", "examples/", "CHANGELOG.md", "README.md", "RELEASING.md", "CONTRIBUTING.md", "SECURITY.md", "LICENSE", "pyproject.toml", "uv.lock", "justfile", ".gitattributes", ".pre-commit-config.yaml"]
 exclude = ["/tests/fixtures/repos", "/.docs-drift", "**/__pycache__", "**/node_modules", "**/.git", "/benchmark/runs", "/benchmark/search-*.json", "/examples/*.cast", "/examples/*.png", "/docs/assets/*.gif"]
 
 [tool.pytest.ini_options]

@@ -4,31 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Find stale documentation. Inspect the exact line, source evidence and available Git history. Try docs-drift without an account or API key.">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#181818">
   <title>{% block title %}docs-drift — Code moves. Docs drift.{% endblock %}</title>
+  <link rel="preload" href="/static/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/report.css">
   <link rel="stylesheet" href="/static/demo.css">
+  <link rel="stylesheet" href="/static/site.css">
   <script src="/static/demo.js" defer></script>
+  <script src="/static/site.js" defer></script>
 </head>
-<body class="app-body">
+<body class="app-body dd-inner">
+  {% include '_chrome.html' %}
   <a class="skip" href="#main">Skip to content</a>
-  <div class="reading-progress" aria-hidden="true"><i></i></div>
-  <header class="sitehead">
-    <a class="wordmark" href="/" aria-label="docs-drift home"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span>docs<span class="wordmark-dash">-</span>drift<span class="wordmark-period">.</span></a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="/#scan">Scanner</a><a href="/#how">How it works</a><a href="/case-study">Real case</a><a href="/built-with-voice">Flow evidence</a>
-    </nav>
-    <div class="nav-actions">
-      <button class="utility-button" id="motion" aria-pressed="false" title="Toggle scroll and perspective effects">Motion off</button>
-      <button class="utility-button" id="theme" aria-label="Switch to light theme">Light <span aria-hidden="true">◐</span></button>
-      <a class="nav-source" href="{{ settings.project_url }}" aria-label="docs-drift on GitHub">GitHub <span aria-hidden="true">↗</span></a>
-    </div>
-  </header>
+  {% include '_nav.html' %}
   {% block content %}{% endblock %}
-  <footer class="sitefooter">
-    <a class="wordmark" href="/">docs-drift.</a>
-    <p>Source first. Evidence always. <span>Human review matters.</span></p>
-    <div><a href="{{ settings.project_url }}">Source ↗</a><a href="/built-with-voice">Flow evidence</a><span class="build-id">Build {{ settings.build_sha[:8] }}</span></div>
-  </footer>
+  {% include '_footer.html' %}
 </body>
 </html>

@@ -1,1 +1,42 @@
-{% extends 'base.html' %}{% block title %}Flow evidence | docs-drift{% endblock %}{% block content %}<main id="main" class="voice-page"><div class="eyebrow">No Hands challenge / actual supplied cards</div><h1>Wispr Flow evidence.</h1><p class="subline">Original cards supplied by the owner on 22 October 2026. Account usage is not a docs-drift-only word count.</p><section class="insight"><h2>Actual Flow Highlights</h2><img class="usage-card" src="/static/evidence/flow-highlights-2026-10-22.png" alt="Supplied Flow Highlights card: 31,351 total words dictated, 276 words per minute, 11 apps, one-day streak"><p>31,351 total words | 276 words/minute average | 11 apps | 1-day streak, as shown by the card. Capture date is not independently established.</p></section><section class="insight"><h2>Second supplied card</h2><img class="usage-card" src="/static/evidence/usage-card-supplied.png" alt="Supplied Wispr Flow card showing 26,412 total words dictated"><p>26,412 total words. No dates, weekly uploads or project-only usage are inferred from this total.</p></section><section class="insight"><h2>Release requirement dictated through Flow</h2><p>On 23 October 2026 the owner supplied a release requirement in this coding session and explicitly reported using Wispr Flow.</p><blockquote>Prepare and run the first public release.</blockquote><p>The follow-up revision refreshes the 0.1.0 release notes, keeps the first TestPyPI RC, permits later stable releases from one tag, and checks packaged test assets through the installed wheel.</p><a href="{{ settings.project_url }}/blob/main/docs/assets/flow/dictated-release-request-2026-10-23.txt">Original supplied text, including recognition errors</a><p>This is owner-reported dictation. No audio/video was supplied for independent verification, and public publication remains pending. The earlier build-story placeholder has been replaced with traceable evidence; no project-only usage total is inferred.</p><a href="{{ settings.project_url }}/blob/main/docs/built-with-voice.md">Requirement, resulting changes and provenance</a><p>The original Flow-use recording and final submission video remain pending.</p></section></main>{% endblock %}
+{% extends 'base.html' %}{% from '_macros.html' import arrow, glyph %}{% block title %}Built with voice · docs-drift{% endblock %}{% block content %}
+<main id="main" class="dd-page">
+  <section class="dd-page-hero">
+    {{ glyph('mic', 'dd-page-glyph') }}
+    <p class="dd-page-kicker">WeMakeDevs × Wispr Flow · No Hands challenge</p>
+    <h1 class="dd-h-xl">Built without a keyboard.</h1>
+    <p class="dd-p-m dd-page-lede">Requirements, prompts, docs and this site's copy were dictated through Wispr Flow. These are the usage cards, exactly as supplied.</p>
+  </section>
+
+  <section class="dd-voice-latest" aria-labelledby="latest-title">
+    <div class="dd-voice-copy">
+      <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i><span id="latest-title">Latest card · 25 October 2026</span></div>
+      <div class="dd-voice-stats">
+        <div class="dd-data-big"><span>Words dictated</span><strong>139,355</strong></div>
+        <div class="dd-voice-mini"><span>Average speed</span><strong>222 wpm</strong></div>
+        <div class="dd-voice-mini"><span>Daily streak</span><strong>5 days</strong></div>
+        <div class="dd-voice-mini"><span>Apps used</span><strong>16</strong></div>
+      </div>
+      <p class="dd-voice-note">Up from 31,351 words on the 22 October card. Account-level totals across all apps, not a docs-drift-only count.</p>
+    </div>
+    <figure class="dd-tilt dd-voice-card"><img src="/static/evidence/flow-highlights-2026-10-25.png" width="1600" height="1083" alt="Flow Highlights card: 5-day daily streak, 139,355 total words dictated, 222 words per minute average speed, 16 apps used."></figure>
+  </section>
+
+  <section class="dd-voice-earlier" aria-labelledby="earlier-title">
+    <h2 id="earlier-title" class="dd-h-s">Earlier cards · 22 October</h2>
+    <div class="dd-voice-grid">
+      <figure><img src="/static/evidence/flow-highlights-2026-10-22.png" alt="Flow Highlights card: 31,351 total words dictated, 276 words per minute, 11 apps, one-day streak."><figcaption>31,351 words · 276 wpm · 11 apps</figcaption></figure>
+      <figure><img src="/static/evidence/usage-card-supplied.png" alt="Wispr Flow card showing 26,412 total words dictated."><figcaption>26,412 words dictated</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="dd-voice-dictation" aria-labelledby="dictated-title">
+    <h2 id="dictated-title" class="dd-h-s">A dictated requirement</h2>
+    <blockquote class="dd-quote-text">“Prepare and run the first public release. Walk me through the release step by step, stopping before any action that publishes something.”</blockquote>
+    <p class="dd-voice-note">Dictated on 23 October 2026 and kept with its recognition errors (“dogstrip” for docs-drift). It became the tag-driven release workflow that shipped docs-drift 0.1.0 to PyPI. No audio was recorded, so this is owner-reported.</p>
+    <div class="dd-btn-row dd-btn-row-left">
+      <a class="dd-btn dd-btn-dark" href="{{ settings.project_url }}/blob/main/docs/assets/flow/dictated-release-request-2026-10-23.txt">Original text {{ arrow() }}</a>
+      <a class="dd-btn dd-btn-lime" href="{{ settings.project_url }}/blob/main/docs/built-with-voice.md">Provenance and hashes {{ arrow() }}</a>
+    </div>
+  </section>
+</main>
+{% endblock %}

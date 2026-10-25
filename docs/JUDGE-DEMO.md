@@ -68,4 +68,4 @@ still deferred by the owner: deployment needs approval, a hosting account and it
 credentials, a final origin, and post-deployment smoke checks. No deployment or
 public URL is claimed here. PyPI publication, upstream documentation changes,
 video recording/upload, and challenge submission remain owner actions; none is
-needed for this local demo. See [deployment handoff](AWS-HANDOFF.md).
+needed for this local demo. See [deployment](deploy.md).
