@@ -14,6 +14,7 @@
 #   DOCKER_NETWORK            network shared with the proxy   (default: web)
 #   HOST_BIND                 publish on host addr:port       (default: none; the proxy reaches it by name)
 #   ENV_FILE                  container environment           (default: /etc/docs-drift.env, if present)
+#   MEMORY_LIMIT              container memory cap            (default: 1536m)
 #   HEALTH_TIMEOUT            seconds to wait for health      (default: 90)
 set -Eeuo pipefail
 
@@ -51,7 +52,7 @@ run_container() {
   local args=(
     run -d --name "$CONTAINER_NAME" --restart unless-stopped
     --network "$DOCKER_NETWORK"
-    --memory=2g --cpus=1 --pids-limit=256
+    --memory="${MEMORY_LIMIT:-1536m}" --cpus=1 --pids-limit=256
     --cap-drop=ALL --security-opt=no-new-privileges
     -v docs-drift-data:/data
   )
