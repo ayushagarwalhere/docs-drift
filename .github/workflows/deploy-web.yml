@@ -1,9 +1,16 @@
 name: Deploy web
+# Ships main to the EC2 Docker host after CI passes, over SSH.
+# Setup: docs/deploy.md ("Automatic deploys").
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit to deploy (defaults to the latest main)
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -14,46 +21,43 @@ jobs:
     if: >-
       vars.DOCS_DRIFT_DEPLOY_ENABLED == 'true' &&
       vars.DOCS_DRIFT_DEPLOY_FREEZE != 'true' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+      (github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     environment: production
     env:
-      TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
-      FLY_APP: ${{ vars.FLY_APP }}
+      DEPLOY_SHA: ${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
+      EC2_HOST: ${{ vars.EC2_HOST }}
+      EC2_USER: ${{ vars.EC2_USER }}
+      EC2_APP_DIR: ${{ vars.EC2_APP_DIR }}
+      BASE_URL: ${{ vars.DOCS_DRIFT_BASE_URL }}
     steps:
-      - name: Enforce judging deployment freeze in IST
-        run: |
-          python - <<'PY'
-          from datetime import datetime, timezone
-          now = datetime.now(timezone.utc)
-          start = datetime.fromisoformat('2026-10-29T18:30:00+00:00')
-          end = datetime.fromisoformat('2026-11-06T18:30:00+00:00')
-          if start <= now < end:
-              raise SystemExit('Production deploys frozen through 6 November IST; use a branch.')
-          PY
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 0
+          ref: ${{ env.DEPLOY_SHA }}
           persist-credentials: false
-      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-        with:
-          python-version: '3.13'
-      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1
-        with:
-          version: '0.4.118'
-      - name: Build and push immutable image
+      - name: Configure SSH
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
         run: |
-          flyctl auth docker
-          PACKAGE_VERSION=$(python -c "from scripts.release import tag_version; import subprocess; print(tag_version(subprocess.check_output(['git','describe','--tags','--exact-match'],text=True).strip()))")
-          docker build -f Dockerfile.web --build-arg BUILD_SHA="$TESTED_SHA" --build-arg PACKAGE_VERSION="$PACKAGE_VERSION" -t "registry.fly.io/$FLY_APP:$TESTED_SHA" .
-          docker push "registry.fly.io/$FLY_APP:$TESTED_SHA"
-          flyctl deploy --app "$FLY_APP" --image "registry.fly.io/$FLY_APP:$TESTED_SHA" --ha=false
-      - name: Smoke test deployed service
-        env:
-          BASE_URL: ${{ vars.DOCS_DRIFT_BASE_URL }}
-        run: uv run --locked --extra web python scripts/smoke.py "$BASE_URL"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Redeploy on the host
+        run: |
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            "DEPLOY_SHA='$DEPLOY_SHA' bash '${EC2_APP_DIR:-/opt/docs-drift}/deploy/ec2/redeploy.sh'"
+      - name: Verify the public site serves this commit
+        run: |
+          body=$(curl -fsS --max-time 20 "$BASE_URL/healthz")
+          echo "$body"
+          case "$body" in *"$DEPLOY_SHA"*) ;; *) echo "healthz does not report $DEPLOY_SHA" >&2; exit 1 ;; esac
+          python3 scripts/smoke.py "$BASE_URL"
+      - name: Remove the key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

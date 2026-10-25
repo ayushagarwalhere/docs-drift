@@ -1,45 +1,22 @@
 # Public demo deployment
 
-Status: local implementation and deployment preparation. No hosting account,
-resource, token, domain or public deployment has been created. Approve a host
-before running provisioning commands. GitHub repository/Action/extension links
-must be set to the actual project repository before launch.
+The demo runs as one Docker container on an AWS EC2 instance, behind an HTTPS
+reverse proxy, at https://13-211-179-95.sslip.io. `/healthz` reports the deployed
+commit SHA.
 
-## Host choice (checked 18 October 2026)
+## Shape
 
-Recommend one **always-on Fly Machine, Singapore, 2 GB RAM**, one Uvicorn process,
-at most two disposable scan workers. Its background CPU stays available after
-POST returns. Keep a roughly **$15/month compute allowance**, plus traffic/storage;
-the exact Singapore quote must be reviewed before provisioning. Current published
-US baseline is $2.19 for 256 MB plus $6/GB additional RAM: about $12.69 for one
-shared CPU and 2 GB, rather than the older prices found in many comparisons.
-[Fly pricing](https://docs.fly.io/about/pricing),
-[October 2026 update](https://fly.io/pricing-update/).
-
-| Host | Idle/cold start | Free/cheap resources | Git and disk | India-friendly region; GitHub deploy |
-| --- | --- | --- | --- | --- |
-| Render | Free sleeps after 15 idle minutes; waking can take about a minute. Paid avoids idle sleep. | Free 512 MB/0.1 CPU, 750 hours/month; 2 GB paid compute listed at $25/month. Free outbound/build limits matter for clones. | Install Git in this Docker image. Free filesystem ephemeral; paid disks available. | Singapore; GitHub Docker auto-deploy or image deploy. |
-| Fly.io | Auto-stop disabled in supplied config: no idle wake. Deploy/restart boot latency remains unmeasured. | Pay as you go; no permanent free allocation for new accounts. Choose RAM/CPU explicitly. | Git in image; root disk ephemeral, optional volume $0.15/GB/month. | Singapore; provided GitHub Action builds a SHA image and deploys it. |
-| Railway | Leave optional Serverless sleeping off; no idle wake. Actual restart time unmeasured. | Free $1/month credit after trial, up to 0.5 GB RAM/1 CPU; Hobby $5/month minimum credited toward metered usage, not unlimited compute. | Git in image; ephemeral disk plus persistent volumes by plan. | Singapore; GitHub repo/Dockerfile auto-deploy. |
-| Hugging Face Docker Spaces | CPU Basic can sleep; rebuild/wake depends on image. No app-specific timing measured. | CPU Basic: 2 vCPU, 16 GB RAM, 50 GB ephemeral disk, no hourly charge; **new Docker compute Spaces now require a paid subscription**, so this is not a free account option. | Git installed in image; persistent storage costs extra. | No selectable India region verified; GitHub needs a sync/push workflow to the Space Git repo. |
-| Google Cloud Run | Scales to zero by default; variable container boot. Min instances removes idle scale-to-zero. | Request-based free allowance includes 2 million requests, 180k vCPU-seconds, 360k GiB-seconds/month; always-allocated background CPU uses different billing/allowances. | Git in image; writable filesystem is memory backed/ephemeral, persistent state needs an external store. | Mumbai/Delhi; Cloud Build GitHub integration or registry deploy Action. |
-
-Sources: [Render free](https://render.com/docs/free),
-[Render pricing](https://render.com/pricing),
-[Railway plans](https://docs.railway.com/pricing/plans),
-[Railway regions](https://docs.railway.com/deployments/regions),
-[Spaces overview](https://huggingface.co/docs/hub/en/spaces-overview),
-[Cloud Run pricing](https://cloud.google.com/run/pricing),
-[Cloud Run billing](https://docs.cloud.google.com/run/docs/configuring/billing-settings),
-[Cloud Run regions](https://cloud.google.com/run/docs/locations).
-These are provider policies/specifications, not measured cross-provider benchmarks.
-Prices exclude taxes and extra network usage.
-
-Cloud Run request-based CPU is unsuitable for this in-process queue: returning
-202 must not freeze the scan. It needs instance-based billing, min/max instances
-one, and enough RAM, or a redesigned external queue. Render paid is a simpler
-GitHub UI alternative at higher baseline cost. Fly requires more CLI setup and
-metered-cost monitoring; a single Machine is not highly available.
+- One container from `Dockerfile.web`, one Uvicorn worker, at most two scan
+  workers. Queue, rate limits and job state are in-process, so run exactly one
+  container.
+- The app container is named `app` and listens on 8080 on the Docker network
+  `web`, with no host port. A Caddy container on the same network terminates TLS
+  (automatic Let's Encrypt) and forwards to it:
+  `caddy reverse-proxy --from <host> --to app:8080`.
+- A named Docker volume holds `/data` (live results expire after 24 hours; the
+  baked examples ship in the image).
+- The host needs outbound HTTPS to clone public GitHub repositories. It needs no
+  AWS API permissions.
 
 ## Local run and container
 
@@ -78,7 +55,7 @@ memory limit is still required. Windows local development lacks RLIMIT support.
 | `DOCS_DRIFT_BUILD_SHA` | `development`; image build arg sets deployed commit shown in footer/healthz. Falls back to `RENDER_GIT_COMMIT`. |
 | `DOCS_DRIFT_PROJECT_URL` | Placeholder `https://github.com/docs-drift/docs-drift`; **replace before release** with the actual repo for navigation/integration links. |
 | `PORT` | `8080`; Uvicorn bind port, healthcheck/container expect 8080. |
-| `FORWARDED_ALLOW_IPS` | `127.0.0.1`; only trust a known reverse proxy. Supplied Fly config trusts its front proxy; direct instance ports must not be publicly exposed. |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1`; only trust a known reverse proxy. Set it to the reverse proxy address; the container port must not be publicly exposed. |
 | `GITHUB_TOKEN` | Optional in the deployment environment; **unused** by this implementation, which uses only anonymous public Git. It is never passed to workers. No API token is needed. |
 
 There is no public model-enable flag or endpoint. Scans always use server-owned
@@ -87,55 +64,59 @@ Structured scan logs omit IPs, source text, author identities and exception
 tracebacks. `/api/stats` reports completed non-cached scans/stale statements and
 failures since this process started; it does not pretend restarts retain totals.
 
-## Approval and release setup
+## Deploying a new version
 
-After host confirmation, the owner signs in and creates an app (no signup by the
-agent). Set the real app/origin in `fly.toml`, project URL in the host environment,
-and an optional 1 GB `/data` volume for live permalink survival across deploys.
-Without a volume examples always work, but live permalinks may disappear on a
-restart before their normal 24-hour expiry. Keep exactly one Machine with
-`flyctl scale count 1 --app APP` and verify its selected region/RAM/price.
+`deploy/ec2/redeploy.sh` runs on the server. It checks out the requested commit,
+builds `Dockerfile.web`, replaces the container, waits until `/healthz` reports
+the new commit, and rolls back to the previous image if it does not.
 
-Configure repository variables `FLY_APP`, `DOCS_DRIFT_BASE_URL`, and, only after
-approval, `DOCS_DRIFT_DEPLOY_ENABLED=true`. Set an app-scoped Fly deploy token in
-the repository secret `FLY_API_TOKEN`; never commit it. Restrict the production
-environment to main. Successful CI push runs on main trigger the deploy workflow;
-fork PR runs cannot deploy or obtain the token. Images use the tested commit SHA,
-and `scripts/smoke.py` runs against the public URL after deploying.
+```text
+ssh <user>@<host>
+cd /opt/docs-drift            # the server's checkout of this repository
+DEPLOY_SHA=origin/main ./deploy/ec2/redeploy.sh
+```
 
-Set up a PyPI trusted publisher for this repository, workflow `.github/workflows/release.yml`,
-environments `testpypi` and `pypi`, and protect both environments. Follow the
-exact owner setup and separate publish gates in the repository's RELEASING.md.
-The release workflow uses OIDC,
-not a stored PyPI token. No publisher registration or release was performed here.
+Container settings (origin, project URL, limits) go in `/etc/docs-drift.env`,
+one VAR=value per line, so they survive redeploys.
 
-## Judging uptime, monitoring and rollback
+## Automatic deploys
 
-The scheduled monitor is enabled only by the repository variable above and only
-acts from **2026-10-18 through 2026-11-06 inclusive (UTC)**, every ten minutes.
-GitHub schedules are best effort and may be delayed. It probes `/healthz` and the
-baked py-cli result twice, ten seconds apart, then opens one deduplicated issue
-if both attempts fail. Subscribe to repository issue notifications to receive
-email; the workflow cannot guarantee account notification settings. Manual runs
-can test monitoring outside the date window.
+`.github/workflows/deploy-web.yml` runs the same script over SSH after CI
+passes on main, then checks that the public `/healthz` reports the tested commit
+and runs `scripts/smoke.py` against the public URL. It can also be started by
+hand with a commit SHA.
 
-The end of monitoring does not stop the paid Machine or billing. The owner can
-stop/delete the approved resources after results are announced.
+Repository settings (Settings → Secrets and variables → Actions):
 
-Use paid always-on hosting and actual health monitoring. Fly explicitly supports
-disabling auto-stop; no anti-sleep traffic is needed. We have not established that
-artificially keeping a Render Free/Spaces free process awake is permitted, and
-do not recommend using pings to bypass provider idle policies.
-[Fly auto-stop configuration](https://fly.io/docs/launch/autostop-autostart/).
+| Kind | Name | Value |
+| --- | --- | --- |
+| Variable | DOCS_DRIFT_DEPLOY_ENABLED | true |
+| Variable | DOCS_DRIFT_BASE_URL | public origin, no trailing slash |
+| Variable | EC2_HOST | instance public IP or DNS name |
+| Variable | EC2_USER | SSH user that can run docker |
+| Variable | EC2_APP_DIR | checkout path on the server (default /opt/docs-drift) |
+| Secret | EC2_SSH_KEY | private key for that user (a deploy-only key is best) |
+| Secret | EC2_KNOWN_HOSTS | output of ssh-keyscan for the host |
 
-View logs with `flyctl logs --app APP`; check `flyctl status --app APP` and
-`/healthz` SHA. Roll back with
-`flyctl deploy --app APP --image registry.fly.io/APP:PREVIOUS_SHA`. Then rerun smoke.py. Keep the
-previous successful image tag. If GitHub cloning fails, the automatic circuit
-breaker leaves all baked examples and report routes available; set
-`DOCS_DRIFT_LIVE_ENABLED=0` for a longer incident and redeploy.
+Set DOCS_DRIFT_DEPLOY_FREEZE to true to pause deploys (for example during
+judging). Fork pull requests never reach this workflow or its secrets.
 
-Deployment smoke output cannot exist until a host is approved and a public URL
-exists. Docker image execution is also pending: Docker CLI is installed locally
-but its daemon is unavailable. Local browser, API and scanner checks are recorded
-in `docs/WEB-VERIFICATION.md`.
+## Logs and rollback
+
+On the server: `docker logs -f app` and `docker ps`; the public `/healthz`
+shows the running commit. To roll back, redeploy a previous commit with
+`DEPLOY_SHA=<sha> ./deploy/ec2/redeploy.sh`; earlier images are kept for a week.
+If GitHub cloning fails, the automatic circuit breaker keeps the baked examples
+and reports available; set DOCS_DRIFT_LIVE_ENABLED=0 in `/etc/docs-drift.env`
+and redeploy for a longer incident.
+
+## Monitoring
+
+`.github/workflows/monitor-web.yml` probes `/healthz` and a baked report every
+ten minutes while deploys are enabled, and opens one deduplicated issue if both
+attempts fail.
+
+## PyPI
+
+Releases use a PyPI trusted publisher (OIDC) for `.github/workflows/release.yml`
+with protected `testpypi` and `pypi` environments. See RELEASING.md.
