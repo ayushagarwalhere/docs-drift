@@ -87,7 +87,7 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
     with TestClient(app) as client:
         landing = client.get("/")
         assert landing.status_code == 200 and "Inspect the real case" in landing.text
-        assert "pipx install docs-drift" not in landing.text
+        assert "pipx install docs-drift" in landing.text
         case = client.get("/case-study")
         assert case.status_code == 200 and "567f6c84" in case.text
         assert "False positive" in case.text
@@ -95,8 +95,9 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
         assert reviewed.status_code == 200
         assert reviewed.json()["head_sha"] == "46f4d2469097be395558768714a5f07ebccf1412"
         assert 'href="https://github.com/ayushagarwalhere/docs-drift"' in landing.text
-        assert 'href="https://pypi.org/project/docs-drift/"' not in landing.text
-        assert "PyPI unpublished" in landing.text
+        assert 'href="https://pypi.org/project/docs-drift/"' in landing.text
+        for asset in ("/static/site.css", "/static/site.js", "/static/fonts/InstrumentSerif-400.woff2"):
+            assert client.get(asset).status_code == 200
         assert len(landing.content) < 300_000
         assert "frame-ancestors 'none'" in landing.headers["content-security-policy"]
         assert landing.headers["x-content-type-options"] == "nosniff"

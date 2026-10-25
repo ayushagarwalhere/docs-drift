@@ -1,0 +1,36 @@
+{% macro wordmark(cls='') -%}
+<svg class="dd-wordmark {{ cls }}" viewBox="0 -14 1440 336" role="img" aria-label="docs-drift">
+  <text x="720" y="296" text-anchor="middle" class="dd-wordmark-text">docs-drift</text>
+</svg>
+{%- endmacro %}
+
+{% macro arrow() -%}<i class="dd-btn-ico" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i>{%- endmacro %}
+
+{# Chrome objects drawn as SVG shapes or glyphs; no third-party imagery. #}
+{% macro glyph(kind, cls='') -%}
+<svg class="dd-glyph {{ cls }}" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+  <g class="dd-chrome-shape">
+  {%- if kind == 'pilcrow' -%}
+    <text x="100" y="168" text-anchor="middle" class="dd-glyph-serif" font-size="190">¶</text>
+  {%- elif kind == 'braces' -%}
+    <text x="100" y="160" text-anchor="middle" class="dd-glyph-serif" font-size="170">{ }</text>
+  {%- elif kind == 'check' -%}
+    <path d="M38 104 82 146 164 56" fill="none" stroke="url(#dd-chrome-fill)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  {%- elif kind == 'quote' -%}
+    <text x="100" y="205" text-anchor="middle" class="dd-glyph-serif" font-size="300">&#8221;</text>
+  {%- elif kind == 'lens' -%}
+    <circle cx="86" cy="84" r="46" fill="none" stroke="url(#dd-chrome-fill)" stroke-width="22"/>
+    <path d="M120 120 162 162" stroke="url(#dd-chrome-fill)" stroke-width="28" stroke-linecap="round"/>
+  {%- elif kind == 'terminal' -%}
+    <rect x="22" y="40" width="156" height="120" rx="16" fill="url(#dd-chrome-fill)"/>
+    <path d="M52 78 78 100 52 122M92 124h50" fill="none" stroke="#3b3b3b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  {%- elif kind == 'mic' -%}
+    <rect x="72" y="22" width="56" height="98" rx="28" fill="url(#dd-chrome-fill)"/>
+    <path d="M50 96c0 30 22 50 50 50s50-20 50-50" fill="none" stroke="url(#dd-chrome-fill)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M100 146v28M70 178h60" stroke="url(#dd-chrome-fill)" stroke-width="12" stroke-linecap="round"/>
+  {%- elif kind == 'diff' -%}
+    <text x="100" y="150" text-anchor="middle" class="dd-glyph-serif" font-size="150">±</text>
+  {%- endif -%}
+  </g>
+</svg>
+{%- endmacro %}

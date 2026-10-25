@@ -1,90 +1,350 @@
-{% extends 'base.html' %}
-{% block content %}
-<main id="main" class="landing">
-  <section class="opening" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <div class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Documentation intelligence / open source</div>
-      <h1 id="hero-title">Code moves.<br><span class="outline-word">Docs drift.</span></h1>
-      <p class="hero-lede">Find the instructions<br>your code left behind.</p>
-      <p class="hero-description">From a stale README line to source evidence and available Git history. Less guesswork. A correction you can actually review.</p>
-      <div class="hero-actions"><a class="button button-primary" href="#scan">Scan a repository <span aria-hidden="true">↗</span></a><a class="button button-ghost" href="/scan/example-judge">Try one stale claim (synthetic fixture) <span aria-hidden="true">→</span></a></div>
-      <p class="hero-assurance"><span>No sign-in</span><span>No API key</span><span>No target code execution</span></p>
-    </div>
-    <div class="depth-scene" data-depth-scene aria-label="A real rich-cli documentation error connected to source and manually inspected history">
-      <div class="scene-grid" aria-hidden="true"></div>
-      <div class="scene-orbit" aria-hidden="true"><i></i><i></i></div>
-      <div class="depth-stack">
-        <div class="depth-plane plane-doc">
-          <div class="plane-heading"><span><i class="file-icon" aria-hidden="true"></i> README.md</span><span>01 / CLAIM</span></div>
-          <div class="plane-content"><span class="line-number">61</span><p>Add the <code class="stale-token">--line-number</code><br>switch to enable line numbers.</p></div>
-          <div class="plane-foot"><span class="small-square" aria-hidden="true"></span> An instruction that fails. <span>exit 2</span></div>
-        </div>
-        <div class="depth-plane plane-source">
-          <div class="plane-heading"><span><i class="code-icon" aria-hidden="true">⌘</i> __main__.py</span><span>02 / SOURCE</span></div>
-          <div class="plane-content"><span class="line-number">358</span><pre><code>@click.option(
-  "<strong>--line-numbers</strong>", "-n"
-)</code></pre></div>
-          <div class="plane-foot"><span class="small-square filled" aria-hidden="true"></span> The declared option works. <span>exit 0</span></div>
-        </div>
-        <div class="depth-plane plane-history">
-          <div class="plane-heading"><span>◷ 567f6c84</span><span>03 / GIT REVIEW</span></div>
-          <p>Incorrect wording introduced.<span>Manually inspected, not automatic attribution.</span></p>
-        </div>
+{% from '_macros.html' import wordmark, arrow, glyph %}<!doctype html>
+<html lang="en" data-motion="on">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="docs-drift checks every flag, endpoint and setting in your docs against your code, and points to the line that's wrong. Open source, rule-based, no API key.">
+  <meta name="theme-color" content="#eae9e6">
+  <title>docs-drift — Code moves. Docs drift.</title>
+  <link rel="preload" href="/static/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/InterTight-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/site.css">
+  <script src="/static/demo.js" defer></script>
+  <script src="/static/site.js" defer></script>
+</head>
+<body class="dd-home">
+{% include '_chrome.html' %}
+<div class="dd-preloader" aria-hidden="true"><svg viewBox="0 0 64 64"><text x="32" y="50" text-anchor="middle" class="dd-mark-text">d</text></svg></div>
+<a class="dd-skip" href="#main">Skip to content</a>
+{% set home = true %}{% include '_nav.html' %}
+<main id="main">
+
+  <!-- 01 HERO -->
+  <section class="dd-hero" data-tone="light">
+    {{ glyph('pilcrow', 'dd-drifter dd-drifter-a') }}
+    {{ glyph('braces', 'dd-drifter dd-drifter-b') }}
+    {{ wordmark('dd-hero-wordmark') }}
+    <nav class="dd-hero-links" aria-label="Sections">
+      <a href="#how">How it works</a><a href="#cases">Cases</a><a href="/case-study">Real case</a><a href="/built-with-voice">Built with voice</a>
+    </nav>
+    <div class="dd-hero-body">
+      <h1 class="dd-h-xl" data-rise>If a newcomer can't copy-paste your README, your docs are broken.</h1>
+      <p class="dd-p-m dd-hero-sub" data-rise>docs-drift checks every flag, endpoint and setting in your docs against your code, and points to the line that's wrong.</p>
+      <div class="dd-btn-row" data-rise>
+        <a class="dd-btn dd-btn-dark" href="#how">How it works</a>
+        <a class="dd-btn dd-btn-lime" href="#scan">Scan a repo {{ arrow() }}</a>
       </div>
-      <div class="scene-caption"><span>REAL SNAPSHOT / RICH-CLI</span><a href="/case-study">Inspect the real case <span aria-hidden="true">↗</span></a></div>
+      <figure class="dd-tilt dd-hero-photo" data-float>
+        <img src="/static/media/findings.webp" width="684" height="560" alt="docs-drift findings: README.md line 4 documents --port, the code now declares --listen, with the rename commit 450a93d.">
+      </figure>
     </div>
-    <div class="hero-bottom"><span>01 — The gap between docs and code</span><a href="#how">Scroll to follow the evidence <span aria-hidden="true">↓</span></a><span>Python / JavaScript / TypeScript</span></div>
   </section>
 
-  <section class="chapter" aria-labelledby="fixture-title">
-    <h2 id="fixture-title">Judge quick start: one stale claim</h2>
-    <p>Synthetic fixture, precomputed with the static scanner. No network, sign-in, or API key needed. This is a demonstration, not a real-world accuracy result.</p>
-    <ol><li>Open the sample: README.md:3 still says <code>--port</code>.</li><li>Expand Evidence to inspect <code>cli.py</code> and the Git diff. The rename commit appears on the finding.</li><li>Review the proposed documentation fix: replace <code>--port</code> with <code>--listen</code>. Nothing is applied automatically.</li></ol>
-    <a class="button button-primary" href="/scan/example-judge">Open synthetic fixture report</a>
-  </section>
+  <!-- 02 STATEMENT -->
+  <section class="dd-statement" data-tone="dark" aria-labelledby="statement-title">
+    <div class="dd-codewall" aria-hidden="true">
+      <div class="dd-codewall-track">
+        {% for _ in range(2) %}
+        <pre>## Usage
 
-  <section id="how" class="chapter evidence-chapter" aria-labelledby="how-title">
-    <div class="chapter-heading" data-reveal><div class="chapter-index"><span>02</span><i></i><span>Follow the evidence</span></div><h2 id="how-title">A finding is only useful<br>if you can <span class="muted-word">prove it.</span></h2><p>One small mistake. An inspectable trail. No invented certainty.</p></div>
-    <div class="evidence-walkthrough">
-      <div class="evidence-sticky" data-depth-panel><div class="evidence-diagram" aria-label="Documentation to source to Git review"><span class="diagram-node">README.md<span>the documented claim</span></span><i aria-hidden="true">↓</i><span class="diagram-node diagram-node-inverse">Source declaration<span>the option that actually exists</span></span><i aria-hidden="true">↓</i><span class="diagram-node diagram-node-dashed">Git history<span>inspect the available change</span></span></div><p class="diagram-note">Static inspection. Your repository’s code is never run.</p></div>
-      <div class="evidence-steps">
-        <article class="evidence-step" data-reveal><div class="step-kicker"><span>01</span> Locate the instruction</div><h3>It’s one letter.<br>Until the command fails.</h3><p>rich-cli’s README documents <code>--line-number</code>. The reproduced command exits with “No such option.”</p><pre><code>$ rich README.md --line-number
-Error: No such option '--line-number'.</code></pre><a class="text-link" href="https://github.com/Textualize/rich-cli/blob/46f4d2469097be395558768714a5f07ebccf1412/README.md#L61">README.md:61 <span aria-hidden="true">↗</span></a></article>
-        <article class="evidence-step" data-reveal><div class="step-kicker"><span>02</span> Check the source</div><h3>Not a guess.<br>A declaration.</h3><p>The Click declaration accepts <code>--line-numbers</code>. The corrected command exits successfully. docs-drift’s index points to the declaration.</p><pre><code>− --line-number
-+ --line-numbers</code></pre><a class="text-link" href="https://github.com/Textualize/rich-cli/blob/46f4d2469097be395558768714a5f07ebccf1412/src/rich_cli/__main__.py#L358">__main__.py:358 <span aria-hidden="true">↗</span></a></article>
-        <article class="evidence-step" data-reveal><div class="step-kicker"><span>03</span> Understand the change</div><h3>Show what’s known.<br>Keep the limits visible.</h3><p>Manual Git inspection identifies <code>567f6c84</code>, which introduced the typo. The scanner returns no introducing commit for this case. We show that distinction.</p><a class="text-link" href="/case-study">Read the full investigation <span aria-hidden="true">→</span></a><p class="footnote">Pinned snapshot. Agent-assisted review. Not a claim about the owner’s past experience.</p></article>
+rich README.md <s>--line-number</s>
+@click.option("<b>--line-numbers</b>", "-n")
+export APP_LOG_LEVEL=debug
+GET /v1/status          → 404
+tool serve <s>--port</s> 8000
+p.add_argument("<b>--listen</b>")
+npm run build
+"workers" defaults to <s>4</s>   default=<b>8</b>
+git log -S --port  → 450a93d Rename port to listen
+from client import Client; Client.connect()
+files-to-prompt path/to/dir -e txt -e md
+-c/--cxml   Output in Claude XML format
+README.md:61   missing   --line-number
+README.md:4    renamed   --port → --listen
+README.md:6    default   4 → 8
+docs/config.md:12   ok   timeout
+uv run docs-drift scan --repo .
+exit 2  Error: No such option '--line-number'.
+exit 0  rich README.md --line-numbers</pre>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="dd-statement-inner">
+      <h2 id="statement-title" class="dd-h-l" data-rise>Code ships every day. Docs change when someone remembers.</h2>
+    </div>
+    <div class="dd-statement-notes">
+      <div class="dd-note">
+        <span class="dd-note-tag">README.md:61</span>
+        <p>rich-cli documented <code>--line-number</code>. The CLI only accepts <code>--line-numbers</code>.</p>
+        <span>—</span>
+        <strong>Textualize/rich-cli</strong><small>pinned at 46f4d24</small>
+      </div>
+      <div class="dd-note">
+        <span class="dd-note-tag">pipx install docs-drift</span>
+        <p>Rule-based and offline. No account, no API key, no code execution.</p>
+        <span>—</span>
+        <strong>docs-drift 0.1.0</strong><small>on PyPI</small>
       </div>
     </div>
   </section>
 
-  <section id="scan" class="chapter scanner-chapter" aria-labelledby="scan-title">
-    <div class="chapter-heading" data-reveal><div class="chapter-index"><span>03</span><i></i><span>Your repository</span></div><h2 id="scan-title">Put your README<br><span class="muted-word">to the test.</span></h2><p>A public GitHub URL. A static scan. Evidence you can inspect.</p></div>
-    <div class="scanner-console" data-reveal>
-      <div class="console-top"><span><i class="live-dot" aria-hidden="true"></i> DOCS-DRIFT / SCANNER</span><span id="service-status">Rule-based · no API key</span></div>
-      <form id="scan-form" class="scanform">
+  <!-- 03 CASE DECK -->
+  <section id="cases" class="dd-deck" data-tone="light" aria-label="Cases">
+    <button class="dd-deck-arrow is-prev" type="button" aria-label="Previous case" data-deck-prev><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+    <div class="dd-deck-track" data-deck>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">R</span>
+          <h2 class="dd-card-title">rich-cli's README asked for a flag the CLI never had.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>Saved scan, pinned at 46f4d24</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>Statements checked</span><strong>54</strong></div>
+              <div class="dd-data-chrome">{{ glyph('check', 'dd-data-glyph') }}<span>Confirmed drift</span><strong>2</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="/scan/example-rich-cli-reviewed">Open report {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">README.md:61</span><span class="dd-ev-tag is-alt">documented</span><pre>Add the <s>--line-number</s>
+switch to enable
+line numbers.</pre><p>The docs tell you to type this.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">__main__.py:358</span><span class="dd-ev-tag is-alt">declared</span><pre>@click.option(
+  "<b>--line-numbers</b>",
+  "-n",
+)</pre><p>The code accepts this.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">terminal</span><span class="dd-ev-tag is-alt">exit 2</span><pre>$ rich README.md \
+    --line-number
+Error: No such option
+'--line-number'.</pre><p>What a newcomer sees.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">P</span>
+          <h2 class="dd-card-title">A flag got renamed. The README never heard about it.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>Synthetic fixture, real Git history</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>Statements checked</span><strong>10</strong></div>
+              <div class="dd-data-chrome">{{ glyph('diff', 'dd-data-glyph') }}<span>Drift found</span><strong>5</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="/scan/example-py-cli">Open report {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">README.md:4</span><span class="dd-ev-tag is-alt">renamed</span><pre>`serve` accepts
+<s>--port</s> (default 8000).</pre><p>Still documented.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">cli.py</span><span class="dd-ev-tag is-alt">declared</span><pre>p.add_argument(
+  "<b>--listen</b>",
+)</pre><p>What the code says now.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">450a93d</span><span class="dd-ev-tag is-alt">commit</span><pre>Rename port to listen
+02 Oct 2026
+
+- --port
++ --listen</pre><p>The change that caused it.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">F</span>
+          <h2 class="dd-card-title">files-to-prompt: drift caught, then fixed upstream.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>Historical snapshot, pinned before the fix</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>Statements checked</span><strong>31</strong></div>
+              <div class="dd-data-chrome">{{ glyph('pilcrow', 'dd-data-glyph') }}<span>Upstream fix</span><strong class="dd-mono">f7cf729</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="/scan/example-files-to-prompt">Open report {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">README.md:55</span><span class="dd-ev-tag is-alt">documented</span><pre><s>c/--cxml</s></pre><p>A dropped dash in the docs.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">cli.py</span><span class="dd-ev-tag is-alt">declared</span><pre>@click.option(
+  "<b>-c</b>", "<b>--cxml</b>",
+)</pre><p>The real option.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">f7cf729</span><span class="dd-ev-tag is-alt">upstream</span><pre>Fixed by the
+maintainer later.</pre><p>Other findings in this snapshot may be scanner limits.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+    </div>
+    <button class="dd-deck-arrow is-next" type="button" aria-label="Next case" data-deck-next><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+  </section>
+
+  <!-- 04 SERVICES -->
+  <section id="how" class="dd-services" data-tone="dark" aria-labelledby="how-title">
+    <h2 id="how-title" class="dd-h-m dd-services-title" data-rise>How it works</h2>
+    {{ glyph('pilcrow', 'dd-float dd-float-a') }}
+    {{ glyph('braces', 'dd-float dd-float-b') }}
+    {{ glyph('check', 'dd-float dd-float-c') }}
+    <div class="dd-stack">
+      <article class="dd-svc dd-svc-lime">
+        <div class="dd-svc-head"><h3 class="dd-h-l">Scan</h3><p class="dd-p-m">Find every statement your code no longer supports.</p></div>
+        <span class="dd-svc-num">01</span>
+        <div class="dd-svc-body"><p>Reads your Markdown, indexes argparse, Click, Typer, FastAPI, Flask, Commander and Express, and matches each claim to a real declaration. Rule-based. Your code is never run.</p><a class="dd-btn dd-btn-dark" href="/scan/example-judge">Try one stale claim {{ arrow() }}</a></div>
+        <div class="dd-svc-thumb"><pre><b>$ docs-drift scan</b>
+
+README.md:4
+  renamed  --port
+  → --listen
+  450a93d
+
+README.md:6
+  default  4 → 8
+
+5 findings · 10 claims</pre></div>
+      </article>
+      <article class="dd-svc dd-svc-white">
+        <div class="dd-svc-head"><h3 class="dd-h-l">Gate</h3><p class="dd-p-m">(and fail only on drift a pull request introduces)</p></div>
+        <span class="dd-svc-num">02</span>
+        <div class="dd-svc-body"><p>Add the GitHub Action to CI. Reports come out as SARIF, JUnit, JSON, HTML and Markdown, and a baseline keeps old drift from blocking new work.</p><a class="dd-btn dd-btn-dark" href="{{ settings.project_url }}/blob/main/docs/github-action.md">GitHub Action guide {{ arrow() }}</a></div>
+        <div class="dd-svc-thumb"><pre><b>docs.yml</b>
+
+on: [pull_request]
+jobs:
+  docs:
+    steps:
+      - uses: actions/checkout
+      - uses: docs-drift
+        with:
+          fail-on-drift: true</pre></div>
+      </article>
+      <article class="dd-svc dd-svc-green">
+        <div class="dd-svc-head"><h3 class="dd-h-l">Fix</h3><p class="dd-p-m">Review a patch, not a guess.</p></div>
+        <span class="dd-svc-num">03</span>
+        <div class="dd-svc-body"><p><code>docs-drift fix</code> previews a documentation patch built from source evidence. Nothing is written without an explicit flag. VS Code shows the same findings with quick fixes.</p><a class="dd-btn dd-btn-white" href="{{ settings.project_url }}/tree/main/editors/vscode">VS Code extension {{ arrow() }}</a></div>
+        <div class="dd-svc-thumb"><pre><b>$ docs-drift fix</b>
+
+--- README.md
++++ README.md
+@@ -4 +4 @@
+-`serve` accepts --port
++`serve` accepts --listen
+
+Apply? [y/N]</pre></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 05 INDEX (what it reads) -->
+  <section id="reads" class="dd-index" data-tone="light" aria-labelledby="reads-title">
+    <h2 id="reads-title" class="dd-index-label">What it reads <span>· hover a row</span></h2>
+    <div class="dd-index-window">
+      <ul class="dd-index-list" data-index>
+        {% set surfaces = [
+          ('argparse', 'Python', 'CLI flags', 'p.add_argument("--listen")'),
+          ('Click', 'Python', 'Options & commands', '@click.option("--line-numbers", "-n")'),
+          ('Typer', 'Python', 'Options & commands', 'def serve(port: int = typer.Option(8000)):'),
+          ('FastAPI', 'Python', 'Routes', '@app.get("/v1/status")'),
+          ('Flask', 'Python', 'Routes', '@bp.route("/health", methods=["GET"])'),
+          ('Express', 'JavaScript', 'Routes', "router.get('/users/:id', handler)"),
+          ('Commander', 'JavaScript', 'CLI flags', ".option('-p, --port <n>')"),
+          ('Environment variables', 'Any language', 'Literal reads', 'os.environ["APP_LOG_LEVEL"]'),
+          ('Package scripts', 'npm · make · just', 'Tasks', '"scripts": { "build": "vite build" }'),
+          ('Settings & defaults', 'JSON · YAML · TOML', 'Declared values', 'workers = 8'),
+          ('Code symbols', 'Python · TS', 'Functions & classes', 'class Client: def connect(self): ...'),
+          ('File paths', 'Repository', 'Linked files', 'config/settings.toml'),
+        ] %}
+        {% for pass in range(2) %}{% for name, lang, kind, code in surfaces %}
+        <li class="dd-index-row"{% if pass %} aria-hidden="true"{% endif %}>
+          <span class="dd-index-tags"><span>{{ lang }}</span><span>{{ kind }}</span></span>
+          <span class="dd-index-name">{{ name }}</span>
+          <span class="dd-index-peek" aria-hidden="true"><code>{{ code }}</code></span>
+          <a class="dd-btn dd-btn-dark dd-index-btn" href="{{ settings.project_url }}/blob/main/docs/claims.md"{% if pass %} tabindex="-1"{% endif %}>See claims {{ arrow() }}</a>
+        </li>
+        {% endfor %}{% endfor %}
+      </ul>
+    </div>
+    <p class="dd-index-note">Coverage is partial for every framework: literal, static patterns only. <a href="{{ settings.project_url }}/blob/main/docs/LIMITATIONS.md">Known limits →</a></p>
+    <div class="dd-cursor" aria-hidden="true" data-cursor>{{ glyph('pilcrow') }}</div>
+  </section>
+
+  <!-- 06 QUOTES -->
+  <section class="dd-quotes" data-tone="light" aria-roledescription="carousel" aria-label="What the evidence says">
+    <div class="dd-quotes-inner" data-quotes>
+      <div class="dd-quotes-top"><p><span data-quote-count>1</span> / 4</p><p>What the evidence says:</p></div>
+      {{ glyph('quote', 'dd-quote-mark') }}
+      <div class="dd-quote-list">
+        <figure class="dd-quote is-active"><blockquote class="dd-quote-text">“Error: No such option '--line-number'.” Exit code 2, from the exact command rich-cli's README told us to run.</blockquote><figcaption><span class="dd-avatar dd-avatar-sm">R</span><span><b>rich-cli 1.8.1</b><br>Reproduced at README.md:61</span></figcaption></figure>
+        <figure class="dd-quote"><blockquote class="dd-quote-text">Rules decide literal claims first. The optional model can never override a finding the code already decided.</blockquote><figcaption><span class="dd-avatar dd-avatar-sm">d</span><span><b>docs-drift design rule</b><br>How it works</span></figcaption></figure>
+        <figure class="dd-quote"><blockquote class="dd-quote-text">Rule-only scans never import or execute your code. They parse text and syntax trees, and ask Git for history.</blockquote><figcaption><span class="dd-avatar dd-avatar-sm">S</span><span><b>Security model</b><br>SECURITY.md</span></figcaption></figure>
+        <figure class="dd-quote"><blockquote class="dd-quote-text">Two confirmed defects and two false positives in the saved sample. We publish both, because a tool you can't check is a tool you can't trust.</blockquote><figcaption><span class="dd-avatar dd-avatar-sm">4</span><span><b>rich-cli review</b><br>Saved scan, agent-assisted review</span></figcaption></figure>
+      </div>
+      <div class="dd-quote-arrows"><button type="button" aria-label="Previous" data-quote-prev><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><button type="button" aria-label="Next" data-quote-next><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></div>
+    </div>
+  </section>
+
+  <!-- 06 TRUST STATEMENT -->
+  <section class="dd-trust" data-tone="dark" aria-labelledby="trust-title">
+    <div class="dd-trust-bg" aria-hidden="true"><img src="/static/media/report.webp" alt="" width="1440" height="1280"></div>
+    <h2 id="trust-title" class="dd-h-xxl" data-rise>Does your documentation have trust issues?</h2>
+    <figure class="dd-tilt dd-trust-a" data-float><img src="/static/media/graph.webp" width="652" height="676" alt="Evidence graph linking README claims to source symbols and commits."></figure>
+    <figure class="dd-tilt dd-trust-b" data-float><img src="/static/media/pr.webp" width="996" height="605" alt="Generated Markdown review: documentation health 56 out of 100 with a verdict table."></figure>
+    <div class="dd-trust-foot">
+      <p class="dd-p-m">Every stale flag teaches a newcomer the README can't be trusted. docs-drift checks each instruction against the code, so the next person who follows your docs runs a command that works.</p>
+      <div class="dd-btn-row"><a class="dd-btn dd-btn-white" href="/case-study">Inspect the real case</a><a class="dd-btn dd-btn-lime" href="#scan">Scan a repo {{ arrow() }}</a></div>
+    </div>
+  </section>
+
+  <!-- 07 CTA -->
+  <section class="dd-cta" data-tone="dark" aria-labelledby="cta-title">
+    <div class="dd-cta-title"><h2 id="cta-title" class="dd-h-l" data-rise>Ready to check your docs?</h2><p class="dd-p-m">Choose how you'd like to start.</p></div>
+    <div class="dd-cta-cards">
+      <div class="dd-cta-card is-lime">
+        <h3 class="dd-h-s">Scan in the browser</h3>
+        {{ glyph('lens', 'dd-cta-glyph') }}
+        <p>Paste a public GitHub URL. No sign-in. Most small repos finish in under two minutes.</p>
+        <a class="dd-btn dd-btn-dark" href="#scan">Paste a repo URL</a>
+      </div>
+      <div class="dd-cta-card is-grey">
+        <h3 class="dd-h-s">Install the CLI</h3>
+        {{ glyph('terminal', 'dd-cta-glyph') }}
+        <p><code id="install-command">pipx install docs-drift</code><br>then run <code>docs-drift scan</code> in any repository.</p>
+        <button class="dd-btn dd-btn-white" id="copy-install" type="button">Copy ↗</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 SCANNER -->
+  <section id="scan" class="dd-scan" data-tone="light" aria-labelledby="scan-title">
+    <div class="dd-scan-head">
+      <h2 id="scan-title" class="dd-h-l" data-rise>Put your README to the test.</h2>
+      <p class="dd-p-m">A public GitHub URL. A static scan. Evidence you can inspect.</p>
+    </div>
+    <div class="dd-console">
+      <div class="dd-console-top"><span><i class="dd-dot" aria-hidden="true"></i> docs-drift / scanner</span><span id="service-status">Rule-based · no API key</span></div>
+      <form id="scan-form" class="dd-form">
         <label for="repo-url">Public GitHub repository</label>
-        <div class="inputrow"><span class="input-prefix" aria-hidden="true">↳</span><input id="repo-url" name="repo_url" type="text" inputmode="url" maxlength="512" required placeholder="github.com/owner/repository" autocomplete="off" spellcheck="false" aria-describedby="scan-help scan-error"><button class="button button-primary" type="submit" id="scan-button"><span>Scan repository</span><span aria-hidden="true">↗</span></button></div>
-        <div class="scan-meta"><p id="scan-help">Public repos only. Small repos work best. Up to 2 minutes.</p><span>No sign-in required</span></div>
+        <div class="dd-inputrow"><input id="repo-url" name="repo_url" type="text" inputmode="url" maxlength="512" required placeholder="github.com/owner/repository" autocomplete="off" spellcheck="false" aria-describedby="scan-help scan-error"><button class="dd-btn dd-btn-lime dd-btn-lg" type="submit" id="scan-button">Scan repository ↗</button></div>
+        <p id="scan-help" class="dd-form-help">Public repos only. Small repos work best. Up to two minutes.</p>
         <p id="scan-error" role="alert" hidden></p>
       </form>
-      <div class="scanner-bottom"><span>TRY A LIVE SCAN</span><button type="button" class="repo-shortcut" data-repo="https://github.com/Textualize/rich-cli">rich-cli <span aria-hidden="true">↗</span></button><button type="button" class="repo-shortcut" data-repo="https://github.com/simonw/files-to-prompt">files-to-prompt <span aria-hidden="true">↗</span></button><a href="/scan/example-rich-cli-reviewed">Or open the instant sample →</a></div>
-      <p class="notice" id="live-notice" {% if live_available %}hidden{% endif %}>Live scans are paused. The precomputed samples below still open immediately.</p>
-      <noscript><p class="notice">Live scanning needs JavaScript. You can still open the sample reports and read their evidence.</p></noscript>
+      <div class="dd-shortcuts"><span>Try</span><button type="button" class="dd-chip repo-shortcut" data-repo="https://github.com/Textualize/rich-cli">rich-cli</button><button type="button" class="dd-chip repo-shortcut" data-repo="https://github.com/simonw/files-to-prompt">files-to-prompt</button><a href="/scan/example-rich-cli-reviewed">or open the instant sample →</a></div>
+      <p class="dd-notice" id="live-notice" {% if live_available %}hidden{% endif %}>Live scans are paused. The saved samples below still open instantly.</p>
+      <noscript><p class="dd-notice">Live scanning needs JavaScript. The saved reports below still work.</p></noscript>
     </div>
-    <div class="samples-heading"><div><span class="eyebrow">Skip the wait</span><h3>Open the evidence.</h3></div><p>Precomputed snapshots, not live scan timings.</p></div>
-    <div class="sample-grid">
+    <div class="dd-samples">
       {% for example in examples if example.kind == 'public' %}
-      <a class="sample-card" href="/scan/{{ example.scan_id }}" data-reveal><div class="sample-top"><span class="sample-index">0{{ loop.index }}</span><span class="tag">{% if example.scan_id == 'example-rich-cli-reviewed' %}Agent-reviewed case{% elif 'historical' in example.name|lower %}Historical snapshot{% else %}Saved scan{% endif %}</span><span aria-hidden="true">↗</span></div><h4>{{ example.name }}</h4><p>{% if example.scan_id == 'example-rich-cli-reviewed' %}Two defective options, reproduced. Follow the report to the code and its limits.{% elif example.scan_id == 'example-rich-cli' %}The earlier scan, including two extension false positives. Compare it with the reviewed case.{% else %}A deliberately pinned historical snapshot. The upstream fix and remaining limits are disclosed.{% endif %}</p><div class="sample-bottom"><code>{{ example.sha[:8] }}</code><span>Open report →</span></div></a>
+      <a class="dd-sample" href="/scan/{{ example.scan_id }}"><span class="dd-sample-top"><span>0{{ loop.index }}</span><span>{% if example.scan_id == 'example-rich-cli-reviewed' %}Reviewed case{% elif 'historical' in example.name|lower %}Historical snapshot{% else %}Saved scan{% endif %}</span></span><span class="dd-sample-name">{{ example.name }}</span><span class="dd-sample-bottom"><code>{{ example.sha[:8] }}</code><span>Open report →</span></span></a>
       {% endfor %}
     </div>
-    <details class="fixture-disclosure"><summary>Synthetic fixtures <span>Separate from real-repository evidence</span></summary><p>Deterministic examples for exploring features. These results are not real-world accuracy measurements.</p><div class="chips">{% for example in examples if example.kind == 'fixture' %}<a class="example-chip" href="/scan/{{ example.scan_id }}">{{ example.name }} · synthetic ↗</a>{% endfor %}</div></details>
+    <details class="dd-fixtures"><summary>Synthetic fixtures <span>separate from real-repository evidence</span></summary><div class="dd-chips">{% for example in examples if example.kind == 'fixture' %}<a class="dd-chip" href="/scan/{{ example.scan_id }}">{{ example.name }}</a>{% endfor %}</div></details>
   </section>
 
-  <section class="chapter trust-chapter" aria-labelledby="trust-title">
-    <div class="chapter-heading" data-reveal><div class="chapter-index"><span>04</span><i></i><span>Built to be inspected</span></div><h2 id="trust-title">Evidence over<br><span class="muted-word">a perfect score.</span></h2></div>
-    <div class="trust-grid"><div class="trust-stat" data-reveal><strong>04<span>findings reviewed</span></strong><p>All four drift findings in the saved rich-cli sample. Selected and agent-assisted; no independent human labels.</p></div><div class="trust-stat" data-reveal><strong>02<span>confirmed defects</span></strong><p>Both incorrect options fail with exit 2. Both corrected commands succeed with exit 0.</p></div><div class="trust-stat" data-reveal><strong>02<span>false positives</span></strong><p>The saved scan wrongly flags two file extensions. The fresh scan does not. Recall is not measured.</p></div></div>
-    <div class="trust-foot"><p>These are review counts, not a population accuracy score. Framework coverage is partial. Human benchmark labeling remains pending.</p><a class="text-link" href="/case-study">Inspect the sample and counterexamples →</a></div>
-  </section>
-  <section class="workflow-strip" aria-labelledby="workflow-title" data-reveal><div><span class="eyebrow">Keep it in your workflow</span><h2 id="workflow-title">Before the next<br>“just follow the README.”</h2><div class="workflow-links"><a href="{{ settings.project_url }}/blob/main/docs/github-action.md">GitHub Action ↗</a><a href="{{ settings.project_url }}/tree/main/editors/vscode">VS Code ↗</a><a href="{{ settings.project_url }}">Source ↗</a></div></div><div class="install-block"><span class="eyebrow">From a source checkout · PyPI unpublished</span><div class="installcode"><code id="install-command">uv run --all-extras docs-drift scan --repo .</code><button id="copy-install" class="utility-button" aria-label="Copy source checkout scan command">Copy ↗</button></div><p>Clone the repository first. A registry install is not yet available.</p></div></section>
 </main>
-{% endblock %}
+{% include '_footer.html' %}
+</body>
+</html>
