@@ -1,6 +1,18 @@
 {
   "cards": [
     {
+      "file": "flow-highlights-2026-10-25.png",
+      "sha256": "4d490b40e20c47d10c034276d9e8e12669ab151af52e68b9baa8b0a34e0eb99a",
+      "received_date": "2026-10-25",
+      "capture_date": "not independently established",
+      "values": {
+        "daily_streak_days": 5,
+        "total_words_dictated": 139355,
+        "average_wpm": 222,
+        "apps_used": 16
+      }
+    },
+    {
       "file": "flow-highlights-2026-10-22.png",
       "sha256": "0a99115c9cc10b00bb1bbf31cdd03d5faeedc51b50a1b51de82ddb04a4947ddc",
       "received_date": "2026-10-22",

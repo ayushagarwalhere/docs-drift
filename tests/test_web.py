@@ -131,7 +131,7 @@ def test_lifecycle_rendering_examples_and_headers(tmp_path: Path, result: ScanRe
         assert review.headers["cache-control"] == "no-store"
         graph = client.get(f"/api/scans/{ident}/graph").json()
         assert len(graph["nodes"]) <= 1000
-        assert "placeholder" in client.get("/built-with-voice").text.lower()
+        assert "139,355" in client.get("/built-with-voice").text
         assert client.get("/healthz").json()["status"] == "ok"
     assert not list((tmp_path / "data/work").iterdir())
 
