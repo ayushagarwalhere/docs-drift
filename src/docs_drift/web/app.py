@@ -20,7 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ConfigDict, Field
 
-from docs_drift.limits import MAX_BODY_BYTES, MAX_IP_BUCKETS
+from docs_drift.limits import MAX_BODY_BYTES, MAX_IP_BUCKETS, MAX_WEBHOOK_BYTES
 from docs_drift.models import ScanResult
 from docs_drift.report import RenderOptions, render
 from docs_drift.report.html import graph_data
@@ -40,21 +40,24 @@ class ScanRequest(BaseModel):
 
 
 class SafetyMiddleware:
-    def __init__(self, app: Any):
+    def __init__(self, app: Any, large_paths: dict[str, int] | None = None):
         self.app = app
+        # Signed GitHub webhooks are the only larger POST bodies; everything else keeps the tight limit.
+        self.large_paths = large_paths or {}
 
     async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
         if scope["method"] == "POST":
+            limit = self.large_paths.get(scope["path"], MAX_BODY_BYTES)
             body = bytearray()
             while True:
                 message = await receive()
                 if message["type"] == "http.disconnect":
                     return
                 body.extend(message.get("body", b""))
-                if len(body) > MAX_BODY_BYTES:
+                if len(body) > limit:
                     await JSONResponse(
                         {"detail": "The request is too large. Send only a GitHub URL and optional ref."},
                         status_code=413,
@@ -76,8 +79,24 @@ class SafetyMiddleware:
         await self.app(scope, receive, send)
 
 
-def create_app(settings: Settings | None = None, *, test_runner: Any = None) -> FastAPI:  # noqa: PLR0915 - route factory.
+def _github_router(settings: Settings) -> Any:
+    """Mount the GitHub App webhook only when DOCS_DRIFT_GITHUB_APP_* is configured."""
+    from docs_drift.github.app_config import GitHubAppConfig  # noqa: PLC0415 - import-light settings.
+
+    config = GitHubAppConfig.from_env()
+    if config is None:
+        return None
+    from docs_drift.github.app_server import create_router  # noqa: PLC0415 - optional github-app extra.
+
+    return create_router(config, work_dir=settings.data_dir.resolve() / "github-work")
+
+
+def create_app(  # noqa: PLR0915 - route factory.
+    settings: Settings | None = None, *, test_runner: Any = None, github_router: Any = None
+) -> FastAPI:
     settings = settings or Settings.from_env()
+    if github_router is None:
+        github_router = _github_router(settings)
     store = Store(settings)
     queue = LocalQueue(settings, store, test_runner)
     examples: list[dict[str, Any]] = []
@@ -102,6 +121,8 @@ def create_app(settings: Settings | None = None, *, test_runner: Any = None) -> 
                 examples.append(item)
         yield
         await queue.close()
+        if github_router is not None:
+            await asyncio.to_thread(github_router.queue.close)
 
     app = FastAPI(title="docs-drift", lifespan=lifespan, docs_url=None, redoc_url=None)
     app.state.queue, app.state.store = queue, store
@@ -111,7 +132,11 @@ def create_app(settings: Settings | None = None, *, test_runner: Any = None) -> 
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
     )
-    app.add_middleware(SafetyMiddleware)
+    app.add_middleware(
+        SafetyMiddleware, large_paths={"/github/webhook": MAX_WEBHOOK_BYTES} if github_router is not None else None
+    )
+    if github_router is not None:
+        app.include_router(github_router)
 
     @app.middleware("http")
     async def security(request: Request, call_next: Any) -> Response:

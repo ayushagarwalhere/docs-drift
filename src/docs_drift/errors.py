@@ -71,7 +71,10 @@ class Group(TyperGroup):
         try:
             destination = ctx.params.get("output")
             quiet = ctx.params.get("quiet", False)
-            capture = ctx.parent is None and ctx._protected_args[:1] != ["lsp"] and bool(destination or quiet)
+            # Protocol servers own stdout; never capture it.
+            capture = (
+                ctx.parent is None and ctx._protected_args[:1] not in (["lsp"], ["mcp"]) and bool(destination or quiet)
+            )
             buffer = StringIO()
             with redirect_stdout(buffer) if capture else nullcontext():
                 value = super().invoke(ctx)

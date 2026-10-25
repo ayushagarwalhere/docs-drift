@@ -1,0 +1,43 @@
+# Comment on pull requests with a sticky docs-drift summary and inline suggested changes.
+# Replace <reviewed-commit-sha> with a reviewed commit of ayushagarwalhere/docs-drift.
+name: Documentation drift
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write # sticky summary comment + inline review suggestions
+  # checks: write      # uncomment together with check-run: 'true'
+
+concurrency:
+  group: docs-drift-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  docs-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          # The PR head (not the merge commit) keeps inline comment lines exact.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5 # pin to a reviewed commit SHA
+        with:
+          python-version: '3.12'
+      - id: drift
+        uses: ayushagarwalhere/docs-drift@<reviewed-commit-sha>
+        with:
+          base-ref: ${{ github.event.pull_request.base.sha }}
+          comment: 'true'
+          check-run: 'false'
+          # fail-on-drift: 'false'  # report-only while adopting
+      - if: always() && steps.drift.outputs.report-directory != ''
+        uses: actions/upload-artifact@v4 # pin to a reviewed commit SHA
+        with:
+          name: docs-drift-report
+          path: ${{ steps.drift.outputs.report-directory }}
+          retention-days: 14

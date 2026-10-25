@@ -15,7 +15,7 @@ from docs_drift.git_safety import checkout_options
 from docs_drift.history import _run
 from docs_drift.history_cache import CACHE_DISABLED
 from docs_drift.llm.privacy import mask_secrets, redact_result, redact_value
-from docs_drift.models import Evidence, ScanResult
+from docs_drift.models import Evidence, Finding, ScanResult, Verdict
 from docs_drift.ownership import coverage_report
 from docs_drift.report import render
 from docs_drift.review import ReviewBook, review_status
@@ -33,6 +33,15 @@ def static_scan(repo: Path, config: Config) -> ScanResult:
         CACHE_DISABLED.reset(token)
 
 
+def _same_drift(old: Finding, new: Finding) -> bool:
+    if (old.verdict, old.suggestion, old.reasons) == (new.verdict, new.suggestion, new.reasons):
+        return True
+    # Base snapshots are scanned without history, so a history-confirmed rename at the
+    # head appears as plain missing drift at the base. That drift is pre-existing, not new.
+    absent = {Verdict.missing, Verdict.renamed}
+    return old.verdict in absent and new.verdict in absent
+
+
 def pr_comparison(repo: Path, config: Config, base: str) -> tuple[ScanResult, ScanResult, dict[str, Any]]:
     base_sha = resolve_revision(repo, base)
     before = scan_snapshot(repo, base_sha, config)
@@ -43,9 +52,7 @@ def pr_comparison(repo: Path, config: Config, base: str) -> tuple[ScanResult, Sc
     observations = []
     for finding in current.findings:
         old = previous.get(finding.claim.claim_id)
-        if not finding.is_drift or (
-            old and (old.verdict, old.suggestion, old.reasons) == (finding.verdict, finding.suggestion, finding.reasons)
-        ):
+        if not finding.is_drift or (old and _same_drift(old, finding)):
             continue
         if old is None and finding.claim.doc_path not in changed:
             continue

@@ -22,6 +22,27 @@ inputs:
   max-findings:
     description: Allowed number of qualifying new drift findings before the gate fails.
     default: '0'
+  mode:
+    description: >-
+      check (gate and artifacts only), pr-review (sticky PR comment and inline suggestions),
+      issue (one tracking issue for scheduled scans) or auto (pr-review on pull requests,
+      issue on schedule/workflow_dispatch).
+    default: check
+  comment:
+    description: Shortcut for mode auto when mode is check. Requires pull-requests/issues write permission.
+    default: 'false'
+  github-token:
+    description: Token for publishing; only the publish step receives it, never the scan step.
+    default: ${{ github.token }}
+  issue-label:
+    description: Label that identifies the docs-drift tracking issue in issue mode.
+    default: docs-drift
+  check-run:
+    description: In pr-review mode also create a docs-drift Check Run (needs checks write).
+    default: 'false'
+  suggestions:
+    description: Attach GitHub suggested changes to inline comments when the fix is a certain line edit.
+    default: 'true'
 outputs:
   report-directory:
     description: Runner-local HTML, JSON, SARIF and Markdown report directory.
@@ -38,6 +59,9 @@ outputs:
   baseline-drift:
     description: Existing drift accepted by the selected baseline; retained in full reports.
     value: ${{ steps.scan.outputs.baseline-drift }}
+  bundle-path:
+    description: Runner-local JSON bundle of publishable findings consumed by the publish step.
+    value: ${{ steps.scan.outputs.bundle-path }}
 runs:
   using: composite
   steps:
@@ -47,7 +71,7 @@ runs:
         ACTION_SOURCE: ${{ github.action_path }}
       run: |
         python -m venv "$RUNNER_TEMP/docs-drift-action"
-        "$RUNNER_TEMP/docs-drift-action/bin/python" -m pip install "$ACTION_SOURCE"
+        "$RUNNER_TEMP/docs-drift-action/bin/python" -m pip install "$ACTION_SOURCE[github]"
     - id: scan
       shell: bash
       env:
@@ -60,3 +84,17 @@ runs:
         SCAN_MAX_FINDINGS: ${{ inputs.max-findings }}
         ACTION_SOURCE: ${{ github.action_path }}
       run: '"$RUNNER_TEMP/docs-drift-action/bin/python" "$ACTION_SOURCE/scripts/action_runner.py"'
+    - id: publish
+      if: ${{ always() && steps.scan.outputs.bundle-path != '' && (inputs.mode != 'check' || inputs.comment == 'true') }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        DOCS_DRIFT_MODE: ${{ inputs.mode }}
+        DOCS_DRIFT_COMMENT: ${{ inputs.comment }}
+        DOCS_DRIFT_BUNDLE: ${{ steps.scan.outputs.bundle-path }}
+        DOCS_DRIFT_ISSUE_LABEL: ${{ inputs.issue-label }}
+        DOCS_DRIFT_CHECK_RUN: ${{ inputs.check-run }}
+        DOCS_DRIFT_SUGGESTIONS: ${{ inputs.suggestions }}
+        ACTION_SOURCE: ${{ github.action_path }}
+      working-directory: ${{ github.workspace }}
+      run: '"$RUNNER_TEMP/docs-drift-action/bin/python" "$ACTION_SOURCE/scripts/action_publish.py"'

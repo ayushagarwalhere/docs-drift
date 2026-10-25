@@ -15,6 +15,7 @@ from pathlib import Path
 from docs_drift.config import Config
 from docs_drift.docs.defaults import extract_defaults
 from docs_drift.docs.discover import DiscoveryWarning, discover_docs, read_doc
+from docs_drift.docs.discover import _format as doc_format
 from docs_drift.docs.extract_blocks import extract_block_claims, project_command_names
 from docs_drift.docs.extract_inline import extract_claims
 from docs_drift.docs.sections import ParsedDoc, is_historical_span, parse_document
@@ -177,9 +178,9 @@ def scan_claims(
                         DocFile(
                             path=path,
                             content_hash=hashlib.sha256(text.encode()).hexdigest(),
-                            format={".rst": DocFormat.rst, ".mdx": DocFormat.mdx}.get(
-                                Path(path).suffix, DocFormat.markdown
-                            ),
+                            # Same (case-insensitive) suffix mapping as discovery, so in-memory and
+                            # on-disk checks of one document parse it identically.
+                            format=doc_format(path) or DocFormat.markdown,
                         )
                     )
         warnings_out.extend(str(item.message) for item in caught)

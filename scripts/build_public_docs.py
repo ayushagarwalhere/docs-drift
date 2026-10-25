@@ -86,8 +86,12 @@ written before a failing drift gate exits, so artifact upload should use
 See [organization adoption](ORGANIZATIONS.md) for multi-repository scanning,
 review and operating guidance.
 
-The Action never posts PR comments, accepts model/API keys, or calls a model.
-It uses no write token. Do not use `pull_request_target` to check out PR code with
+In the default `check` mode the Action never posts comments, uses no write token,
+accepts no model/API keys and never calls a model. Opt in with `comment: 'true'` (or
+`mode: pr-review` / `mode: issue`) for a sticky PR summary with inline suggested
+changes, or a scheduled tracking issue; only the separate publish step receives
+`github-token`. See [GitHub integration](github-integration.md) for permissions and
+fork handling. Do not use `pull_request_target` to check out PR code with
 secrets/write permissions. Fork PR checks need only read permissions. JSON/HTML
 and Markdown are redacted at serialization; repository caches are not trusted.
 

@@ -1,0 +1,21 @@
+{
+  "name": "docs-drift",
+  "url": "https://github.com/ayushagarwalhere/docs-drift",
+  "description": "Flags documentation statements the code no longer supports, with suggested fixes.",
+  "hook_attributes": {
+    "url": "https://13-211-179-95.sslip.io/github/webhook",
+    "active": true
+  },
+  "public": false,
+  "default_permissions": {
+    "checks": "write",
+    "pull_requests": "write",
+    "issues": "write",
+    "contents": "read",
+    "metadata": "read"
+  },
+  "default_events": [
+    "pull_request",
+    "issue_comment"
+  ]
+}

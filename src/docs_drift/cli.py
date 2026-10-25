@@ -3,6 +3,7 @@
 import asyncio
 import json
 import math
+import os
 import sys
 import time
 import tomllib
@@ -866,6 +867,59 @@ def lsp(ctx: typer.Context) -> None:
     start(options.repo, options.config)
 
 
+class MCPTransport(StrEnum):
+    """Supported Model Context Protocol transports."""
+
+    stdio = "stdio"
+    streamable_http = "streamable-http"
+
+
+@app.command("mcp", cls=Command)
+def mcp_command(
+    ctx: typer.Context,
+    transport: Annotated[
+        MCPTransport, typer.Option(help="stdio for editors and agents; streamable-http for a local HTTP endpoint.")
+    ] = MCPTransport.stdio,
+    host: Annotated[str, typer.Option(help="Interface for streamable-http (keep it local).")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port for streamable-http.", min=1, max=65535)] = 8765,
+    allow_root: Annotated[
+        list[Path] | None, typer.Option("--allow-root", help="Another repository root tools may inspect.")
+    ] = None,
+    timeout: Annotated[float, typer.Option(help="Seconds before a tool call gives up.", min=1, max=3600)] = 120.0,
+) -> None:
+    """Start a Model Context Protocol server so AI coding agents can check docs drift."""
+    from docs_drift.mcp_server import serve  # noqa: PLC0415 - optional dependency.
+
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    for root in allow_root or []:
+        if not root.is_dir():
+            raise typer.BadParameter(f"{root} is not a directory.", param_hint="--allow-root")
+    # The global --config was validated by the callback; tools reload it when the file changes.
+    config = ctx.parent.params.get("config") if ctx.parent else None
+    repo = options.repo
+    source = ctx.parent.get_parameter_source("repo") if ctx.parent else None
+    project = os.environ.get("CLAUDE_PROJECT_DIR")
+    if project and (source is None or source.name == "DEFAULT"):
+        # Claude Code exports the project root; prefer it over the launch directory when --repo is omitted.
+        repo = Path(project).resolve()
+        if not repo.is_dir():
+            raise typer.BadParameter(f"CLAUDE_PROJECT_DIR={project} is not a directory.", param_hint="--repo")
+    serve(
+        repo,
+        config_path=Path(config).resolve() if config else None,
+        extra_roots=allow_root or [],
+        transport="stdio" if transport == MCPTransport.stdio else "streamable-http",
+        host=host,
+        port=port,
+        timeout=timeout,
+        verbose=options.verbose,
+    )
+
+
 from docs_drift.workflow_cli import register as register_workflows  # noqa: E402
 
 register_workflows(app)
+
+from docs_drift.github.cli import register as register_github  # noqa: E402
+
+register_github(app)

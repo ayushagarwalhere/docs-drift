@@ -1,0 +1,39 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ayushagarwalhere/docs-drift",
+  "title": "docs-drift",
+  "description": "Find docs the code no longer supports: stale flags, env vars, endpoints, settings and paths.",
+  "websiteUrl": "https://github.com/ayushagarwalhere/docs-drift/blob/main/docs/mcp.md",
+  "repository": {
+    "url": "https://github.com/ayushagarwalhere/docs-drift",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "docs-drift",
+      "version": "0.1.1",
+      "runtimeHint": "uvx",
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--with",
+          "value": "mcp>=2.3,<3",
+          "description": "Install the MCP SDK (the docs-drift[mcp] extra) alongside docs-drift."
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp",
+          "description": "Start the MCP server over stdio."
+        }
+      ],
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

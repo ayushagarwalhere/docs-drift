@@ -218,3 +218,27 @@ Model rewrites are limited to one sentence. Unknown new identifiers, missing ren
 targets, multiple sentences, and newly extracted non-OK claims reject the rewrite.
 Model edits stay separately labelled. Static checks establish only supported code
 claims, not runtime success.
+
+## GitHub integration and App
+
+Reviewed 25 October 2026 with offline tests against a fake GitHub API. No App has
+been registered or deployed and no real GitHub API call has been made yet.
+
+| Threat | Impact | Mitigation | Test/evidence |
+| --- | --- | --- | --- |
+| Forged or tampered webhook | Attacker-chosen scans and comments | `X-Hub-Signature-256` HMAC-SHA256 over the raw body with `hmac.compare_digest`; missing/invalid → 401; secret of at least 16 characters required at startup | `test_signature_verification_valid_invalid_missing`, `test_webhook_route_rejects_bad_signatures_and_replays` |
+| Replayed delivery | Duplicate work and comments | Bounded 24-hour `X-GitHub-Delivery` cache → 409 | same route test, `test_replay_cache_is_bounded_and_expires` |
+| Webhook flood / huge PRs | Resource exhaustion | 5 MB webhook body cap (4 KB elsewhere unchanged), bounded backlog (503 when full), per-PR coalescing, 1–4 workers, fetch disk/time budget, 1 MB per file, sparse text-only checkout, disposable scan subprocess with Unix CPU/memory limits and a 180 s timeout | queue and route tests |
+| Untrusted repository content | Code execution on the host | No hooks, filters, LFS smudge, submodules, redirects or `file`/`ext` protocols; symlinks checked out as plain files; tree paths validated; scan only parses text and never runs target code; the repo's `.docs-drift.toml` is validated TOML data and cannot enable model calls | end-to-end webhook test; `web/git.py` hardening reused |
+| Token exposure | Repository write access | Installation tokens are scoped to the installation, cached in memory and expire in an hour; they reach Git only through `GIT_CONFIG_*` environment entries of the fetch process (not argv, `.git/config` or logs); the scan subprocess and the Action scan step receive no token; client reprs/errors omit credentials; CLI reads tokens only from the environment | `test_client_retries_5xx_and_transport_errors_then_fails_bounded_without_leaking_token`, end-to-end token assertions |
+| Private key handling | App impersonation | Key read from the environment only, never logged or written; JWTs are RS256, `iat` backdated 60 s, `exp` under 10 minutes; manifest helper prints the `/etc/docs-drift.env` lines once and saves nothing | `test_app_jwt_claims_are_backdated_short_lived_and_rs256`, manifest tests |
+| Comment/Markdown injection from docs or code | Mentions, tracking images, phishing links, broken layout | All repository text goes through the report escaper (mentions, links, images, HTML, backticks, table pipes) or a fence longer than any backtick run; permalinks are built only from validated slugs, SHAs and `https` hosts; secret-shaped text is masked and suggestions containing it are dropped | `test_repository_text_is_escaped_everywhere` |
+| Over-broad permissions | Larger blast radius | Action defaults to `check` (read-only); publishing needs explicit `pull-requests`/`issues`/`checks` write; App requests Checks/PRs/Issues write and Contents/Metadata read only | manifest permission test |
+| Fork PRs / `pull_request_target` | Secret or write-token exposure to fork code | Fork `pull_request` runs are detected and skipped with a log line; 403s are treated as read-only; docs warn against `pull_request_target`; the App never executes PR code | `test_fork_pr_cli_skips_commenting_with_clear_message`, `test_read_only_token_skips_publishing_without_failing` |
+| Spoofed sticky marker or `/docs-drift recheck` | Hijacked, suppressed or spammed comments | Markers are honoured, and comments edited, only when authored by the publishing identity (App `slug[bot]`, `github-actions[bot]` or the token's user); recheck requires owner/member/collaborator association and a non-bot author | `test_markers_from_other_authors_are_ignored`, `test_job_from_event_filters_drafts_closed_prs_and_untrusted_recheck` |
+
+Residual risks: the replay cache and queue live in one process's memory (a restart
+forgets them; queued and running jobs are logged and marked "Service restarting" for a recheck); base snapshots are scanned without the
+source preflight that guards the head checkout, relying on archive budgets and the
+subprocess limits; Windows hosts lack the Unix memory limit; and GitHub's REST API
+cannot resolve review threads, so resolved findings are marked by editing comments.

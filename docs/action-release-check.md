@@ -28,7 +28,8 @@ of the synthetic test repository, PR and review comment separately.
    and rerun the Action to see a clean check. Capture the real PR URL and run URL
    for the final verification table. Do not describe a local preview as posted.
 
-The composite Action itself has no comment token and never posts comments.
-Keep write permission and any owner-approved review submission in a separate
+In its default `check` mode the composite Action has no comment token and never
+posts comments; publishing modes are opt-in and give the token only to a separate
+publish step (see [GitHub integration](github-integration.md)). Keep write permission and any owner-approved review submission in a separate
 trusted context. Never combine a privileged pull_request_target checkout with
 execution of untrusted PR scripts.

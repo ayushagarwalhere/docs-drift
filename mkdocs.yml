@@ -39,8 +39,11 @@ nav:
       - Organization adoption: ORGANIZATIONS.md
       - Maintainer pilot: MAINTAINER-PILOT.md
       - GitHub Action: github-action.md
+      - GitHub PR reviews and issues: github-integration.md
+      - GitHub App: github-app.md
       - Pre-commit and CI: ci.md
       - VS Code: vscode.md
+      - AI coding agents (MCP): mcp.md
       - Python API: python-api.md
   - Design:
       - How it works: how-it-works.md

@@ -1,4 +1,8 @@
-"""Static, read-token-only composite Action runner; never posts comments or calls a model."""
+"""Static composite Action scan step: holds no token, never posts or calls a model.
+
+Publishing to GitHub is a separate step (scripts/action_publish.py) that receives
+the write token and only the bundle written here, never the scan environment.
+"""
 
 import os
 import uuid
@@ -7,6 +11,8 @@ from pathlib import Path
 from docs_drift.baseline import load_baseline
 from docs_drift.collaboration import pr_comparison, write_pr_report
 from docs_drift.config import load_config
+from docs_drift.github.bundle import BUNDLE_NAME, bundle_from_evaluation, touched_findings
+from docs_drift.github.diff import changed_lines
 from docs_drift.history_cache import CACHE_DISABLED
 from docs_drift.policy import GatePolicy, evaluate_gate
 from docs_drift.report import RenderOptions, render
@@ -14,7 +20,7 @@ from docs_drift.review import load_reviews, suppressed_ids
 from docs_drift.scanning import run_scan
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0915 - one linear Action contract.
     workspace = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
     repo = (workspace / os.getenv("SCAN_REPO", ".")).resolve()
     if not repo.is_relative_to(workspace):
@@ -49,9 +55,14 @@ def main() -> None:
         if Path(selected).is_absolute() or not path.resolve().is_relative_to(repo):
             raise ValueError("Reviews must stay inside the selected repository.")
         book = load_reviews(path)
+    base_sha = None
+    touched = []
     if base := os.getenv("SCAN_BASE_REF", "").strip():
         result, gate_result, comparison = pr_comparison(repo, config, base)
         write_pr_report(gate_result, comparison, output / "pr", book, full_result=result)
+        base_sha = str(comparison["base_sha"])
+        drift_docs = {f.claim.doc_path for f in result.findings if f.is_drift}
+        touched = touched_findings(result, changed_lines(repo, base_sha, paths=drift_docs))
     suppressed = suppressed_ids(result, book) if book else set()
     for format, suffix in [("html", "html"), ("json", "json"), ("sarif", "sarif"), ("markdown", "md")]:
         (output / ("scan." + suffix)).write_text(render(result, format, RenderOptions(pr_mode=True)), encoding="utf-8")
@@ -67,8 +78,11 @@ def main() -> None:
         update={"findings": [f for f in evaluation.new_findings if f.claim.claim_id not in suppressed]}
     )
     print(render(annotations, "github"), end="")
+    bundle = bundle_from_evaluation(result, evaluation, policy, suppressed, base_sha, touched)
+    (output / BUNDLE_NAME).write_text(bundle.model_dump_json(), encoding="utf-8")
     with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
         stream.write("report-directory=" + output.as_posix() + "\n")
+        stream.write("bundle-path=" + (output / BUNDLE_NAME).as_posix() + "\n")
         for name, value in {
             "gate-status": summary.status,
             "new-drift": summary.new_drift,

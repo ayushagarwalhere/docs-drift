@@ -39,10 +39,8 @@ def public_result(result: ScanResult, url: str) -> ScanResult:
     return ScanResult.model_validate(data)
 
 
-def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
-    from docs_drift.scanning import run_scan  # noqa: PLC0415 - worker-only scanner import.
-
-    # Reject pathological parser input before any extractor or JSON/TOML parser sees it.
+def preflight(repo: Path) -> None:
+    """Reject pathological parser input before any extractor or JSON/TOML parser sees it."""
     for path in repo.rglob("*"):
         if not path.is_file() or ".git" in path.relative_to(repo).parts or path.is_symlink():
             continue
@@ -69,6 +67,12 @@ def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
                         "A configuration file is nested too deeply.",
                         "Scan locally after reviewing the input.",
                     )
+
+
+def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - worker-only scanner import.
+
+    preflight(repo)
     token = CACHE_DISABLED.set(True)
     try:
         result = run_scan(

@@ -89,13 +89,34 @@ jobs:
 ```
 
 With `base-ref`, the gate fails only on drift the pull request introduces.
-Reports are written as JSON, HTML, SARIF and Markdown. [Action guide](docs/github-action.md).
+Reports are written as JSON, HTML, SARIF and Markdown. Add `comment: 'true'` for a sticky PR
+summary with inline suggested changes, or use a scheduled tracking issue or the self-hosted GitHub App.
+[Action guide](docs/github-action.md) · [GitHub integration](docs/github-integration.md) ·
+[GitHub App](docs/github-app.md).
 
 ## Editor
 
 The VS Code extension shows findings as diagnostics, jumps to the source
 declaration, and offers quick fixes, backed by `docs-drift lsp`.
 [Extension guide](docs/vscode.md).
+
+## Use it from your AI coding agent
+
+<!-- mcp-name: io.github.ayushagarwalhere/docs-drift -->
+
+An MCP server lets Claude Code, Cursor, VS Code Copilot, Windsurf and other agents
+check docs while they edit: ask "check docs drift" or "is my README still accurate
+after this rename?", or have the agent check a paragraph before writing it. Tools
+are read-only except an explicit `apply_fix`, and paths are confined to the
+repository. Claude Code setup:
+
+```text
+claude mcp add docs-drift -- uvx --from "docs-drift[mcp]" docs-drift mcp
+```
+
+Until docs-drift 0.1.1 is on PyPI, use
+`--from "docs-drift[mcp] @ git+https://github.com/ayushagarwalhere/docs-drift"` instead.
+[MCP guide](docs/mcp.md): Cursor, VS Code, Windsurf and Claude Desktop setup, plus the tool reference.
 
 ## How it works
 

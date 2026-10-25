@@ -6,6 +6,30 @@ All notable user-facing changes are recorded here, following
 
 ## [Unreleased]
 
+### Added
+
+- `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
+  extra, for AI coding agents. It checks the repository, single documents and unsaved
+  text, explains findings, previews fixes and applies them only on an explicit,
+  destructive-annotated call. Paths are confined to the repository root, output and
+  time are bounded, and scans are cached until files change.
+- GitHub publishing (`docs-drift github pr-review` / `issue`, `github` extra): a
+  sticky PR summary comment, inline review comments with GitHub suggested changes
+  on diff lines, deduplicated reruns, an optional Check Run, and one scheduled
+  tracking issue that closes at zero drift and reopens if it returns.
+- Action inputs `mode`, `comment`, `github-token`, `check-run`, `suggestions` and
+  `issue-label` (default behaviour unchanged); the write token reaches only a
+  separate publish step. Example PR and scheduled workflows in `examples/workflows`.
+- A self-hostable GitHub App (`github-app` extra): signed, replay-protected
+  webhooks, a coalescing job queue, credential-scoped PR fetches, and a manifest
+  helper that registers the App in two clicks and prints the `/etc/docs-drift.env`
+  lines for the EC2 host without saving secrets.
+
+### Fixed
+
+- PR comparisons no longer report history-confirmed renames as new drift when the
+  base snapshot (scanned without history) already had the same claim missing.
+
 ## [0.1.0] - 2026-10-24
 
 ### Added
