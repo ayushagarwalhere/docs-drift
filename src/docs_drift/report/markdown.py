@@ -2,9 +2,10 @@
 
 import html
 
+from docs_drift.drift_age import age_label
 from docs_drift.models import ScanResult
 from docs_drift.report import RenderOptions
-from docs_drift.report.common import health, ordered
+from docs_drift.report.common import health, ordered, verdict_counts
 
 
 def escape(text: object) -> str:
@@ -31,14 +32,17 @@ def fence(text: str, language: str) -> str:
 
 def render(result: ScanResult, options: RenderOptions) -> str:
     header = f"# Documentation health: {health(result.findings)}/100\n\n| Verdict | Count |\n| --- | ---: |\n"
-    header += "".join(f"| {key} | {value} |\n" for key, value in result.summary()["by_verdict"].items())
+    header += "".join(f"| {key} | {value} |\n" for key, value in verdict_counts(result).items())
+    if result.dependency_issues:
+        header += f"\n{len(result.dependency_issues)} dependency usage issue(s); run `docs-drift deps` for details.\n"
     note = f"\nReport truncated. [Full artifact]({options.artifact_url.replace(')', '%29')}).\n"
     blocks, previous = [header], None
     for f in ordered(result):
         if f.verdict == "ok":
             continue
         block = f"\n## {escape(f.claim.doc_path)}\n" if previous != f.claim.doc_path else ""
-        block += f"\n**{escape(f.verdict)} · line {f.claim.line}** {escape(f.claim.raw_text)}\n\n"
+        due = f" · fix by {f.fix_by.isoformat()}" if f.fix_by else ""
+        block += f"\n**{escape(f.verdict)} · line {f.claim.line}{due}** {escape(f.claim.raw_text)}\n\n"
         block += (
             fence(f.suggestion or f.reasons[0], "text")
             if options.pr_mode
@@ -49,6 +53,9 @@ def render(result: ScanResult, options: RenderOptions) -> str:
             block += f"{escape(evidence.file)}:{evidence.line}\n\n" + fence(evidence.text, "text") + "\n\n"
         if f.introduced_by:
             block += escape(f"{f.introduced_by.short_sha} {f.introduced_by.summary} {f.introduced_by.date.isoformat()}")
+            age = age_label(f, result.config_used.policy)
+            if age:
+                block += "<br>" + escape(age[0].upper() + age[1:])
         block += "\n</details>\n"
         if len(("".join(blocks) + block + note).encode()) > options.size_cap:
             blocks.append(note)

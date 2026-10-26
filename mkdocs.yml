@@ -28,16 +28,21 @@ nav:
   - Getting started: getting-started.md
   - Configuration: configuration.md
   - Claims and verdicts: claims.md
+  - Dependency drift: dependencies.md
   - Supported ecosystems: support.md
   - Rules:
       - DD001: rules/DD001.md
       - DD002: rules/DD002.md
       - DD003: rules/DD003.md
       - DD004: rules/DD004.md
+      - DD006: rules/DD006.md
+      - DD007: rules/DD007.md
   - Integrations:
       - Team workflows: TEAM-WORKFLOWS.md
       - Organization adoption: ORGANIZATIONS.md
       - Maintainer pilot: MAINTAINER-PILOT.md
+      - Contributor mode: contribute.md
+      - Drift age policy: drift-age.md
       - GitHub Action: github-action.md
       - GitHub PR reviews and issues: github-integration.md
       - GitHub App: github-app.md
@@ -45,10 +50,12 @@ nav:
       - VS Code: vscode.md
       - AI coding agents (MCP): mcp.md
       - Python API: python-api.md
+      - As a dependency: as-a-dependency.md
   - Design:
       - How it works: how-it-works.md
       - Graph schema: graph.md
       - LLM mode: llm-mode.md
+      - LLM triage evaluation: llm-triage-eval.md
   - Trust:
       - Product maturity: PRODUCT.md
       - Security: SECURITY.md

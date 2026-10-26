@@ -27,6 +27,11 @@ Optional prose assessment settings.
 | `llm.timeout` | `{"exclusiveMinimum": 0, "maximum": 600, "type": "number"}` | `60.0` |
 | `llm.budget` | `{"minimum": 0, "type": "number"}` | `0.5` |
 | `llm.redact_paths` | `{"items": {"type": "string"}, "type": "array"}` | `[]` |
+| `llm.triage` | `{"type": "boolean"}` | `false` |
+| `llm.triage_model` | `{"anyOf": [{"type": "string"}, {"type": "null"}]}` | `null` |
+| `llm.triage_max_findings` | `{"maximum": 5000, "minimum": 0, "type": "integer"}` | `200` |
+| `llm.triage_batch_size` | `{"maximum": 12, "minimum": 1, "type": "integer"}` | `8` |
+| `llm.triage_context_lines` | `{"maximum": 40, "minimum": 2, "type": "integer"}` | `8` |
 
 ## history
 
@@ -36,6 +41,29 @@ Limits for static git history inspection.
 | --- | --- | --- |
 | `history.max_commits` | `{"minimum": 0, "type": "integer"}` | `2000` |
 | `history.show_emails` | `{"type": "boolean"}` | `false` |
+
+## deps
+
+Dependency and runtime checks against package manifests; manifests are read as data only.
+
+| Setting | Type / constraints | Default |
+| --- | --- | --- |
+| `deps.enabled` | `{"type": "boolean"}` | `true` |
+| `deps.usage` | `{"type": "boolean"}` | `false` |
+| `deps.report_understated` | `{"type": "boolean"}` | `false` |
+| `deps.ignore` | `{"items": {"type": "string"}, "type": "array"}` | `[]` |
+| `deps.import_map` | `{"additionalProperties": {"type": "string"}, "type": "object"}` | `{}` |
+| `deps.max_files` | `{"maximum": 100000, "minimum": 1, "type": "integer"}` | `5000` |
+
+## policy
+
+Drift age policy: how long attributed drift may stay unfixed. Unset keeps check behaviour unchanged.
+
+| Setting | Type / constraints | Default |
+| --- | --- | --- |
+| `policy.max_drift_age_days` | `{"anyOf": [{"maximum": 36500, "minimum": 0, "type": "integer"}, {"type": "null"}]}` | `null` |
+| `policy.warn_drift_age_days` | `{"anyOf": [{"maximum": 36500, "minimum": 0, "type": "integer"}, {"type": "null"}]}` | `null` |
+| `policy.fail_unknown_age` | `{"type": "boolean"}` | `true` |
 
 ## Snapshot and runtime metadata
 

@@ -12,11 +12,12 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import _head, scan_claims
+from docs_drift.drift_age import age_findings
 from docs_drift.errors import DocsDriftError
 from docs_drift.index import build_index
 from docs_drift.index.base import CodeIndex
 from docs_drift.match import match_claims
-from docs_drift.models import Claim, Finding, Package, ScanResult, Symbol
+from docs_drift.models import Claim, DependencyIssue, Finding, Package, ScanResult, Symbol
 from docs_drift.workspaces import detect_packages, package_for
 
 
@@ -179,6 +180,20 @@ def run_scan(  # noqa: PLR0913, PLR0912, PLR0915 - staged pipeline with optional
                 warnings.extend(notes)
             findings = enriched
         timings["history"] = time.perf_counter() - start
+        issues: list[DependencyIssue] = []
+        if config.deps.enabled or config.deps.usage:
+            from docs_drift.deps import scan_dependencies  # noqa: PLC0415 - optional dependency checks.
+
+            start = time.perf_counter()
+            dependencies = scan_dependencies(repo, config, result.claims, index.source_paths)
+            findings.extend(
+                f.model_copy(update={"package": package_for(f.claim.doc_path, packages).name})
+                for f in dependencies.findings
+            )
+            result.claims = [c for c in result.claims if c.claim_id not in dependencies.unchecked_claims]
+            issues = dependencies.issues
+            warnings.extend(dependencies.warnings)
+            timings["deps"] = time.perf_counter() - start
     doc_lines = {}
     for doc in result.docs:
         with suppress(OSError, UnicodeError):
@@ -187,16 +202,20 @@ def run_scan(  # noqa: PLR0913, PLR0912, PLR0915 - staged pipeline with optional
         lines = doc_lines.get(finding.claim.doc_path, [])
         if finding.claim.line <= len(lines):
             finding.doc_text = lines[finding.claim.line - 1]
+    head_sha = _head(repo)
+    # scan_time is the source HEAD commit time, so drift ages are reproducible for a commit.
+    findings = age_findings(findings, result.scan_time, head_sha, config.policy)
     return result.model_copy(
         update={
             "repo_path": repo,
             "docs_repo_path": docs_root if docs_repo else None,
-            "head_sha": _head(repo),
+            "head_sha": head_sha,
             "remote_url": remote_url(repo),
             "symbols": index.symbols,
             "findings": findings,
             "packages": packages,
             "timings": timings,
             "warnings": list(dict.fromkeys([*result.warnings, *index.warnings, *warnings])),
+            "dependency_issues": issues,
         }
     )

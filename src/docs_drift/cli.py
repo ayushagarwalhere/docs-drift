@@ -22,7 +22,7 @@ from rich.table import Table
 from rich.tree import Tree
 
 from docs_drift import __version__
-from docs_drift.baseline import load_baseline, new_findings, save_baseline
+from docs_drift.baseline import DEFAULT_BASELINE, load_baseline, new_findings, save_baseline
 from docs_drift.config import Config, ConfigError, HistoryConfig, load_config
 from docs_drift.docs.defaults import normalize_value
 from docs_drift.docs.pipeline import scan_claims
@@ -35,6 +35,7 @@ from docs_drift.index import build_index, clear_cache
 from docs_drift.index.base import CodeIndex
 from docs_drift.llm.client import ClientError
 from docs_drift.llm.pricing import format_usage
+from docs_drift.llm.triage import triage_result
 from docs_drift.llm.verify import verify_prose
 from docs_drift.match import match_claims
 from docs_drift.models import Claim, ClaimKind, Evidence, Finding, ScanResult, SymbolKind, Verdict
@@ -137,14 +138,37 @@ def main(
     )
 
 
-def _model_layer(result: ScanResult, enabled: bool, budget: float | None) -> ScanResult:
+def _model_layer(result: ScanResult, enabled: bool, budget: float | None, triage: bool = False) -> ScanResult:
     config = result.config_used
-    if not enabled and not config.llm.enabled:
+    verify = enabled or config.llm.enabled
+    run_triage = triage or config.llm.triage
+    if not verify and not run_triage:
         return result
     if budget is not None and (not math.isfinite(budget) or budget < 0):
         raise typer.BadParameter("Use a finite, non-negative USD amount.", param_hint="--llm-budget")
-    llm_config = config.llm.model_copy(update={"enabled": True, **({"budget": budget} if budget is not None else {})})
+    llm_config = config.llm.model_copy(
+        update={"enabled": verify, "triage": run_triage, **({"budget": budget} if budget is not None else {})}
+    )
     result = result.model_copy(update={"config_used": config.model_copy(update={"llm": llm_config})})
+    if run_triage:
+        triage_marker = result.repo_path / ".docs-drift" / "llm-triage-privacy-v1"
+        if not triage_marker.exists():
+            typer.echo(
+                "Model triage notice: live/record mode sends, for each rule drift finding, the flagged name, "
+                "rule reason and a redacted documentation excerpt of about 17 lines through OpenRouter to the "
+                "triage model. Triage can only downgrade findings. Replay stays local. See docs/llm-mode.md.",
+                err=True,
+            )
+            try:
+                triage_marker.parent.mkdir(parents=True, exist_ok=True)
+                triage_marker.write_text("notice-v1\n", encoding="utf-8")
+            except OSError:
+                pass
+        if not verify:
+            try:
+                return asyncio.run(triage_result(result))
+            except (ClientError, ValueError) as exc:
+                raise typer.BadParameter(str(exc), param_hint="--llm-triage") from exc
     marker = result.repo_path / ".docs-drift" / "llm-privacy-v1"
     if not marker.exists():
         typer.echo(
@@ -159,7 +183,11 @@ def _model_layer(result: ScanResult, enabled: bool, budget: float | None) -> Sca
         except OSError:
             pass
     try:
-        return asyncio.run(verify_prose(result))
+        result = asyncio.run(verify_prose(result))
+        if run_triage:
+            # Triage runs after prose verification and shares what is left of the same budget.
+            result = asyncio.run(triage_result(result, spent=result.llm_usage.get("cost", 0)))
+        return result
     except (ClientError, ValueError) as exc:
         raise typer.BadParameter(str(exc), param_hint="--llm") from exc
 
@@ -306,6 +334,10 @@ def scan(
     show_low_confidence: Annotated[bool, typer.Option("--show-low-confidence", help="Include weak findings.")] = False,
     llm: Annotated[bool, typer.Option("--llm", help="Assess anchored prose through OpenRouter.")] = False,
     llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
+    llm_triage: Annotated[
+        bool,
+        typer.Option("--llm-triage", help="Let a model downgrade rule drift that is not about this project."),
+    ] = False,
     docs_repo: Annotated[
         Path | None, typer.Option("--docs-repo", help="Read documentation from a separate repository.")
     ] = None,
@@ -331,7 +363,7 @@ def scan(
         package=package,
         progress=sys.stderr.isatty() and not options.quiet and not options.no_color,
     )
-    result = _model_layer(result, llm, llm_budget)
+    result = _model_layer(result, llm, llm_budget, llm_triage)
     _print_findings(result, options, show_all=show_all, show_low_confidence=show_low_confidence)
 
 
@@ -425,8 +457,16 @@ def _print_findings(
             typer.echo(text, nl=False, color=render_options.color)
 
 
+def _check_baseline(repo: Path, baseline: Path | None, *, auto: bool) -> Path | None:
+    """An explicit --baseline wins; --auto-baseline uses the default file only when it exists."""
+    if baseline is not None:
+        return baseline if baseline.is_absolute() else repo / baseline
+    default = repo / DEFAULT_BASELINE
+    return default if auto and default.is_file() else None
+
+
 @app.command(cls=Command)
-def check(
+def check(  # noqa: PLR0912 - independent gate options.
     ctx: typer.Context,
     fail_on: Annotated[str, typer.Option("--fail-on", help="Exit 1 on drift, missing, or any finding.")] = "drift",
     min_confidence: Annotated[float | None, typer.Option("--min-confidence")] = None,
@@ -434,10 +474,28 @@ def check(
     baseline: Annotated[
         Path | None, typer.Option("--baseline", help="Fail only for drifts absent from this baseline.")
     ] = None,
+    auto_baseline: Annotated[
+        bool,
+        typer.Option(
+            "--auto-baseline",
+            help="Use .docs-drift-baseline.json when it exists, like the pytest plugin; --baseline wins.",
+        ),
+    ] = False,
     reviews: Annotated[Path | None, typer.Option(help="Source-scoped human review decisions.")] = None,
     quiet: Annotated[bool, typer.Option("--quiet", help="Print nothing unless the check fails.")] = False,
     llm: Annotated[bool, typer.Option("--llm")] = False,
     llm_budget: Annotated[float | None, typer.Option("--llm-budget")] = None,
+    no_history: Annotated[
+        bool, typer.Option("--no-history", help="Skip Git history: faster, without attribution or history renames.")
+    ] = False,
+    max_drift_age: Annotated[
+        int | None,
+        typer.Option("--max-drift-age", min=0, max=36500, help="Fail only for drift older than this many days."),
+    ] = None,
+    llm_triage: Annotated[
+        bool,
+        typer.Option("--llm-triage", help="Let a model downgrade rule drift that is not about this project."),
+    ] = False,
 ) -> None:
     """Run a full scan; exit 1 for configured findings, or 2 for usage errors."""
     if fail_on not in {"drift", "missing", "any"}:
@@ -447,15 +505,19 @@ def check(
     if max_findings is not None and max_findings < 0:
         raise typer.BadParameter("Choose a non-negative count.", param_hint="--max-findings")
     options: CLIOptions = ctx.ensure_object(CLIOptions)
+    from docs_drift.drift_age import annotate_ages, gate_by_age, policy_summary, with_max_age  # noqa: PLC0415
     from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
 
-    result = _model_layer(run_scan(options.repo, options.config), llm, llm_budget)
+    policy = with_max_age(options.config.policy, max_drift_age)
+    result = annotate_ages(
+        _model_layer(run_scan(options.repo, options.config, history=not no_history), llm, llm_budget, llm_triage),
+        policy,
+    )
     history_warnings: list[str] = []
-    findings = result.findings
     baselined = 0
     findings = result.findings
-    if baseline is not None:
-        baseline_path = baseline if baseline.is_absolute() else options.repo / baseline
+    baseline_path = _check_baseline(options.repo, baseline, auto=auto_baseline)
+    if baseline_path is not None:
         try:
             original_count = len(findings)
             findings = new_findings(findings, load_baseline(baseline_path))
@@ -477,8 +539,14 @@ def check(
         failures = [item for item in qualifying if item.verdict in {Verdict.missing, Verdict.invalid_command}]
     else:
         failures = [item for item in qualifying if item.verdict != Verdict.ok]
+    failures = gate_by_age(failures, policy)
     if max_findings is not None:
         failures = failures if len(failures) > max_findings else []
+    age_note = policy_summary(qualifying, policy)
+    if age_note:
+        history_warnings.append(age_note)
+        if no_history:
+            history_warnings.append("--no-history skips attribution, so no drift has an age under the policy.")
     if not (quiet or options.quiet) or failures or options.output or options.output_json or options.output_sarif:
         _print_findings(
             result.model_copy(
@@ -538,7 +606,7 @@ def explain(
 @baseline_app.command("update", cls=Command)
 def baseline_update(
     ctx: typer.Context,
-    path: Path = Path(".docs-drift-baseline.json"),
+    path: Path = Path(DEFAULT_BASELINE),
     llm: Annotated[bool, typer.Option("--llm")] = False,
 ) -> None:
     """Replace the baseline with current drift findings; fixed findings are pruned."""
@@ -659,13 +727,27 @@ def graph(ctx: typer.Context) -> None:
 
 
 @app.command("insights", cls=Command)
-def insights_command(ctx: typer.Context) -> None:
-    """Summarize findings by verdict, document and workspace package."""
+def insights_command(
+    ctx: typer.Context,
+    trend: Annotated[
+        Path | None, typer.Option("--trend", help="Folder of saved JSON reports to chart drift and age over time.")
+    ] = None,
+) -> None:
+    """Summarize findings by verdict, document, package and drift age."""
     from docs_drift.analysis import insights  # noqa: PLC0415 - optional command path.
+    from docs_drift.drift_age import load_trend  # noqa: PLC0415
     from docs_drift.scanning import run_scan  # noqa: PLC0415
 
     options: CLIOptions = ctx.ensure_object(CLIOptions)
-    text = json.dumps(insights(run_scan(options.repo, options.config)), indent=2, sort_keys=True) + "\n"
+    data = insights(run_scan(options.repo, options.config))
+    if trend is not None:
+        try:
+            points, notes = load_trend(trend if trend.is_absolute() else options.repo / trend)
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc), param_hint="--trend") from exc
+        data["trend"] = [point.model_dump() for point in points]
+        data["warnings"] = [*data["warnings"], *notes]
+    text = json.dumps(data, indent=2, sort_keys=True) + "\n"
     if options.output:
         options.output.write_text(text, encoding="utf-8")
     elif not options.quiet:
@@ -923,3 +1005,11 @@ register_workflows(app)
 from docs_drift.github.cli import register as register_github  # noqa: E402
 
 register_github(app)
+
+from docs_drift.deps.cli import register as register_deps  # noqa: E402
+
+register_deps(app)
+
+from docs_drift.contribute_cli import register as register_contribute  # noqa: E402
+
+register_contribute(app)

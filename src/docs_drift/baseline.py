@@ -10,6 +10,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from docs_drift.models import DecidedBy, Finding, Verdict
 from docs_drift.safe_files import metadata_text
 
+# Picked up automatically by the pytest plugin and by `docs-drift check --auto-baseline`.
+DEFAULT_BASELINE = ".docs-drift-baseline.json"
+
 
 class BaselineEntry(BaseModel):
     model_config = ConfigDict(extra="forbid")

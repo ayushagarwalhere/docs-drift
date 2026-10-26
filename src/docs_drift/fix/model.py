@@ -66,7 +66,8 @@ async def add_model_fixes(
 ) -> FixPlan:
     config = result.config_used.llm
     selected_client = client or RecordedClient(config)
-    budget = Budget(max(0, config.budget - result.llm_usage.get("cost", 0)))
+    spent = result.llm_usage.get("cost", 0) + result.llm_usage.get("triage_cost", 0)
+    budget = Budget(max(0, config.budget - spent))
     semaphore = asyncio.Semaphore(config.concurrency)
     fixed = {edit.claim_id for edit in plan.edits}
     occupied = {(edit.file, edit.line) for edit in plan.edits}

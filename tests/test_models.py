@@ -173,7 +173,15 @@ def test_full_json_round_trip() -> None:
 @pytest.mark.parametrize("verdict", list(Verdict))
 def test_drift_property(verdict: Verdict) -> None:
     assert finding(verdict).is_drift is (
-        verdict in {Verdict.missing, Verdict.renamed, Verdict.default_changed, Verdict.invalid_command}
+        verdict
+        in {
+            Verdict.missing,
+            Verdict.renamed,
+            Verdict.default_changed,
+            Verdict.invalid_command,
+            Verdict.version_mismatch,
+            Verdict.unknown_extra,
+        }
     )
 
 
@@ -186,6 +194,8 @@ def test_summary_counts_findings_including_zero_categories() -> None:
         "default_changed": 0,
         "invalid_command": 0,
         "unverifiable": 0,
+        "version_mismatch": 0,
+        "unknown_extra": 0,
     }
     assert summary["by_kind"]["cli_flag"] == 3
     assert summary["by_kind"]["env_var"] == 0

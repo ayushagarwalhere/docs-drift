@@ -409,3 +409,21 @@ main.dd-page{max-width:none;margin:0;padding:0 var(--gutter) 7rem;background:var
   .dd-voice-latest,.dd-voice-grid{grid-template-columns:1fr}
   .dd-voice-card{transform:none}
 }
+
+/* ---------- where it runs ---------- */
+.dd-use{padding:7rem var(--gutter) 6rem;background:var(--off)}
+.dd-use-head{display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center;margin-bottom:3rem}
+.dd-use-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;max-width:75rem;margin:0 auto}
+.dd-use-card{position:relative;display:flex;flex-direction:column;gap:.9rem;min-height:22rem;padding:1.3rem;background:var(--white);color:var(--black);transition:transform .5s var(--ease)}
+.dd-use-card:hover{transform:translateY(-6px) rotate(-.4deg)}
+.dd-use-card.is-lime{background:var(--lime)}
+.dd-use-card.is-dark{background:var(--black);color:var(--off)}
+.dd-use-card.is-green{background:var(--green)}
+.dd-use-num{position:absolute;right:1.2rem;top:1rem;font:400 2rem/1 var(--serif);opacity:.45}
+.dd-use-card p{font-size:.86rem;line-height:1.35;max-width:22rem}
+.dd-use-card pre{margin:auto 0 0;padding:.8rem;background:var(--black);color:#d6d6d6;font:400 .72rem/1.55 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;border:.25rem solid var(--white)}
+.dd-use-card.is-dark pre{border-color:var(--grey);background:#0f0f0f}
+.dd-use-card pre b{color:var(--lime);font-weight:400}
+.dd-use-who{font-size:.75rem;opacity:.7}
+@media (max-width:1000px){.dd-use-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.dd-use-grid{grid-template-columns:1fr}.dd-use-card{min-height:0}}

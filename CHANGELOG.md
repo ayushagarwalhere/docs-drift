@@ -8,6 +8,13 @@ All notable user-facing changes are recorded here, following
 
 ### Added
 
+- Opt-in model triage (`--llm-triage` on `scan` and `check`, or `[llm] triage = true`).
+  A small model sees a redacted documentation excerpt for each rule drift finding.
+  It can only downgrade a finding to `unverifiable`, and only when it cites
+  verbatim excerpt text showing the name is not about this project (a
+  doc-defined example, another tool, a placeholder, and so on). The original verdict
+  and the model's reason stay in the finding's new `triage` field. Measured gain is
+  small; see `docs/llm-triage-eval.md`.
 - `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
   extra, for AI coding agents. It checks the repository, single documents and unsaved
   text, explains findings, previews fixes and applies them only on an explicit,
@@ -24,6 +31,52 @@ All notable user-facing changes are recorded here, following
   webhooks, a coalescing job queue, credential-scoped PR fetches, and a manifest
   helper that registers the App in two clicks and prints the `/etc/docs-drift.env`
   lines for the EC2 host without saving secrets.
+- Dependency drift. Runtime minimums (in prose, tables and badges) and install
+  commands in docs are checked against `pyproject.toml`, `setup.cfg`, `setup.py`,
+  requirements files, `Pipfile` and `package.json`. Two new verdicts are added:
+  `version_mismatch` (DD006) and `unknown_extra` (DD007). These checks are on by
+  default under `[deps] enabled`.
+- `docs-drift deps` compares source imports with declared dependencies and
+  reports undeclared, development-only and unused packages. `--base` shows only
+  issues the branch introduced, plus new dependencies the docs never name.
+  Baselines and terminal, JSON and Markdown output are supported. Scan JSON
+  gains a `dependency_issues` array when `[deps] usage = true` finds issues
+  (the key is omitted when empty).
+- Use docs-drift as a dependency: a pytest plugin (`pytest --docs-drift`, one
+  test per documentation file, cached and xdist-safe), `assert_no_drift` for
+  your own tests, a stable `docs_drift.check()` Python API, pre-commit hooks
+  (`docs-drift` and `docs-drift-fast`), `python -m docs_drift`, and
+  `docs-drift check --no-history` and `--auto-baseline` (apply
+  `.docs-drift-baseline.json` when present, as the plugin does). See
+  docs/as-a-dependency.md.
+- `docs-drift contribute` turns well-evidenced drift into issue drafts for
+  contributors: file and line, current and corrected text, evidence links pinned
+  to HEAD, local verification commands, difficulty, suggested labels and a ready
+  patch. Related findings share one draft. Output is a Markdown digest, one file
+  per draft (`--out-dir`) or JSON. `--summary` prints a docs health card for
+  CONTRIBUTING.md.
+- Drift findings with history attribution now record `stale_since`, `age_days`
+  (measured against the HEAD commit date) and, under a policy, `fix_by`. Reports
+  show them. Ages start when the introducing commit landed on the branch (its
+  committer date, recorded as `introduced_by.committed`), so rebased or
+  cherry-picked drift is not overdue on arrival. The JSON schema gains these
+  optional fields; older reports still load.
+- An optional `[policy]` table (`max_drift_age_days`, `warn_drift_age_days`,
+  `fail_unknown_age`) and `docs-drift check --max-drift-age`: when set, the check
+  fails only for drift older than the maximum age. Default behaviour is unchanged.
+- `docs-drift insights` reports a drift age histogram, the oldest drift and
+  policy status, and a trend across saved JSON reports with `--trend`.
+
+### Changed
+
+- scan-result v1 gains claim kinds/verdicts; strict validators pinned to 0.1.0's
+  copy must update. The `scan-result.v1.json` schema is extended additively
+  (claim kinds `dependency` and `runtime_version`, verdicts `version_mismatch`
+  and `unknown_extra`, the optional `dependency_issues` array and the optional
+  drift age fields) and `schema_version` stays `1`. Use the copy shipped with the installed package
+  or `docs/schema/scan-result.v1.json`.
+- The terminal report shows drift age relative to HEAD instead of days before
+  the current date, so repeated runs on the same commit print the same text.
 
 ### Fixed
 

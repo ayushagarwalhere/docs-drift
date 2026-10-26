@@ -1,0 +1,23 @@
+# Hooks other repositories can use with `repo: https://github.com/ayushagarwalhere/docs-drift`.
+# Both scan the whole repository (drift spans files), so filenames are not passed;
+# `files` only decides whether a commit touches anything that can change the result,
+# and must cover every file the indexers and documentation discovery read (tested).
+# Like the pytest plugin, they accept the drift in .docs-drift-baseline.json when it exists.
+- id: docs-drift
+  name: docs-drift
+  description: Fail when documentation claims are no longer supported by the code.
+  entry: docs-drift check --quiet --auto-baseline
+  language: python
+  pass_filenames: false
+  require_serial: true
+  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile)|(^|/)(Makefile|GNUmakefile|justfile|Dockerfile|\.env\.(example|sample|template)))$'
+  minimum_pre_commit_version: '3.0.0'
+- id: docs-drift-fast
+  name: docs-drift (fast, no history)
+  description: Like docs-drift but skips Git history; quicker, with no commit attribution or history-proven renames.
+  entry: docs-drift check --quiet --auto-baseline --no-history
+  language: python
+  pass_filenames: false
+  require_serial: true
+  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile)|(^|/)(Makefile|GNUmakefile|justfile|Dockerfile|\.env\.(example|sample|template)))$'
+  minimum_pre_commit_version: '3.0.0'

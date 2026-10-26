@@ -128,7 +128,9 @@
         "make_target",
         "default_value",
         "code_command",
-        "prose"
+        "prose",
+        "dependency",
+        "runtime_version"
       ],
       "title": "ClaimKind",
       "type": "string"
@@ -199,6 +201,19 @@
           "title": "Date",
           "type": "string"
         },
+        "committed": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Committed"
+        },
         "summary": {
           "minLength": 1,
           "title": "Summary",
@@ -267,6 +282,12 @@
         },
         "history": {
           "$ref": "#/$defs/HistoryConfig"
+        },
+        "deps": {
+          "$ref": "#/$defs/DepsConfig"
+        },
+        "policy": {
+          "$ref": "#/$defs/PolicyConfig"
         }
       },
       "title": "Config",
@@ -279,6 +300,142 @@
       ],
       "title": "DecidedBy",
       "type": "string"
+    },
+    "DependencyIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "issue_id": {
+          "pattern": "^dep_[0-9a-f]{64}$",
+          "title": "Issue Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/DependencyIssueKind"
+        },
+        "ecosystem": {
+          "enum": [
+            "python",
+            "node"
+          ],
+          "title": "Ecosystem",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "import_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Import Name"
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Manifest"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "issue_id",
+        "kind",
+        "ecosystem",
+        "name",
+        "message",
+        "evidence",
+        "confidence"
+      ],
+      "title": "DependencyIssue",
+      "type": "object"
+    },
+    "DependencyIssueKind": {
+      "description": "Code-versus-manifest dependency observations; these are not documentation claims.",
+      "enum": [
+        "undeclared",
+        "dev_only",
+        "undeclared_dev",
+        "unused",
+        "added_undocumented",
+        "removed_documented"
+      ],
+      "title": "DependencyIssueKind",
+      "type": "string"
+    },
+    "DepsConfig": {
+      "description": "Dependency and runtime checks against package manifests; manifests are read as data only.",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "usage": {
+          "default": false,
+          "title": "Usage",
+          "type": "boolean"
+        },
+        "report_understated": {
+          "default": false,
+          "title": "Report Understated",
+          "type": "boolean"
+        },
+        "ignore": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ignore",
+          "type": "array"
+        },
+        "import_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Import Map",
+          "type": "object"
+        },
+        "max_files": {
+          "default": 5000,
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Max Files",
+          "type": "integer"
+        }
+      },
+      "title": "DepsConfig",
+      "type": "object"
     },
     "DocFile": {
       "additionalProperties": false,
@@ -461,6 +618,56 @@
           ],
           "default": null,
           "title": "Doc Text"
+        },
+        "stale_since": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stale Since"
+        },
+        "age_days": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Days"
+        },
+        "fix_by": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fix By"
+        },
+        "triage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TriageNote"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -544,6 +751,44 @@
           },
           "title": "Redact Paths",
           "type": "array"
+        },
+        "triage": {
+          "default": false,
+          "title": "Triage",
+          "type": "boolean"
+        },
+        "triage_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Triage Model"
+        },
+        "triage_max_findings": {
+          "default": 200,
+          "maximum": 5000,
+          "minimum": 0,
+          "title": "Triage Max Findings",
+          "type": "integer"
+        },
+        "triage_batch_size": {
+          "default": 8,
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Triage Batch Size",
+          "type": "integer"
+        },
+        "triage_context_lines": {
+          "default": 8,
+          "maximum": 40,
+          "minimum": 2,
+          "title": "Triage Context Lines",
+          "type": "integer"
         }
       },
       "title": "LLMConfig",
@@ -579,6 +824,46 @@
         "language"
       ],
       "title": "Package",
+      "type": "object"
+    },
+    "PolicyConfig": {
+      "description": "Drift age policy: how long attributed drift may stay unfixed. Unset keeps check behaviour unchanged.",
+      "properties": {
+        "max_drift_age_days": {
+          "anyOf": [
+            {
+              "maximum": 36500,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Drift Age Days"
+        },
+        "warn_drift_age_days": {
+          "anyOf": [
+            {
+              "maximum": 36500,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Warn Drift Age Days"
+        },
+        "fail_unknown_age": {
+          "default": true,
+          "title": "Fail Unknown Age",
+          "type": "boolean"
+        }
+      },
+      "title": "PolicyConfig",
       "type": "object"
     },
     "Section": {
@@ -861,6 +1146,79 @@
       "title": "SymbolKind",
       "type": "string"
     },
+    "TriageNote": {
+      "additionalProperties": false,
+      "description": "Why optional model triage downgraded a rule finding; the original verdict stays visible.",
+      "properties": {
+        "decision": {
+          "const": "not_project_claim",
+          "default": "not_project_claim",
+          "title": "Decision",
+          "type": "string"
+        },
+        "category": {
+          "minLength": 1,
+          "title": "Category",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_file": {
+          "title": "Quote File",
+          "type": "string"
+        },
+        "quote_line": {
+          "minimum": 1,
+          "title": "Quote Line",
+          "type": "integer"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "original_verdict": {
+          "$ref": "#/$defs/Verdict"
+        },
+        "original_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Original Confidence",
+          "type": "number"
+        },
+        "model": {
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt_version": {
+          "minLength": 1,
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "replayed": {
+          "default": false,
+          "title": "Replayed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "category",
+        "quote",
+        "quote_file",
+        "quote_line",
+        "rationale",
+        "original_verdict",
+        "original_confidence",
+        "model",
+        "prompt_version"
+      ],
+      "title": "TriageNote",
+      "type": "object"
+    },
     "Verdict": {
       "enum": [
         "ok",
@@ -868,7 +1226,9 @@
         "renamed",
         "default_changed",
         "invalid_command",
-        "unverifiable"
+        "unverifiable",
+        "version_mismatch",
+        "unknown_extra"
       ],
       "title": "Verdict",
       "type": "string"
@@ -1011,6 +1371,13 @@
       "minimum": 0,
       "title": "Baselined",
       "type": "integer"
+    },
+    "dependency_issues": {
+      "items": {
+        "$ref": "#/$defs/DependencyIssue"
+      },
+      "title": "Dependency Issues",
+      "type": "array"
     }
   },
   "required": [

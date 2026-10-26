@@ -64,7 +64,9 @@ def run_git(  # noqa: PLR0913 - explicit trusted limits.
             GIT_CONFIG_KEY_0="http.https://github.com/.extraheader",
             GIT_CONFIG_VALUE_0=f"AUTHORIZATION: basic {credential}",
         )
-    options: dict[str, int] = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if sys.platform == "win32" else {}
+    options: dict[str, int] = {}
+    if sys.platform == "win32":
+        options = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
     with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
         process = subprocess.Popen(
             _command(args, allow_local),

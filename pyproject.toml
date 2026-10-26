@@ -36,6 +36,7 @@ dependencies = [
     "tomli-w>=1.0",
     "jinja2>=3.1",
     "pyyaml>=6.0",
+    "packaging>=24.0",
 ]
 
 [project.urls]
@@ -47,6 +48,9 @@ Changelog = "https://github.com/ayushagarwalhere/docs-drift/blob/main/CHANGELOG.
 
 [project.scripts]
 docs-drift = "docs_drift.cli:app"
+
+[project.entry-points.pytest11]
+docs_drift = "docs_drift.pytest_plugin"
 
 [project.optional-dependencies]
 graph = []

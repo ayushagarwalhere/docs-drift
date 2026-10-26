@@ -9,7 +9,7 @@ from docs_drift.docs.defaults import normalize_value
 from docs_drift.docs.sections import is_historical_span
 from docs_drift.fix.edits import FixPlan, StaleDocumentError, TextEdit, decode, safe_path
 from docs_drift.history import GitHistory, _run
-from docs_drift.models import Claim, ClaimKind, Finding, ScanResult, Verdict
+from docs_drift.models import Claim, ClaimKind, Extraction, Finding, ScanResult, Verdict
 
 _WORD = re.compile(r"'[^']*'|\"[^\"]*\"|\S+")
 MIN_RENAME_FIX_CONFIDENCE = 0.9
@@ -105,6 +105,29 @@ def _default_edit(finding: Finding, line: str) -> TextEdit | None:
     return _edit(finding.claim, line, old, new, "Update the documented default.")
 
 
+def rule_edit(finding: Finding, line: str) -> TextEdit | None:
+    """The certain single-line edit for a renamed or default_changed finding, or ``None``.
+
+    This is the only place those edits are decided, so every surface that shows a
+    proposed fix (``docs-drift fix``, reports, ``assert_no_drift``) agrees on it.
+    """
+    claim = finding.claim
+    if finding.verdict == Verdict.default_changed:
+        return _default_edit(finding, line)
+    if finding.verdict != Verdict.renamed or not finding.suggestion or finding.confidence < MIN_RENAME_FIX_CONFIDENCE:
+        return None
+    replacement = finding.suggestion
+    old = claim.value
+    if claim.kind == ClaimKind.endpoint:
+        old = claim.raw_text.strip("`").split(maxsplit=1)[-1]
+        replacement = (
+            finding.matched_symbol.raw_path
+            if finding.matched_symbol and finding.matched_symbol.raw_path
+            else replacement.split(maxsplit=1)[-1]
+        )
+    return _edit(claim, line, old, replacement, "Replace a confirmed renamed identifier.")
+
+
 def _removed_flag_shape(repo: Path, flag: str) -> tuple[bool, str] | None:
     history = GitHistory(repo).search(flag)
     if not history.commit:
@@ -162,6 +185,24 @@ def _command_edit(repo: Path, finding: Finding, line: str) -> tuple[TextEdit | N
     return edit, note
 
 
+def _dependency_edit(finding: Finding, line: str) -> TextEdit | None:
+    """Rewrite a stale runtime minimum or a single misspelled extra; dependency pins are left to a human."""
+    claim = finding.claim
+    if not finding.suggestion:
+        return None
+    if claim.kind == ClaimKind.runtime_version and finding.verdict == Verdict.version_mismatch:
+        if claim.extraction == Extraction.table:
+            return None  # A table row may describe another release or platform; a human decides.
+        documented = claim.value.split(">=", 1)[-1]
+        return _edit(claim, line, documented, finding.suggestion, "Match the runtime minimum the manifest declares.")
+    extras = re.search(r"\[([^\]]*)\]", claim.value)
+    if claim.kind == ClaimKind.dependency and finding.verdict == Verdict.unknown_extra and extras:
+        items = [item.strip() for item in extras[1].split(",") if item.strip()]
+        if len(items) == 1:
+            return _edit(claim, line, items[0], finding.suggestion, "Use an extra the manifest defines.")
+    return None
+
+
 def plan_rule_fixes(result: ScanResult, *, contents: dict[str, str] | None = None) -> FixPlan:  # noqa: PLR0912
     plan = FixPlan(hashes={doc.path: doc.content_hash for doc in result.docs})
     texts: dict[str, list[str]] = {}
@@ -183,27 +224,14 @@ def plan_rule_fixes(result: ScanResult, *, contents: dict[str, str] | None = Non
         claim = finding.claim
         line = texts[claim.doc_path][claim.line - 1]
         edit = None
-        if (
-            finding.verdict == Verdict.renamed
-            and finding.suggestion
-            and finding.confidence >= MIN_RENAME_FIX_CONFIDENCE
-        ):
-            replacement = finding.suggestion
-            old = claim.value
-            if claim.kind == ClaimKind.endpoint:
-                old = claim.raw_text.strip("`").split(maxsplit=1)[-1]
-                replacement = (
-                    finding.matched_symbol.raw_path
-                    if finding.matched_symbol and finding.matched_symbol.raw_path
-                    else replacement.split(maxsplit=1)[-1]
-                )
-            edit = _edit(claim, line, old, replacement, "Replace a confirmed renamed identifier.")
-        elif finding.verdict == Verdict.default_changed:
-            edit = _default_edit(finding, line)
+        if finding.verdict in {Verdict.renamed, Verdict.default_changed}:
+            edit = rule_edit(finding, line)
         elif finding.verdict == Verdict.invalid_command:
             edit, note = _command_edit(result.repo_path, finding, line)
             if note:
                 plan.suggestions.append(note)
+        elif finding.verdict in {Verdict.version_mismatch, Verdict.unknown_extra}:
+            edit = _dependency_edit(finding, line)
         if edit:
             section = next((item for item in result.sections if item.section_id == claim.section_id), None)
             if section and is_historical_span(section, claim.line):

@@ -1,0 +1,48 @@
+{
+  "request_hash": "b57805e2ad4e65827b2c9afd741b8076d87f31bcca459f2803edd22a8e98f2bb",
+  "model": "google/gemini-2.5-flash-lite",
+  "prompt_version": "triage_v4.md",
+  "response": {
+    "result": {
+      "results": [
+        {
+          "id": "f1",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- `serve` accepts `--port` (default 8000).",
+          "rationale": "The documentation mentions a CLI flag that is part of the project's interface."
+        },
+        {
+          "id": "f2",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- The `--workers` default is `4`.",
+          "rationale": "The documentation mentions a default value for a CLI flag that is part of the project's interface."
+        },
+        {
+          "id": "f3",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Set `APP_DEBUG` to enable debug logging.",
+          "rationale": "The documentation mentions an environment variable that the project might use."
+        },
+        {
+          "id": "f4",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Use the `migrate` subcommand to upgrade the database.",
+          "rationale": "The documentation mentions a CLI command that is part of the project's interface."
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 1984,
+      "output_tokens": 296,
+      "cache_read_tokens": 910,
+      "cache_write_tokens": 0,
+      "cost": 0.0002349
+    },
+    "replayed": false
+  },
+  "provenance": "live"
+}

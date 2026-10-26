@@ -1,0 +1,55 @@
+{
+  "request_hash": "386eb505f382d730a0a4870baa4d80382253be9ec59d3fd5023f8cc7487267f8",
+  "model": "google/gemini-2.5-flash-lite",
+  "prompt_version": "triage_v4.md",
+  "response": {
+    "result": {
+      "results": [
+        {
+          "id": "f1",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Read one user with `GET /users/{id}`.",
+          "rationale": "The documentation refers to an API endpoint that could belong to the project."
+        },
+        {
+          "id": "f2",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Sign in with `POST /login`.",
+          "rationale": "The documentation refers to an API endpoint that could belong to the project."
+        },
+        {
+          "id": "f3",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Configure the settings field `request_timeout`.",
+          "rationale": "The documentation refers to a configuration key that could belong to the project."
+        },
+        {
+          "id": "f4",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- The request timeout defaults to `30` seconds.",
+          "rationale": "The documentation refers to a default value for a project setting."
+        },
+        {
+          "id": "f5",
+          "decision": "keep",
+          "category": "none",
+          "quote": "- Create the application with `create_app`.",
+          "rationale": "The documentation refers to a function or symbol that could belong to the project."
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 2093,
+      "output_tokens": 265,
+      "cache_read_tokens": 2056,
+      "cache_write_tokens": 2056,
+      "cost": 0.00030159333333333333
+    },
+    "replayed": false
+  },
+  "provenance": "live"
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "package_version": "0.1.0.dev7+gd6e96eb92.d20261018",
+  "package_version": "0.1.1.dev39+gc063030.d20261026",
   "repo_path": "judge-fixture",
   "head_sha": "66f495fa2e34b38bf32b8351447339d77739a7a5",
   "scan_time": "2026-10-02T09:00:00Z",
@@ -32,6 +32,19 @@
     "history": {
       "max_commits": 2000,
       "show_emails": false
+    },
+    "deps": {
+      "enabled": true,
+      "usage": false,
+      "report_understated": false,
+      "ignore": [],
+      "import_map": {},
+      "max_files": 5000
+    },
+    "policy": {
+      "max_drift_age_days": null,
+      "warn_drift_age_days": null,
+      "fail_unknown_age": true
     }
   },
   "docs": [
@@ -186,6 +199,7 @@
         "author_name": "Priya Shah",
         "author_email": null,
         "date": "2026-10-02T09:00:00Z",
+        "committed": "2026-10-02T09:00:00Z",
         "summary": "Rename port to listen without updating README"
       },
       "confidence": 0.92,
@@ -197,14 +211,18 @@
       "decided_by": "rules",
       "replayed": false,
       "package": "judge-fixture",
-      "doc_text": "Use `--port` to select the listening port."
+      "doc_text": "Use `--port` to select the listening port.",
+      "stale_since": "2026-10-02",
+      "age_days": 0,
+      "fix_by": null
     }
   ],
   "timings": {
-    "docs": 0.26383970002643764,
-    "index": 0.12528340000426397,
-    "match": 0.2292884000344202,
-    "history": 0.2897374000167474
+    "docs": 0.4109854999696836,
+    "index": 0.11085070000262931,
+    "match": 0.30989420000696555,
+    "history": 0.23241429997142404,
+    "deps": 0.00106669997330755
   },
   "warnings": [
     "SYNTHETIC FIXTURE / precomputed static scan. One intentionally stale claim; not a real-world accuracy result. Review the proposed replacement before editing. Rebuild and inspect the two commits with scripts/build_judge_demo.py."

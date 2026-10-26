@@ -312,7 +312,14 @@ def match_claims(claims: list[Claim], index: CodeIndex, repo: Path) -> list[Find
     findings = [
         rename_finding(claim, index, _match_one(claim, index, repo.resolve()))
         for claim in claims
-        if claim.kind not in {ClaimKind.code_command, ClaimKind.default_value, ClaimKind.prose}
+        if claim.kind
+        not in {
+            ClaimKind.code_command,
+            ClaimKind.default_value,
+            ClaimKind.prose,
+            ClaimKind.dependency,
+            ClaimKind.runtime_version,
+        }
     ]
     findings.extend(match_default_claims(claims, index))
     findings.extend(validate_commands(claims, index, repo))

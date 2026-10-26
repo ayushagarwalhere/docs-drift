@@ -44,10 +44,14 @@ and the [declaration](https://github.com/Textualize/rich-cli/blob/46f4d2469097be
 | Code symbols (`Client.connect()`) | parsed functions, classes and methods |
 | File paths (`config/settings.toml`) | files in the repository |
 | Package scripts (`npm run build`) | package manifests, Make and just tasks |
+| Runtimes and installs ("Python 3.11+", `pip install "pkg[extra]"`) | pyproject, setup, requirements and package.json manifests |
 
 Every finding carries a verdict (`missing`, `renamed`, `default_changed`,
-`invalid_command`, `unverifiable`), a confidence score, the source evidence and,
-where Git history allows, the commit that introduced the drift.
+`invalid_command`, `version_mismatch`, `unknown_extra`, `unverifiable`), a
+confidence score, the source evidence and, where Git history allows, the commit
+that introduced the drift. `docs-drift deps` also compares your imports with your
+declared dependencies to find stale and undeclared packages
+([dependency drift](dependencies.md)).
 
 ## Commands
 
@@ -55,15 +59,23 @@ where Git history allows, the commit that introduced the drift.
 docs-drift scan                             # report findings, exit 0
 docs-drift check                            # exit 1 when findings meet your threshold
 docs-drift fix                              # preview a patch; --write applies it
-docs-drift insights                         # findings by verdict, document and package
+docs-drift insights                         # findings by verdict, document, package and age
+docs-drift contribute                       # issue drafts with patches for contributors
+docs-drift contribute --summary             # docs health card for contributing.md
 docs-drift impact --base HEAD~1             # findings touched by recent changes
 docs-drift pr --base HEAD~1 --report-dir pr  # review artifacts for drift a branch introduces
 docs-drift baseline update                  # accept today's drift, gate only new drift
+docs-drift deps                             # dependency drift: docs, manifests and imports
 docs-drift scan --format html --output report.html
 ```
 
 `docs-drift explain <finding-id>` shows the docs, source, reasons and history
 behind one finding.
+
+Each drift finding records when it went stale. Set `max_drift_age_days` in a
+`[policy]` table, or pass `--max-drift-age` to `check`, to fail only for drift
+older than that and print a fix-by date per finding.
+[Drift age policy](drift-age.md) · [Contributor mode](contribute.md).
 
 Reports: terminal, JSON, HTML (with an evidence graph), Markdown, SARIF, JUnit
 and GitHub annotations. [Full CLI reference](CLI.md).
@@ -89,13 +101,41 @@ jobs:
 ```
 
 With `base-ref`, the gate fails only on drift the pull request introduces.
-Reports are written as JSON, HTML, SARIF and Markdown. [Action guide](github-action.md).
+Reports are written as JSON, HTML, SARIF and Markdown. Add `comment: 'true'` for a sticky PR
+summary with inline suggested changes, or use a scheduled tracking issue or the self-hosted GitHub App.
+[Action guide](github-action.md) · [GitHub integration](github-integration.md) ·
+[GitHub App](github-app.md).
+
+## Use it as a dependency
+
+Add docs-drift to your dev dependencies and drift fails like a test:
+`pytest --docs-drift` adds one test per documentation file, `assert_no_drift()`
+works inside any test, `docs_drift.check()` returns a typed result, and
+pre-commit hooks are included. [Guide](as-a-dependency.md).
 
 ## Editor
 
 The VS Code extension shows findings as diagnostics, jumps to the source
 declaration, and offers quick fixes, backed by `docs-drift lsp`.
 [Extension guide](vscode.md).
+
+## Use it from your AI coding agent
+
+<!-- mcp-name: io.github.ayushagarwalhere/docs-drift -->
+
+An MCP server lets Claude Code, Cursor, VS Code Copilot, Windsurf and other agents
+check docs while they edit: ask "check docs drift" or "is my README still accurate
+after this rename?", or have the agent check a paragraph before writing it. Tools
+are read-only except an explicit `apply_fix`, and paths are confined to the
+repository. Claude Code setup:
+
+```text
+claude mcp add docs-drift -- uvx --from "docs-drift[mcp]" docs-drift mcp
+```
+
+Until docs-drift 0.1.1 is on PyPI, use
+`--from "docs-drift[mcp] @ git+https://github.com/ayushagarwalhere/docs-drift"` instead.
+[MCP guide](mcp.md): Cursor, VS Code, Windsurf and Claude Desktop setup, plus the tool reference.
 
 ## How it works
 

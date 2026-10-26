@@ -7,6 +7,7 @@ from typing import Any
 
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import _head
+from docs_drift.drift_age import age_insights
 from docs_drift.history import _run
 from docs_drift.models import ScanResult
 from docs_drift.scanning import run_scan
@@ -21,6 +22,7 @@ def insights(result: ScanResult) -> dict[str, Any]:
         "drift_by_document": dict(sorted(Counter(f.claim.doc_path for f in drift).items())),
         "drift_by_package": dict(sorted(Counter(f.package or "." for f in drift).items())),
         "with_introducing_commit": sum(f.introduced_by is not None for f in drift),
+        "drift_age": age_insights(drift, result.config_used.policy),
         "warnings": result.warnings,
     }
 

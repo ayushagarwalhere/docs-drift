@@ -5,7 +5,11 @@ from dataclasses import dataclass
 from docs_drift.llm.types import CallUsage, ModelRequest
 
 DEFAULT_MODEL = "anthropic/claude-sonnet-4.6"
+# Triage is a high-volume, doc-only classification; a small model that accepts
+# temperature 0 and strict JSON schemas keeps it cheap and repeatable.
+TRIAGE_DEFAULT_MODEL = "google/gemini-2.5-flash-lite"
 MAX_OUTPUT_TOKENS = 1024
+TRIAGE_MAX_OUTPUT_TOKENS = 2048
 
 
 @dataclass(frozen=True)
@@ -18,7 +22,13 @@ class Price:
 
 # Verified 2026-10-18. Update from https://openrouter.ai/anthropic/claude-sonnet-4.6
 # and https://platform.claude.com/docs/en/about-claude/pricing before adding models.
-PRICES = {DEFAULT_MODEL: Price(3.0, 15.0, 0.30, 3.75)}
+# Gemini and GPT nano rates verified 2026-10-25 from https://openrouter.ai/api/v1/models.
+PRICES = {
+    DEFAULT_MODEL: Price(3.0, 15.0, 0.30, 3.75),
+    TRIAGE_DEFAULT_MODEL: Price(0.10, 0.40, 0.01, 0.0834),
+    "openai/gpt-4.1-nano": Price(0.10, 0.40, 0.025, 0.10),
+    "qwen/qwen3-235b-a22b-2507": Price(0.09, 0.55, 0.09, 0.09),
+}
 
 
 def price_for(model: str) -> Price:
@@ -27,11 +37,15 @@ def price_for(model: str) -> Price:
     return PRICES[model]
 
 
+def max_output_tokens(request: ModelRequest) -> int:
+    return TRIAGE_MAX_OUTPUT_TOKENS if request.purpose == "triage" else MAX_OUTPUT_TOKENS
+
+
 def estimate_request(request: ModelRequest) -> float:
     price = price_for(request.model)
     # UTF-8 bytes bound token count conservatively; reserve worst-case cache-write and output costs.
     byte_count = len((request.system + request.context + request.claim).encode("utf-8")) + 2048
-    return (byte_count * max(price.input, price.cache_write) + MAX_OUTPUT_TOKENS * price.output) / 1_000_000
+    return (byte_count * max(price.input, price.cache_write) + max_output_tokens(request) * price.output) / 1_000_000
 
 
 def usage_cost(usage: CallUsage, model: str) -> float:

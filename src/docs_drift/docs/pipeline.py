@@ -146,6 +146,15 @@ def _merge(parsed: ParsedDoc, claims: list[Claim]) -> list[Claim]:
     return list(groups.values())
 
 
+def _dependency_claims(parsed: ParsedDoc, config: Config, timings: dict[str, float]) -> list[Claim]:
+    if not config.deps.enabled:
+        return []
+    from docs_drift.deps.claims import extract_dependency_claims  # noqa: PLC0415 - optional check.
+
+    with _timed(timings, "dependencies"):
+        return extract_dependency_claims(parsed)
+
+
 def scan_claims(
     repo: Path,
     config: Config,
@@ -204,8 +213,9 @@ def scan_claims(
                 source.extend(rst_claims(parsed))
             with _timed(timings, "defaults"):
                 defaults = extract_defaults(parsed, source)
+            dependency_claims = _dependency_claims(parsed, config, timings)
             with _timed(timings, "merge_filter"):
-                merged = _merge(parsed, [*source, *defaults.claims])
+                merged = _merge(parsed, [*source, *defaults.claims, *dependency_claims])
                 for claim in merged:
                     section = parsed.line_to_section.get(claim.line)
                     reason = _suppression(parsed, claim)

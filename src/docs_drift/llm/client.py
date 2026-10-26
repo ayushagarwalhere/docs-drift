@@ -6,16 +6,30 @@ hashes and validated redacted responses, never credentials or raw requests.
 """
 
 import asyncio
+import json
 import os
+import re
 from pathlib import Path
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, TypeVar
+
+from pydantic import BaseModel, ValidationError
 
 from docs_drift.config import LLMConfig
-from docs_drift.llm.pricing import MAX_OUTPUT_TOKENS, estimate_request, usage_cost
+from docs_drift.llm.pricing import estimate_request, max_output_tokens, usage_cost
 from docs_drift.llm.privacy import mask_secrets
-from docs_drift.llm.types import CallUsage, ModelRequest, ModelResponse, ModelVerdict, StrictModel
+from docs_drift.llm.types import (
+    MAX_TRIAGE_BATCH,
+    CallUsage,
+    ModelRequest,
+    ModelResponse,
+    ModelVerdict,
+    StrictModel,
+    TriageBatch,
+    TriageItem,
+    TriageResponse,
+)
 
-MAX_ATTEMPTS = 3
+MAX_ATTEMPTS = 4
 RETRYABLE_STATUSES = {429, 529}
 
 
@@ -65,8 +79,23 @@ class Recording(StrictModel):
     provenance: Literal["live", "synthetic"] = "live"
 
 
-def _strict_schema() -> dict[str, Any]:
-    schema = ModelVerdict.model_json_schema()
+class TriageRecording(StrictModel):
+    request_hash: str
+    model: str
+    prompt_version: str
+    response: TriageResponse
+    provenance: Literal["live", "synthetic"] = "live"
+
+
+ResponseT = TypeVar("ResponseT", ModelResponse, TriageResponse)
+
+
+def _result_type(request: ModelRequest) -> type[BaseModel]:
+    return TriageBatch if request.purpose == "triage" else ModelVerdict
+
+
+def _strict_schema(model: type[BaseModel] = ModelVerdict) -> dict[str, Any]:
+    schema = model.model_json_schema()
     for node in [schema, *schema.get("$defs", {}).values()]:
         if node.get("type") == "object":
             node["required"] = list(node.get("properties", {}))
@@ -77,7 +106,7 @@ def _strict_schema() -> dict[str, Any]:
 def payload_for(request: ModelRequest) -> dict[str, Any]:
     return {
         "model": request.model,
-        "max_tokens": MAX_OUTPUT_TOKENS,
+        "max_tokens": max_output_tokens(request),
         "temperature": 0,
         "provider": {"require_parameters": True, "data_collection": "deny"},
         "messages": [
@@ -93,17 +122,51 @@ def payload_for(request: ModelRequest) -> dict[str, Any]:
         ],
         "response_format": {
             "type": "json_schema",
-            "json_schema": {"name": "documentation_verdict", "strict": True, "schema": _strict_schema()},
+            "json_schema": {
+                "name": "triage_decisions" if request.purpose == "triage" else "documentation_verdict",
+                "strict": True,
+                "schema": _strict_schema(_result_type(request)),
+            },
         },
     }
 
 
-def _parse_response(data: dict[str, Any], model: str) -> ModelResponse:
+def _triage_batch(content: str) -> TriageBatch:
+    """Validate items one by one so one malformed item only keeps its own finding."""
+    try:
+        data = json.loads(content)
+        items = data.get("results") if isinstance(data, dict) else None
+    except json.JSONDecodeError:
+        # A model stuck repeating itself hits the token cap mid-item. Salvage complete items;
+        # the truncated one simply gets no answer, so its finding is kept.
+        decoder = json.JSONDecoder()
+        items = []
+        for match in re.finditer(r'\{\s*"id"\s*:', content):
+            try:
+                items.append(decoder.raw_decode(content, match.start())[0])
+            except json.JSONDecodeError:
+                continue
+    if not isinstance(items, list) or not items:
+        raise ValueError("Expected a results list")
+    valid: list[TriageItem] = []
+    for item in items[:MAX_TRIAGE_BATCH]:
+        try:
+            valid.append(TriageItem.model_validate(item))
+        except ValidationError:
+            continue
+    return TriageBatch(results=valid)
+
+
+def _parse_response(data: dict[str, Any], model: str, response_type: type[ResponseT]) -> ResponseT:
     try:
         content = data["choices"][0]["message"]["content"]
         if not isinstance(content, str):
             raise ValueError("Expected JSON text")
-        result = ModelVerdict.model_validate_json(mask_secrets(content))
+        result: BaseModel = (
+            _triage_batch(mask_secrets(content))
+            if response_type is TriageResponse
+            else ModelVerdict.model_validate_json(mask_secrets(content))
+        )
         raw = data.get("usage", {})
         details = raw.get("prompt_tokens_details", {}) or {}
         usage = CallUsage(
@@ -115,7 +178,7 @@ def _parse_response(data: dict[str, Any], model: str) -> ModelResponse:
         )
         if not usage.cost:
             usage.cost = usage_cost(usage, model)
-        return ModelResponse(result=result, usage=usage)
+        return response_type.model_validate({"result": result, "usage": usage})
     except (KeyError, IndexError, TypeError, ValueError) as exc:
         raise ClientError("OpenRouter returned invalid structured output. The claim remains unverifiable.") from exc
 
@@ -137,20 +200,34 @@ class RecordedClient:
         self.transport = transport
 
     async def complete(self, request: ModelRequest) -> ModelResponse:
+        if request.purpose == "triage":
+            raise ClientError("Use complete_triage for triage requests.")
+        return await self._complete(request, ModelResponse)
+
+    async def complete_triage(self, request: ModelRequest) -> TriageResponse:
+        if request.purpose != "triage":
+            raise ClientError("complete_triage only accepts triage requests.")
+        return await self._complete(request, TriageResponse)
+
+    async def _complete(self, request: ModelRequest, response_type: type[ResponseT]) -> ResponseT:
         request = request.model_copy(
             update={"context": mask_secrets(request.context), "claim": mask_secrets(request.claim)}
         )
         digest = request.request_hash()
         path = self.recordings / f"{digest}.json"
+        recording_type: type[Recording] | type[TriageRecording] = (
+            TriageRecording if response_type is TriageResponse else Recording
+        )
         if self.mode == "replay":
             if not path.is_file():
                 raise ClientError(f"Replay miss: {digest}. Run scripts/record.py in record mode with an API key.")
             try:
-                recording = Recording.model_validate_json(path.read_text(encoding="utf-8"))
+                recording = recording_type.model_validate_json(path.read_text(encoding="utf-8"))
                 if recording.request_hash != digest or recording.model != request.model:
                     raise ValueError("Recording hash or model mismatch")
-                return recording.response.model_copy(
-                    update={"replayed": True, "usage": recording.response.usage.model_copy(update={"cost": 0.0})}
+                replayed = response_type.model_validate(recording.response.model_dump())
+                return replayed.model_copy(
+                    update={"replayed": True, "usage": replayed.usage.model_copy(update={"cost": 0.0})}
                 )
             except (OSError, ValueError) as exc:
                 raise ClientError(f"Invalid replay recording {digest}. Re-record this request.") from exc
@@ -159,7 +236,9 @@ class RecordedClient:
             async with asyncio.timeout(self.config.timeout):
                 for attempt in range(MAX_ATTEMPTS):
                     try:
-                        response = _parse_response(await transport.send(payload_for(request)), request.model)
+                        response = _parse_response(
+                            await transport.send(payload_for(request)), request.model, response_type
+                        )
                         if not response.usage.cost and not (
                             response.usage.input_tokens or response.usage.output_tokens
                         ):
@@ -176,8 +255,13 @@ class RecordedClient:
             raise ClientError("Model request exceeded its total timeout. Reduce context or retry.") from exc
         if self.mode == "record":
             self.recordings.mkdir(parents=True, exist_ok=True)
-            record = Recording(
-                request_hash=digest, model=request.model, prompt_version=request.prompt_version, response=response
+            record = recording_type.model_validate(
+                {
+                    "request_hash": digest,
+                    "model": request.model,
+                    "prompt_version": request.prompt_version,
+                    "response": response.model_dump(),
+                }
             )
             temporary = path.with_suffix(".tmp")
             temporary.write_text(record.model_dump_json(indent=2) + "\n", encoding="utf-8")

@@ -126,6 +126,84 @@ Error: No such option
 
       <article class="dd-card">
         <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">R</span>
+          <h2 class="dd-card-title">Rich says Python 3.8. Its package says 3.9.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>Textualize/rich at 9d8f9a3 &middot; dependency drift</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>Docs with the wrong minimum</span><strong>12</strong></div>
+              <div class="dd-data-chrome">{{ glyph('check', 'dd-data-glyph') }}<span>Same bug, reported by a human</span><strong class="dd-mono">#4206</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="https://github.com/Textualize/rich/issues/4206">See the issue {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">README.md:42</span><span class="dd-ev-tag is-alt">documented</span><pre>Rich requires
+Python <s>3.8</s> or later.</pre><p>Nine translations still say 3.6.3.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">pyproject.toml:30</span><span class="dd-ev-tag is-alt">declared</span><pre>[tool.poetry.dependencies]
+python = "<b>&gt;=3.9.0</b>"</pre><p>What pip actually enforces.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">DD006</span><span class="dd-ev-tag is-alt">version_mismatch</span><pre>- Python 3.8 or later
++ Python 3.9 or later</pre><p>One patch, twelve files.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">C</span>
+          <h2 class="dd-card-title">Click's docs link to a class that doesn't exist.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>pallets/click at 2247b35 &middot; still on main</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>Statements checked</span><strong>291</strong></div>
+              <div class="dd-data-chrome">{{ glyph('braces', 'dd-data-glyph') }}<span>Real class</span><strong class="dd-mono">click.File</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="https://github.com/pallets/click/blob/2247b35ea1c47c727d7a06e51fa280e12a863ff6/docs/exceptions.md?plain=1#L110">See the line {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">exceptions.md:110</span><span class="dd-ev-tag is-alt">documented</span><pre>FileError is raised
+by the {class}`<s>FileType</s>`</pre><p>A broken cross-reference.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">types.py:915</span><span class="dd-ev-tag is-alt">declared</span><pre>class <b>File</b>(ParamType):
+    ...</pre><p>There is no FileType anywhere.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">fix</span><span class="dd-ev-tag is-alt">one line</span><pre>- {class}`FileType`
++ {class}`File` type</pre><p>Ready to send upstream.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
+          <span class="dd-avatar" aria-hidden="true">M</span>
+          <h2 class="dd-card-title">MkDocs' first tutorial points at a file it never builds.</h2>
+          <div class="dd-card-data">
+            <div class="dd-data-title"><i class="dd-dot" aria-hidden="true"></i>mkdocs/mkdocs at 2862536 &middot; Getting Started</div>
+            <div class="dd-data-wrap">
+              <div class="dd-data-big"><span>File last edited</span><strong>2023</strong></div>
+              <div class="dd-data-chrome">{{ glyph('pilcrow', 'dd-data-glyph') }}<span>Real path</span><strong class="dd-mono">search/</strong></div>
+            </div>
+            <a class="dd-btn dd-btn-dark" href="https://github.com/mkdocs/mkdocs/blob/2862536/docs/getting-started.md?plain=1#L161">See the line {{ arrow() }}</a>
+          </div>
+        </div>
+        <div class="dd-card-media">
+          <div class="dd-fan" data-fan>
+            <div class="dd-ev" data-pos="0"><span class="dd-ev-tag">getting-started.md:161</span><span class="dd-ev-tag is-alt">documented</span><pre>...and
+<s>mkdocs/search_index.json</s></pre><p>Every new user reads this page.</p></div>
+            <div class="dd-ev" data-pos="1"><span class="dd-ev-tag">search/__init__.py</span><span class="dd-ev-tag is-alt">source</span><pre>os.path.join(site_dir,
+  "<b>search</b>")</pre><p>Where the index is written.</p></div>
+            <div class="dd-ev" data-pos="2"><span class="dd-ev-tag">fix</span><span class="dd-ev-tag is-alt">two lines</span><pre>- mkdocs/search_index.json
++ search/search_index.json</pre><p>Path and the ls listing.</p></div>
+          </div>
+          <div class="dd-fan-arrows"><button type="button" aria-label="Previous evidence" data-fan-prev>←</button><button type="button" aria-label="Next evidence" data-fan-next>→</button></div>
+        </div>
+      </article>
+
+      <article class="dd-card">
+        <div class="dd-card-text">
           <span class="dd-avatar" aria-hidden="true">P</span>
           <h2 class="dd-card-title">A flag got renamed. The README never heard about it.</h2>
           <div class="dd-card-data">
@@ -235,6 +313,65 @@ jobs:
 +`serve` accepts --listen
 
 Apply? [y/N]</pre></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 04b WHERE IT RUNS -->
+  <section id="use" class="dd-use" data-tone="light" aria-labelledby="use-title">
+    <div class="dd-use-head">
+      <h2 id="use-title" class="dd-h-l" data-rise>Works where you already work.</h2>
+      <p class="dd-p-m">One engine, six ways in. Same findings, same evidence, everywhere.</p>
+    </div>
+    <div class="dd-use-grid">
+      <article class="dd-use-card">
+        <span class="dd-use-num">01</span><h3 class="dd-h-s">Terminal</h3>
+        <p>Scan any checkout. Explain one finding. Preview a patch.</p>
+        <pre><b>$</b> pipx install docs-drift
+<b>$</b> docs-drift scan
+<b>$</b> docs-drift fix</pre>
+        <span class="dd-use-who">For maintainers and contributors</span>
+      </article>
+      <article class="dd-use-card is-lime">
+        <span class="dd-use-num">02</span><h3 class="dd-h-s">Pull requests</h3>
+        <p>A GitHub Action or App comments on the PR with a one-click suggested fix, and fails only on drift the PR introduces.</p>
+        <pre>- uses: ayushagarwalhere/docs-drift@v0.1.1
+  with:
+    mode: pr-review
+    comment: 'true'</pre>
+        <span class="dd-use-who">For teams and OSS orgs</span>
+      </article>
+      <article class="dd-use-card is-dark">
+        <span class="dd-use-num">03</span><h3 class="dd-h-s">AI coding agents</h3>
+        <p>An MCP server lets Claude Code, Cursor and Copilot check a paragraph before writing it, and after every rename.</p>
+        <pre><b>$</b> claude mcp add docs-drift -- \
+    uvx --from "docs-drift[mcp]" \
+    docs-drift mcp</pre>
+        <span class="dd-use-who">For anyone writing docs with an agent</span>
+      </article>
+      <article class="dd-use-card">
+        <span class="dd-use-num">04</span><h3 class="dd-h-s">Tests and hooks</h3>
+        <p>A pytest plugin and a pre-commit hook make stale docs a failing test.</p>
+        <pre><b>$</b> pytest --docs-drift
+
+- repo: https://github.com/ayushagarwalhere/docs-drift
+  hooks: [{id: docs-drift}]</pre>
+        <span class="dd-use-who">For projects that treat docs as code</span>
+      </article>
+      <article class="dd-use-card">
+        <span class="dd-use-num">05</span><h3 class="dd-h-s">Dependencies</h3>
+        <p>Catches "requires Python 3.8" when the package needs 3.9, unknown extras, and imports nobody declared.</p>
+        <pre><b>$</b> docs-drift deps
+undeclared  httpx   src/api.py:3
+unused      rich    pyproject.toml</pre>
+        <span class="dd-use-who">For release managers</span>
+      </article>
+      <article class="dd-use-card is-green">
+        <span class="dd-use-num">06</span><h3 class="dd-h-s">First contributions</h3>
+        <p>Turns findings into beginner-friendly issues with the exact line, the evidence and a ready patch.</p>
+        <pre><b>$</b> docs-drift contribute
+wrote 4 good-first-issue drafts</pre>
+        <span class="dd-use-who">For newcomers and their mentors</span>
       </article>
     </div>
   </section>

@@ -10,8 +10,20 @@ RULES = {
     "default_changed": ("DD003", "DEFAULT", "The documented default differs from the code."),
     "invalid_command": ("DD004", "INVALID CMD", "The documented command is invalid."),
     "unverifiable": ("DD005", "UNVERIFIABLE", "Available static evidence is insufficient."),
+    "version_mismatch": ("DD006", "VERSION", "The documented version disagrees with the package manifest."),
+    "unknown_extra": ("DD007", "EXTRA", "The documented install extra is not defined by the manifest."),
     "ok": ("DD000", "OK", "The documented claim matches the code."),
 }
+
+
+# Dependency verdicts appear in summaries only when present, keeping existing report layouts stable.
+_OPTIONAL_VERDICTS = {"version_mismatch", "unknown_extra"}
+
+
+def verdict_counts(result: ScanResult) -> dict[str, int]:
+    return {
+        key: value for key, value in result.summary()["by_verdict"].items() if value or key not in _OPTIONAL_VERDICTS
+    }
 
 
 def ordered(result: ScanResult) -> list[Finding]:

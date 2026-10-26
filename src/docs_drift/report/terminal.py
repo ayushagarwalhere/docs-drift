@@ -1,15 +1,56 @@
 """Wrapping terminal report with optional ANSI styles and OSC 8 file links."""
 
-from datetime import UTC, datetime
 from io import StringIO
 
 from rich.console import Console
 from rich.text import Text
 
+from docs_drift.config import PolicyConfig
+from docs_drift.drift_age import AgeStatus, age_label, age_status
 from docs_drift.llm.pricing import format_usage
-from docs_drift.models import ScanResult
+from docs_drift.llm.triage import format_triage_usage
+from docs_drift.models import Finding, ScanResult
 from docs_drift.report import RenderOptions
-from docs_drift.report.common import RULES, health, ordered
+from docs_drift.report.common import RULES, health, ordered, verdict_counts
+
+
+def _history_lines(f: Finding, policy: PolicyConfig) -> list[tuple[str, str]]:
+    """The introducing commit, then its age at HEAD and any fix-by date (red once overdue)."""
+    if not f.introduced_by:
+        return []
+    commit = f.introduced_by
+    age = age_label(f, policy)
+    lines = [
+        (
+            f"    Introduced by {commit.short_sha} · {commit.summary}"
+            + ("" if age else f" · {commit.date.date().isoformat()}"),
+            "dim",
+        )
+    ]
+    if age:
+        lines.append((f"    {age[0].upper()}{age[1:]}", "red" if age_status(f, policy) == AgeStatus.overdue else "dim"))
+    return lines
+
+
+def _model_summary(console: Console, result: ScanResult) -> None:
+    """Model usage, then rule findings that triage downgraded, listed apart from model verdicts."""
+    if any(not key.startswith("triage_") for key in result.llm_usage):
+        console.print(format_usage(result.llm_usage))
+    if "triage_findings" in result.llm_usage:
+        console.print(format_triage_usage(result.llm_usage))
+    triaged = [(f, f.triage) for f in ordered(result) if f.triage is not None]
+    if triaged:
+        console.print("Downgraded by model triage (kept as unverifiable; full reasons in JSON):", style="bold")
+    for f, note in triaged:
+        console.print(
+            f"  {f.claim.doc_path}:{f.claim.line} {f.claim.value} was {note.original_verdict.value}"
+            f" → {note.category}: {note.rationale}",
+            style="dim",
+        )
+    model_findings = [f for f in result.findings if f.decided_by == "llm" and f.triage is None]
+    if model_findings:
+        mode = "replayed" if all(f.replayed for f in model_findings) else "live"
+        console.print(f"Model verdicts: {len(model_findings)} ({mode})")
 
 
 def render(result: ScanResult, options: RenderOptions) -> str:
@@ -33,6 +74,8 @@ def render(result: ScanResult, options: RenderOptions) -> str:
         "missing": "red",
         "default_changed": "magenta",
         "invalid_command": "red",
+        "version_mismatch": "magenta",
+        "unknown_extra": "yellow",
         "unverifiable": "dim",
         "ok": "green",
     }
@@ -63,24 +106,22 @@ def render(result: ScanResult, options: RenderOptions) -> str:
         if start >= 0:
             console.print(Text("    " + " " * start + "^" * len(f.claim.value), style=styles[f.verdict]))
         console.print(f"    → {f.suggestion or f.reasons[0]}")
-        if f.introduced_by:
-            commit = f.introduced_by
-            days = max(0, (datetime.now(UTC) - commit.date).days)
-            console.print(f"    Introduced by {commit.short_sha} · {commit.summary} · {days} days ago", style="dim")
+        for text, style in _history_lines(f, result.config_used.policy):
+            console.print(text, style=style)
         console.print(f"    {f.claim.claim_id}", style="dim")
         if options.verbose:
             console.print(f"    Confidence {f.confidence:.0%} · {f.decided_by}")
     console.print()
-    console.print(" · ".join(f"{RULES[key][1]} {value}" for key, value in result.summary()["by_verdict"].items()))
+    console.print(" · ".join(f"{RULES[key][1]} {value}" for key, value in verdict_counts(result).items()))
     console.print(
         f"Health {health(result.findings)}/100 · suppressed {len(result.suppressed)} · baselined {result.baselined}"
     )
-    if result.llm_usage:
-        console.print(format_usage(result.llm_usage))
-    model_findings = [f for f in result.findings if f.decided_by == "llm"]
-    if model_findings:
-        mode = "replayed" if all(f.replayed for f in model_findings) else "live"
-        console.print(f"Model verdicts: {len(model_findings)} ({mode})")
+    _model_summary(console, result)
+    if result.dependency_issues:
+        console.print(
+            f"Dependency usage: {len(result.dependency_issues)} issue(s); run docs-drift deps for details.",
+            style="yellow",
+        )
     for warning in result.warnings:
         console.print(f"Warning: {warning}", style="yellow")
     if options.verbose:

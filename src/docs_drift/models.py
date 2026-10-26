@@ -1,10 +1,20 @@
 """Shared pipeline data contracts. Extraction, matching, and history logic live elsewhere."""
 
+from datetime import date, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from docs_drift import __version__
 from docs_drift.config import Config
@@ -46,6 +56,8 @@ class ClaimKind(StrEnum):
     default_value = "default_value"
     code_command = "code_command"
     prose = "prose"
+    dependency = "dependency"
+    runtime_version = "runtime_version"
 
 
 class Extraction(StrEnum):
@@ -79,6 +91,8 @@ class Verdict(StrEnum):
     default_changed = "default_changed"
     invalid_command = "invalid_command"
     unverifiable = "unverifiable"
+    version_mismatch = "version_mismatch"
+    unknown_extra = "unknown_extra"
 
 
 class DecidedBy(StrEnum):
@@ -173,7 +187,15 @@ class CommitRef(PipelineModel):
     author_name: NonemptyText
     author_email: str | None = None
     date: AwareDatetime
+    # Committer date: when the commit landed on the branch. Rebases and cherry-picks keep the
+    # author date but set this anew, so drift age is measured from here. Older reports omit it.
+    committed: AwareDatetime | None = None
     summary: NonemptyText
+
+    @property
+    def landed(self) -> datetime:
+        """When the change reached the branch: the committer date, or the author date in older reports."""
+        return self.committed or self.date
 
     @model_validator(mode="after")
     def matching_short_sha(self) -> Self:
@@ -189,6 +211,22 @@ class Evidence(PipelineModel):
     end_line: Line | None = None
 
 
+class TriageNote(PipelineModel):
+    """Why optional model triage downgraded a rule finding; the original verdict stays visible."""
+
+    decision: Literal["not_project_claim"] = "not_project_claim"
+    category: NonemptyText
+    quote: NonemptyText
+    quote_file: RepoPath
+    quote_line: Line
+    rationale: NonemptyText
+    original_verdict: Verdict
+    original_confidence: Confidence
+    model: NonemptyText
+    prompt_version: NonemptyText
+    replayed: bool = False
+
+
 class Finding(PipelineModel):
     claim: Claim
     matched_symbol: Symbol | None = None
@@ -202,10 +240,53 @@ class Finding(PipelineModel):
     replayed: bool = False
     package: str | None = None
     doc_text: str | None = None
+    # Drift age, measured against the HEAD commit date so reports are reproducible.
+    stale_since: date | None = None
+    age_days: Annotated[int, Field(ge=0)] | None = None
+    fix_by: date | None = None
+    triage: TriageNote | None = None
+
+    @model_serializer(mode="wrap")
+    def _omit_absent_triage(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        # Rule-only output stays byte-identical; triage appears only when it changed the finding.
+        data: dict[str, Any] = handler(self)
+        if self.triage is None:
+            data.pop("triage", None)
+        return data
 
     @property
     def is_drift(self) -> bool:
-        return self.verdict in {Verdict.missing, Verdict.renamed, Verdict.default_changed, Verdict.invalid_command}
+        return self.verdict in {
+            Verdict.missing,
+            Verdict.renamed,
+            Verdict.default_changed,
+            Verdict.invalid_command,
+            Verdict.version_mismatch,
+            Verdict.unknown_extra,
+        }
+
+
+class DependencyIssueKind(StrEnum):
+    """Code-versus-manifest dependency observations; these are not documentation claims."""
+
+    undeclared = "undeclared"
+    dev_only = "dev_only"
+    undeclared_dev = "undeclared_dev"
+    unused = "unused"
+    added_undocumented = "added_undocumented"
+    removed_documented = "removed_documented"
+
+
+class DependencyIssue(PipelineModel):
+    issue_id: Annotated[str, Field(pattern=r"^dep_[0-9a-f]{64}$")]
+    kind: DependencyIssueKind
+    ecosystem: Literal["python", "node"]
+    name: NonemptyText
+    import_name: str | None = None
+    manifest: RepoPath | None = None
+    message: NonemptyText
+    evidence: Annotated[list[Evidence], Field(min_length=1)]
+    confidence: Confidence
 
 
 class Package(PipelineModel):
@@ -236,6 +317,15 @@ class ScanResult(PipelineModel):
     docs_repo_path: Path | None = None
     remote_url: str | None = None
     baselined: int = Field(default=0, ge=0)
+    dependency_issues: list[DependencyIssue] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def _omit_empty_dependency_issues(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """Emit `dependency_issues` only when there are some, so scans without them keep the earlier v1 shape."""
+        data: dict[str, Any] = handler(self)
+        if not data.get("dependency_issues"):
+            data.pop("dependency_issues", None)
+        return data
 
     def summary(self) -> dict[str, dict[str, int]]:
         """Count findings by verdict and claim kind, including zero-count categories."""

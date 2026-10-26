@@ -396,11 +396,9 @@ class AppProcessor:
             )
             env = git_environment(workspace)  # No tokens, keys or proxies reach the scanner.
             env["PYTHONPATH"] = str(Path(__file__).parents[2])
-            options: dict[str, Any] = (
-                {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
-                if sys.platform == "win32"
-                else {"start_new_session": True}
-            )
+            options: dict[str, Any] = {"start_new_session": True}
+            if sys.platform == "win32":
+                options = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
             try:
                 completed = subprocess.run(
                     [sys.executable, "-m", "docs_drift.github.scan_worker"],

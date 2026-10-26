@@ -1,8 +1,9 @@
 # Claim kinds and verdicts
 
 Claims include CLI flags/commands, environment variables, HTTP endpoints,
-literal settings/defaults, code symbols, file paths, package scripts, task targets
-and project-owned shell command examples. Arbitrary behavioural prose is not
+literal settings/defaults, code symbols, file paths, package scripts, task targets,
+project-owned shell command examples, runtime minimums and dependency install
+commands ([dependency drift](dependencies.md)). Arbitrary behavioural prose is not
 proved by static name matching. The optional model path is separately labeled.
 
 | Verdict | Meaning | Rule |
@@ -11,6 +12,8 @@ proved by static name matching. The optional model path is separately labeled.
 | renamed | A replacement is proposed from similarity or history evidence | DD002 |
 | default_changed | An explicit documented default disagrees with a declaration | DD003 |
 | invalid_command | A project-owned command has unknown tokens | DD004 |
+| version_mismatch | A runtime minimum or install pin disagrees with the package manifest | DD006 |
+| unknown_extra | An install command names an extra the manifest does not define | DD007 |
 | unverifiable | Available static evidence cannot decide | DD005 |
 | ok | The extracted claim has a matching static declaration | DD000 |
 

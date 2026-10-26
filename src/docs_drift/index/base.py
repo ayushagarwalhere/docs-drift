@@ -198,38 +198,49 @@ def source_files(  # noqa: PLR0912, PLR0915 - bounded file validation before par
     return sorted(result, key=lambda path: path.relative_to(root).as_posix())
 
 
-def language_for(path: Path) -> str | None:  # noqa: PLR0911
-    if path.name in {"Makefile", "GNUmakefile"}:
-        return "make"
-    if path.name == "justfile":
-        return "just"
-    if path.name == "Taskfile.yml":
-        return "yaml"
-    if path.name in {"tox.ini", "setup.cfg"}:
-        return "ini"
-    if path.name == "Dockerfile" or path.name.casefold().endswith(".dockerfile"):
+# Exact file names the indexers read; keep `.pre-commit-hooks.yaml` `files` in step (a test enforces it).
+NAMED_LANGUAGES = {
+    "Makefile": "make",
+    "GNUmakefile": "make",
+    "justfile": "just",
+    "Taskfile.yml": "yaml",
+    "tox.ini": "ini",
+    "setup.cfg": "ini",
+    "Dockerfile": "dockerfile",
+    ".env.example": "dotenv",
+    ".env.sample": "dotenv",
+    ".env.template": "dotenv",
+}
+# Case-insensitive suffixes the indexers read.
+SUFFIX_LANGUAGES = {
+    ".py": "python",
+    ".js": "javascript",
+    ".mjs": "javascript",
+    ".cjs": "javascript",
+    ".jsx": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".mts": "typescript",
+    ".cts": "typescript",
+    ".yaml": "yaml",
+    ".yml": "yaml",
+    ".toml": "toml",
+    ".json": "json",
+    ".ini": "ini",
+    ".cfg": "ini",
+    ".mk": "make",
+    ".sh": "shell",
+    ".dockerfile": "dockerfile",
+}
+
+
+def language_for(path: Path) -> str | None:
+    named = NAMED_LANGUAGES.get(path.name)
+    if named is not None:
+        return named
+    if path.name.casefold().endswith(".dockerfile"):  # also a bare ".dockerfile", which has no suffix
         return "dockerfile"
-    if path.name in {".env.example", ".env.sample", ".env.template"}:
-        return "dotenv"
-    return {
-        ".py": "python",
-        ".js": "javascript",
-        ".mjs": "javascript",
-        ".cjs": "javascript",
-        ".jsx": "javascript",
-        ".ts": "typescript",
-        ".tsx": "typescript",
-        ".mts": "typescript",
-        ".cts": "typescript",
-        ".yaml": "yaml",
-        ".yml": "yaml",
-        ".toml": "toml",
-        ".json": "json",
-        ".ini": "ini",
-        ".cfg": "ini",
-        ".mk": "make",
-        ".sh": "shell",
-    }.get(path.suffix.casefold())
+    return SUFFIX_LANGUAGES.get(path.suffix.casefold())
 
 
 def ensure_coverage(code_index: CodeIndex) -> Mapping[str, str]:

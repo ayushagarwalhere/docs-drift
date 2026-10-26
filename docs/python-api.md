@@ -1,5 +1,10 @@
 # Python API
 
+For a pass/fail answer, use the stable facade `docs_drift.check()`; it returns
+a small typed `CheckResult` and is described in
+[Use docs-drift as a dependency](as-a-dependency.md#python-api). The lower-level
+pipeline below returns the full scan.
+
 ```python
 from pathlib import Path
 from docs_drift.config import Config

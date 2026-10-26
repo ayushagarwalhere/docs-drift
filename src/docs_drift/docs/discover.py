@@ -105,15 +105,19 @@ def _walk(repo: Path, directory: Path, layers: tuple[_IgnoreLayer, ...] = ()) ->
             yield relative
 
 
+# Case-insensitive documentation suffixes; `.pre-commit-hooks.yaml` `files` must cover them (a test enforces it).
+DOC_FORMATS = {
+    ".md": DocFormat.markdown,
+    ".markdown": DocFormat.markdown,
+    ".mdx": DocFormat.mdx,
+    ".rst": DocFormat.rst,
+    ".txt": DocFormat.text,
+    ".text": DocFormat.text,
+}
+
+
 def _format(path: str) -> DocFormat | None:
-    return {
-        ".md": DocFormat.markdown,
-        ".markdown": DocFormat.markdown,
-        ".mdx": DocFormat.mdx,
-        ".rst": DocFormat.rst,
-        ".txt": DocFormat.text,
-        ".text": DocFormat.text,
-    }.get(PurePosixPath(path).suffix.casefold())
+    return DOC_FORMATS.get(PurePosixPath(path).suffix.casefold())
 
 
 def _read_bytes(repo: Path, relative: str) -> bytes:

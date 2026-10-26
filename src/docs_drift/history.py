@@ -17,7 +17,9 @@ from docs_drift.history_cache import QueryCache
 from docs_drift.limits import MAX_GIT_OUTPUT, MAX_LINE_CHARS
 from docs_drift.models import CommitRef, Finding
 
-_META = re.compile(r"^@@@([0-9a-f]{40,64})\x1f([0-9a-f]{4,64})\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f(.*)$")
+_META = re.compile(
+    r"^@@@([0-9a-f]{40,64})\x1f([0-9a-f]{4,64})\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f([^\x1f]*)\x1f(.*)$"
+)
 _PATH = re.compile(r"^diff --git a/(.*?) b/(.*?)$")
 _SOURCE_GLOBS = (
     "*.py",
@@ -134,13 +136,14 @@ def _run(repo: Path, args: list[str]) -> subprocess.CompletedProcess[str] | None
 
 
 def _commit(metadata: re.Match[str], show_emails: bool) -> CommitRef:
-    sha, short_sha, author, email, date, subject = metadata.groups()
+    sha, short_sha, author, email, date, committed, subject = metadata.groups()
     return CommitRef(
         sha=sha,
         short_sha=short_sha,
         author_name=author or "Unknown author",
         author_email=email if show_emails else None,
         date=datetime.fromisoformat(date),
+        committed=datetime.fromisoformat(committed) if committed else None,
         summary=subject or "(no subject)",
     )
 
@@ -191,7 +194,7 @@ class GitHistory:
                 "--no-textconv",
                 f"--max-count={self.config.max_commits}",
                 "-p",
-                "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%cI%x1f%s",
                 self._revision_range,
                 "--",
                 *_SOURCE_GLOBS,
@@ -238,7 +241,7 @@ class GitHistory:
                     "--no-textconv",
                     f"--max-count={self.config.max_commits}",
                     "-p",
-                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%cI%x1f%s",
                     *(["-G", f"[\"']{re.escape(old_name)}[\"']"] if old_name.startswith("/") else [f"-S{old_name}"]),
                     self._revision_range,
                     "--",
@@ -335,7 +338,7 @@ class GitHistory:
                     "--no-ext-diff",
                     f"--max-count={self.config.max_commits}",
                     "-p",
-                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%s",
+                    "--format=@@@%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%cI%x1f%s",
                     "-G",
                     re.escape(symbol.name),
                     "--",
@@ -397,12 +400,14 @@ class GitHistory:
         email = values.get("author-mail", "").strip("<>")
         timestamp = values.get("author-time", "0")
         date = datetime.fromtimestamp(int(timestamp), tz=UTC)
+        committed = values.get("committer-time")
         commit = CommitRef(
             sha=sha,
             short_sha=sha[:7],
             author_name=author,
             author_email=email if self.config.show_emails else None,
             date=date,
+            committed=datetime.fromtimestamp(int(committed), tz=UTC) if committed else None,
             summary=values.get("summary", "(no subject)"),
         )
         self._blame[key] = commit

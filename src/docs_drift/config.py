@@ -47,6 +47,12 @@ class LLMConfig(ConfigModel):
     timeout: float = Field(default=60, gt=0, le=600)
     budget: float = Field(default=0.50, ge=0, allow_inf_nan=False)
     redact_paths: list[str] = Field(default_factory=list)
+    # Triage can only downgrade rule drift that is likely not about this project.
+    triage: bool = False
+    triage_model: str | None = None
+    triage_max_findings: int = Field(default=200, ge=0, le=5000)
+    triage_batch_size: int = Field(default=8, ge=1, le=12)
+    triage_context_lines: int = Field(default=8, ge=2, le=40)
 
 
 class HistoryConfig(ConfigModel):
@@ -54,6 +60,35 @@ class HistoryConfig(ConfigModel):
 
     max_commits: int = Field(default=2000, ge=0)
     show_emails: bool = False
+
+
+class DepsConfig(ConfigModel):
+    """Dependency and runtime checks against package manifests; manifests are read as data only."""
+
+    enabled: bool = True
+    usage: bool = False
+    report_understated: bool = False
+    ignore: list[str] = Field(default_factory=list)
+    import_map: dict[str, str] = Field(default_factory=dict)
+    max_files: int = Field(default=5000, ge=1, le=100_000)
+
+
+class PolicyConfig(ConfigModel):
+    """Drift age policy: how long attributed drift may stay unfixed. Unset keeps check behaviour unchanged."""
+
+    max_drift_age_days: int | None = Field(default=None, ge=0, le=36500)
+    warn_drift_age_days: int | None = Field(default=None, ge=0, le=36500)
+    fail_unknown_age: bool = True
+
+    @model_validator(mode="after")
+    def ordered_ages(self) -> "PolicyConfig":
+        if (
+            self.max_drift_age_days is not None
+            and self.warn_drift_age_days is not None
+            and self.warn_drift_age_days > self.max_drift_age_days
+        ):
+            raise ValueError("policy.warn_drift_age_days must not exceed policy.max_drift_age_days.")
+        return self
 
 
 class Config(ConfigModel):
@@ -75,6 +110,8 @@ class Config(ConfigModel):
     min_confidence: float = Field(default=0.6, ge=0.0, le=1.0)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     history: HistoryConfig = Field(default_factory=HistoryConfig)
+    deps: DepsConfig = Field(default_factory=DepsConfig)
+    policy: PolicyConfig = Field(default_factory=PolicyConfig)
 
 
 def _read_toml(path: Path) -> dict[str, object]:
