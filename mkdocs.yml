@@ -47,6 +47,7 @@ nav:
       - GitHub PR reviews and issues: github-integration.md
       - GitHub App: github-app.md
       - Pre-commit and CI: ci.md
+      - Docs health badge: badge.md
       - VS Code: vscode.md
       - AI coding agents (MCP): mcp.md
       - Python API: python-api.md
@@ -63,6 +64,7 @@ nav:
       - Limitations: LIMITATIONS.md
       - Performance: RESULTS.md
   - FAQ: faq.md
+  - Write with voice: write-with-voice.md
   - Built with voice: built-with-voice.md
   - Changelog: CHANGELOG.md
 exclude_docs: |

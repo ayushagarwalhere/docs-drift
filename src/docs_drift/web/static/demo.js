@@ -130,6 +130,12 @@
         throw Error(errorMessage(data.detail));
       }
       if (!data.scan_id) throw Error('The scan could not be started. Try an instant sample or retry.');
+      // Remember this session's scans so /write can check dictated text against them.
+      try {
+        const scans = JSON.parse(sessionStorage.getItem('dd-scans') || '[]').filter(item => item.scan_id !== data.scan_id);
+        scans.unshift({ scan_id: data.scan_id, repo_url: normalizeRepo(input.value) });
+        sessionStorage.setItem('dd-scans', JSON.stringify(scans.slice(0, 8)));
+      } catch { /* storage can be blocked */ }
       location.assign(`/scan/${encodeURIComponent(data.scan_id)}`);
     } catch (failure) {
       error.textContent = failure.name === 'AbortError' ? 'The service is taking longer to respond. Try an instant sample, or retry shortly.' : failure.message || 'Could not reach the scanner. Try an instant sample.';
@@ -170,6 +176,7 @@
         if (data.counts?.claims !== undefined) document.getElementById('counts').textContent = `Found ${data.counts.claims} claims across ${data.counts.docs} docs${data.counts.symbols !== undefined ? `; indexed ${data.counts.symbols} symbols` : ''}.`;
         if (data.status === 'failed') {
           document.getElementById('status-title').textContent = 'This scan needs another try.';
+          document.getElementById('pr-preview')?.setAttribute('hidden', '');
           error.textContent = `${data.error.message} ${data.error.hint}`; error.hidden = false; return;
         }
         error.hidden = true; timer = setTimeout(poll, 1000);

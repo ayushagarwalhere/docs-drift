@@ -3,15 +3,22 @@
 import argparse
 import asyncio
 import json
+import subprocess
+import tempfile
+import time
 from pathlib import Path
 
 from docs_drift.config import Config
+from docs_drift.fix.bundle import build_fix_bundle
 from docs_drift.models import ScanResult
 from docs_drift.scanning import run_scan
+from docs_drift.web.git import checkout
 from docs_drift.web.jobs import LocalQueue, Store
 from docs_drift.web.settings import Settings
 from docs_drift.web.validation import validate_repository
 from docs_drift.web.worker import public_result
+from scripts.build_judge_demo import build_demo
+from tests.fixtures.build_fixtures import build_fixtures
 
 EXAMPLES = Path("src/docs_drift/web/examples")
 
@@ -65,10 +72,63 @@ def apply_reviews() -> None:
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
+FIXTURE_CHECKOUT = "uv run python -m tests.fixtures.build_fixtures && cd tests/fixtures/repos/{name}"
+JUDGE_CHECKOUT = "uv run python scripts/build_judge_demo.py --output judge && cd judge/judge-fixture"
+
+
+def _bake(item: dict[str, object], repo: Path) -> None:
+    """Plan certain fixes for a saved example against a checkout of the exact scanned revision."""
+    result = ScanResult.model_validate_json((EXAMPLES / str(item["file"])).read_text(encoding="utf-8"))
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True, check=True)
+    if head.stdout.strip() != result.head_sha:
+        print(f"skip {item['scan_id']}: checkout is {head.stdout.strip()[:8]}, example is {result.head_sha[:8]}")
+        return
+    bundle = build_fix_bundle(result, repo)
+    if not bundle.available:
+        item.pop("fixes", None)
+        print(f"{item['scan_id']}: no certain edits")
+        return
+    name = Path(str(item["file"])).stem + ".fixes.json"
+    (EXAMPLES / name).write_text(bundle.model_dump_json(indent=2) + "\n", encoding="utf-8", newline="\n")
+    item["fixes"] = name
+    print(f"{item['scan_id']}: {len(bundle.files)} file(s), {sum(f.edits for f in bundle.files)} edit(s)")
+
+
+def bake_fixes(public: bool) -> None:
+    """Attach fix bundles to saved examples; public repositories are fetched only with --public."""
+    manifest_path = EXAMPLES / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temporary:
+        root = Path(temporary)
+        build_fixtures(root / "repos")
+        build_demo(root / "judge")
+        for item in manifest:
+            stem = Path(item["file"]).stem
+            if item["kind"] == "fixture" and stem == "judge-fixture":
+                item["checkout"] = JUDGE_CHECKOUT
+                _bake(item, root / "judge" / "judge-fixture")
+            elif item["kind"] == "fixture" and (root / "repos" / stem).is_dir():
+                item["checkout"] = FIXTURE_CHECKOUT.format(name=stem)
+                _bake(item, root / "repos" / stem)
+            elif public and item["kind"] == "public" and item.get("sha"):
+                settings = Settings(data_dir=root / "data", history_days=3650)
+                workspace = root / "public" / item["scan_id"]
+                workspace.mkdir(parents=True)
+                repository = validate_repository(item["repo_url"])
+                deadline = time.monotonic() + settings.clone_timeout
+                _bake(item, checkout(repository, item["sha"], workspace, settings, deadline, depth_only=True))
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--real", nargs="*")
+    parser.add_argument("--fixes", action="store_true", help="Only attach fix bundles to the saved examples.")
+    parser.add_argument("--public", action="store_true", help="With --fixes, also fetch pinned public examples.")
     args = parser.parse_args()
+    if args.fixes:
+        bake_fixes(args.public)
+        return
     EXAMPLES.mkdir(parents=True, exist_ok=True)
     manifest_path = EXAMPLES / "manifest.json"
     previous = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else []

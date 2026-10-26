@@ -1264,3 +1264,21 @@ def test_invalid_deps_baseline_names_the_real_flag(tmp_path: Path) -> None:
     (tmp_path / "bad.json").write_text("{}x", encoding="utf-8")
     with pytest.raises(ValueError, match=r"docs-drift deps --write-baseline <path>"):
         load_deps_baseline(tmp_path / "bad.json")
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "using language features that weren't even available before (Python 3.6+ type hints).",
+        "Python 3.10+ pattern matching makes this shorter.",
+        "Walrus assignments were introduced in Python 3.8.",
+        "This relies on Python 3.9+ syntax for generics.",
+    ],
+)
+def test_language_feature_history_is_not_a_runtime_requirement(line: str) -> None:
+    assert runtime_claims_in_text(line) == []
+
+
+@pytest.mark.parametrize("line", ["Requires Python 3.8+.", "Works with Python 3.9 or later.", "Python >= 3.10"])
+def test_requirement_statements_are_still_runtime_claims(line: str) -> None:
+    assert runtime_claims_in_text(line)

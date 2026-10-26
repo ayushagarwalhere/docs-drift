@@ -1,5 +1,6 @@
 """Public CLI behavior for the CLI and extraction-only scan."""
 
+import io
 from importlib.metadata import version
 from pathlib import Path
 
@@ -8,7 +9,7 @@ from rich.text import Text
 from typer.testing import CliRunner
 
 from docs_drift import __version__
-from docs_drift.cli import app
+from docs_drift.cli import _utf8_streams, app
 from docs_drift.config import Config
 from docs_drift.docs.pipeline import scan_claims
 
@@ -209,3 +210,12 @@ def test_default_repo_is_current_directory(tmp_path: Path, monkeypatch: pytest.M
     result = CliRunner().invoke(app, ["scan"])
     assert result.exit_code == 2
     assert "Correct the listed fields" in " ".join(Text.from_ansi(result.output).plain.replace("│", "").split())
+
+
+def test_legacy_code_page_streams_are_switched_to_utf8() -> None:
+    raw = io.BytesIO()
+    stream = io.TextIOWrapper(raw, encoding="cp1252")
+    _utf8_streams(stream)
+    stream.write("README.md:4 → --listen")
+    stream.flush()
+    assert raw.getvalue().decode("utf-8").endswith("→ --listen")

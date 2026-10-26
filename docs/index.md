@@ -66,6 +66,7 @@ docs-drift impact --base HEAD~1             # findings touched by recent changes
 docs-drift pr --base HEAD~1 --report-dir pr  # review artifacts for drift a branch introduces
 docs-drift baseline update                  # accept today's drift, gate only new drift
 docs-drift deps                             # dependency drift: docs, manifests and imports
+docs-drift badge --json badge.json          # "N stale" shields.io badge (or --svg)
 docs-drift scan --format html --output report.html
 ```
 
@@ -78,7 +79,8 @@ older than that and print a fix-by date per finding.
 [Drift age policy](drift-age.md) · [Contributor mode](contribute.md).
 
 Reports: terminal, JSON, HTML (with an evidence graph), Markdown, SARIF, JUnit
-and GitHub annotations. [Full CLI reference](CLI.md).
+and GitHub annotations. [Full CLI reference](CLI.md). Publish a docs-health
+badge from CI with the [badge guide](badge.md).
 
 ![HTML report with the evidence graph](assets/graph-view.png)
 
@@ -216,11 +218,30 @@ mode is opt-in, sends only redacted excerpts, and can be replayed offline.
 ## Try it in the browser
 
 The web app scans a public GitHub repository without sign-in, and includes saved
-reports you can open instantly. Run it locally:
+reports you can open instantly. Each report can be turned into a pull request: a
+patch with only the exact edits docs-drift is certain about, a suggested PR
+description with evidence pinned to the scanned commit, and issue drafts for the
+rest. Review every change before opening a PR. Run it locally:
 
 ```sh
 uv run --all-extras python -m docs_drift.web   # http://127.0.0.1:8080
 ```
+
+## How Wispr Flow is used
+
+Dictated docs are written from memory, and memory goes stale. Wispr Flow types into
+any focused text field, so dictation goes straight into docs-drift:
+
+- **Write with voice**, a page of the web app: hold your dictation key and
+  describe how to use a project. About 600 ms after you pause, every flag, command,
+  env var and setting you said is checked against the repository's static index,
+  with evidence and one-click suggestions.
+- **Your AI coding agent**: dictate "check this paragraph against the code" and the
+  agent calls the MCP `check_text` tool before it edits the README.
+- **VS Code**: dictate into a Markdown file and the language server flags stale
+  flags and settings as you speak, with quick fixes.
+
+[Write with voice guide](write-with-voice.md).
 
 ## Built with voice
 

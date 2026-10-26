@@ -87,6 +87,53 @@ document.getElementById('reset').onclick = () => {
   filter(() => true); cards.forEach(card => card.classList.remove('selected')); selected = -1;
   if (cy) { cy.elements().removeClass('active'); cy.fit(undefined, 30); }
 };
+// "Turn this into a PR": copy drafts fetched from the same origin; show them for manual copy if the clipboard is blocked.
+const copyStatus = document.getElementById('copy-status');
+const copyFallback = document.getElementById('copy-fallback');
+const loadDraft = async url => {
+  const response = await fetch(url, { headers: { Accept: 'text/markdown, text/plain' }, credentials: 'same-origin' });
+  const text = await response.text();
+  if (!response.ok) { let detail = ''; try { detail = JSON.parse(text).detail; } catch { /* plain error body */ } throw Error(detail || 'That draft is not available for this scan.'); }
+  return text;
+};
+const copied = (button, label, draft) => {
+  button.textContent = 'Copied ✓';
+  if (copyFallback) copyFallback.hidden = true;
+  if (copyStatus) copyStatus.textContent = `${label.replace(/^Copy /, '')} copied.${draft ? ' Review every change before opening a PR.' : ''}`;
+};
+document.querySelectorAll('[data-copy-url], [data-copy-target]').forEach(button => button.addEventListener('click', async () => {
+  const label = button.dataset.label || (button.dataset.label = button.textContent);
+  const source = button.dataset.copyUrl;
+  const target = button.dataset.copyTarget && document.getElementById(button.dataset.copyTarget);
+  const pending = source ? loadDraft(source) : Promise.resolve(target ? target.textContent : '');
+  let text = '';
+  button.disabled = true;
+  try {
+    if (source && window.ClipboardItem && navigator.clipboard?.write) {
+      // Passing a promise keeps the click's user activation while the draft downloads (Safari).
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': pending.then(value => new Blob([value], { type: 'text/plain' })) })]);
+      text = await pending;
+    } else {
+      text = await pending;
+      await navigator.clipboard.writeText(text);
+    }
+    copied(button, label, Boolean(source));
+  } catch (failure) {
+    try {
+      text = text || await pending;
+      await navigator.clipboard.writeText(text);
+      copied(button, label, Boolean(source)); return;
+    } catch (error) { if (!text) failure = error; }
+    if (text && copyFallback) {
+      copyFallback.value = text; copyFallback.hidden = false; copyFallback.focus(); copyFallback.select();
+      if (copyStatus) copyStatus.textContent = 'Clipboard access is blocked here. The text is selected below; copy it manually.';
+    } else if (copyStatus) copyStatus.textContent = failure.message || 'Copy is unavailable.';
+    button.textContent = 'Copy unavailable';
+  } finally {
+    button.disabled = false;
+    setTimeout(() => { button.textContent = label; }, 2200);
+  }
+}));
 document.getElementById('copy-share')?.addEventListener('click', async event => {
   const button = event.currentTarget;
   try { await navigator.clipboard.writeText(location.href); button.textContent = 'Copied ✓'; }

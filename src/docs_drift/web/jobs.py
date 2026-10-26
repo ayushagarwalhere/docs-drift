@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -16,12 +17,15 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
-from docs_drift.limits import CLONE_FAILURE_THRESHOLD, MAX_STORED_BYTES
+from docs_drift.badge import stale_count
+from docs_drift.fix.bundle import FixBundle, FixStatus
+from docs_drift.limits import CLONE_FAILURE_THRESHOLD, MAX_FIX_BUNDLE_BYTES, MAX_STORED_BYTES
 from docs_drift.models import ScanResult
 from docs_drift.web.cleanup import remove_workspace
 from docs_drift.web.git import JobError, disk_bytes, git_environment
 from docs_drift.web.settings import Settings
 from docs_drift.web.validation import Repository
+from docs_drift.web.write import WRITE_INDEX_FILE
 
 LOG = logging.getLogger("docs_drift.web")
 LOG.setLevel(logging.INFO)
@@ -49,6 +53,18 @@ class Job:
     error: dict[str, str] | None = None
     cached: bool = False
     metrics: dict[str, float] = field(default_factory=dict)
+    fixes: FixBundle | None = None
+
+    def fix_summary(self) -> dict[str, Any] | None:
+        if self.fixes is None:
+            return None
+        return {
+            "available": self.fixes.available,
+            "files": len(self.fixes.files),
+            "patched": self.fixes.count(FixStatus.patched),
+            "manual": self.fixes.count(FixStatus.manual),
+            "withheld": self.fixes.count(FixStatus.withheld),
+        }
 
     def public(self) -> dict[str, Any]:
         return {
@@ -61,6 +77,7 @@ class Job:
             "cached": self.cached,
             "result": self.result.model_dump(mode="json") if self.result else None,
             "metrics": self.metrics,
+            "fixes": self.fix_summary(),
         }
 
 
@@ -69,8 +86,45 @@ class Store:
         self.settings = settings
         self.jobs: OrderedDict[str, Job] = OrderedDict()
         self.cache: dict[str, str] = {}
+        # Latest default-branch scan per repository URL: what badge requests read, without disk access.
+        self.latest: dict[str, dict[str, Any]] = {}
         self.directory = settings.data_dir.resolve() / "results"
         self.directory.mkdir(parents=True, exist_ok=True)
+        latest = self.directory / "latest.json"
+        if latest.is_file() and latest.stat().st_size <= MAX_STORED_BYTES:
+            with suppress(ValueError):
+                data = json.loads(latest.read_text(encoding="utf-8"))
+                self.latest = {
+                    url: entry
+                    for url, entry in (data.items() if isinstance(data, dict) else ())
+                    if isinstance(entry, dict)
+                    and isinstance(entry.get("scan_id"), str)
+                    and isinstance(entry.get("stale"), int)
+                    and isinstance(entry.get("created"), int | float)
+                }
+        # Static indexes for /write checks live beside results and expire with them.
+        self.indexes = settings.data_dir.resolve() / "write-indexes"
+        self.indexes.mkdir(parents=True, exist_ok=True)
+
+    def index_path(self, ident: str) -> Path | None:
+        if not re.fullmatch(r"[a-zA-Z0-9-]{1,64}", ident):
+            return None
+        return self.indexes / f"{ident}.json"
+
+    def adopt_index(self, ident: str, source: Path) -> None:
+        """Copy a worker's saved index out of the workspace before the workspace is deleted."""
+        target = self.index_path(ident)
+        if target is None or source.is_symlink() or not source.is_file():
+            return
+        temporary = target.with_suffix(".tmp")
+        shutil.copyfile(source, temporary)
+        temporary.replace(target)
+
+    def share_index(self, source_ident: str, ident: str) -> None:
+        """A cached result reuses the index saved by the scan that produced it."""
+        source = self.index_path(source_ident)
+        if source is not None and source.is_file():
+            self.adopt_index(ident, source)
 
     def get(self, ident: str) -> Job | None:
         if not re.fullmatch(r"[a-zA-Z0-9-]{1,64}", ident):
@@ -80,6 +134,7 @@ class Store:
         if job is None and path.is_file() and path.stat().st_size <= MAX_STORED_BYTES:
             data = json.loads(path.read_text(encoding="utf-8"))
             data["result"] = ScanResult.model_validate(data["result"]) if data.get("result") else None
+            data["fixes"] = FixBundle.model_validate(data["fixes"]) if data.get("fixes") else None
             job = Job(**data)
         if job and time.time() - job.created < self.settings.ttl:
             self.jobs[ident] = job
@@ -104,14 +159,29 @@ class Store:
             return
         data = asdict(job)
         data["result"] = job.result.model_dump(mode="json") if job.result else None
+        data["fixes"] = job.fixes.model_dump(mode="json") if job.fixes else None
         path = self.directory / f"{job.scan_id}.json"
         temporary = path.with_suffix(".tmp")
         temporary.write_text(json.dumps(data), encoding="utf-8")
         temporary.replace(path)
         if job.result:
             self.cache[self.key(job.repo_url, job.result.head_sha)] = job.scan_id
+            if job.ref is None:
+                self.latest[job.repo_url] = {
+                    "scan_id": job.scan_id,
+                    "sha": job.result.head_sha,
+                    "stale": stale_count(job.result.findings, job.result.config_used.min_confidence),
+                    "created": job.created,
+                }
         (self.directory / "cache.json").write_text(json.dumps(self.cache), encoding="utf-8")
         self.expire()
+
+    def badge(self, url: str) -> dict[str, Any] | None:
+        """The latest unexpired default-branch scan summary for a repository; never reads results."""
+        entry = self.latest.get(url)
+        if entry is None or time.time() - entry["created"] >= self.settings.ttl:
+            return None
+        return entry
 
     @staticmethod
     def key(url: str, sha: str) -> str:
@@ -119,7 +189,7 @@ class Store:
 
     def expire(self) -> None:
         files = sorted(
-            (p for p in self.directory.glob("*.json") if p.name != "cache.json"),
+            (p for p in self.directory.glob("*.json") if p.name not in {"cache.json", "latest.json"}),
             key=lambda p: p.stat().st_mtime,
             reverse=True,
         )
@@ -135,6 +205,16 @@ class Store:
                 self.jobs.pop(path.stem, None)
         self.cache = {key: ident for key, ident in self.cache.items() if (self.directory / f"{ident}.json").is_file()}
         (self.directory / "cache.json").write_text(json.dumps(self.cache), encoding="utf-8")
+        self.latest = {
+            url: entry
+            for url, entry in self.latest.items()
+            if (self.directory / f"{entry['scan_id']}.json").is_file()
+            and time.time() - entry["created"] < self.settings.ttl
+        }
+        (self.directory / "latest.json").write_text(json.dumps(self.latest), encoding="utf-8")
+        for saved in self.indexes.glob("*.json"):
+            if not (self.directory / saved.name).is_file():
+                saved.unlink(missing_ok=True)
 
 
 class QueueBackend(Protocol):
@@ -183,6 +263,8 @@ class LocalQueue:
                     else:
                         await self.bounded_worker(job, workspace)
                 if job.result:
+                    if not job.cached:
+                        self.store.adopt_index(job.scan_id, workspace / WRITE_INDEX_FILE)
                     job.status = "done"
                     self.total += not job.cached
                     self.drift += sum(f.is_drift for f in job.result.findings) if not job.cached else 0
@@ -308,7 +390,8 @@ class LocalQueue:
                     cached_id = self.store.cache.get(self.store.key(job.repo_url, data["resolved_sha"]))
                     cached = self.store.get(cached_id) if cached_id else None
                     if cached and cached.result:
-                        job.result, job.cached = cached.result, True
+                        job.result, job.fixes, job.cached = cached.result, cached.fixes, True
+                        self.store.share_index(cached.scan_id, job.scan_id)
                         process.stdin.write(b"stop\n")
                         await process.stdin.drain()
                         break
@@ -323,6 +406,9 @@ class LocalQueue:
                         job.result = ScanResult.model_validate_json(
                             (workspace / "result.json").read_text(encoding="utf-8")
                         )
+                        fixes = workspace / "fixes.json"
+                        if fixes.is_file() and fixes.stat().st_size <= MAX_FIX_BUNDLE_BYTES:
+                            job.fixes = FixBundle.model_validate_json(fixes.read_text(encoding="utf-8"))
                         job.metrics.update({k: data[k] for k in ("clone_seconds", "download_bytes")})
             await process.wait()
             if not job.result and job.status != "failed":

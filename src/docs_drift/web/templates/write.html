@@ -1,0 +1,75 @@
+{% extends 'base.html' %}{% from '_macros.html' import arrow, glyph %}
+{% block title %}Write with voice &middot; docs-drift{% endblock %}
+{% block scripts %}<script src="/static/write.js" defer></script>{% endblock %}
+{% block content %}
+<main id="main" class="dd-page dd-write">
+  <section class="dd-page-hero dd-write-hero">
+    {{ glyph('mic', 'dd-page-glyph') }}
+    <p class="dd-page-kicker">Write with voice</p>
+    <h1 class="dd-h-xl">Say it. We check it against the code.</h1>
+    <p class="dd-p-m dd-page-lede">When you dictate docs, you write from memory &mdash; and memory is stale. docs-drift checks every flag, command, env var and setting you just said against the real code, before you commit.</p>
+  </section>
+
+  <section class="dd-write-app" aria-label="Documentation editor">
+    <form class="dd-write-bar" id="write-form" autocomplete="off">
+      <div class="dd-write-field">
+        <label for="write-repo">Check against</label>
+        <select id="write-repo" name="scan_id" data-default="{{ default_repo }}">
+          <optgroup label="Saved examples">
+            {% for repo in write_repos %}<option value="{{ repo.scan_id }}"{% if repo.scan_id == default_repo %} selected{% endif %}>{{ repo.name }}</option>{% endfor %}
+          </optgroup>
+          <optgroup label="Your scans this session" id="write-session" hidden></optgroup>
+        </select>
+      </div>
+      <div class="dd-write-field dd-write-path">
+        <label for="write-path">Checked as</label>
+        <input id="write-path" name="path" type="text" value="{{ default_path }}" maxlength="200" spellcheck="false" aria-describedby="write-path-help">
+        <span id="write-path-help" class="dd-sr">Relative path the draft is checked as; links are resolved from here.</span>
+      </div>
+      <p class="dd-write-status" id="write-status" role="status">Ready.</p>
+    </form>
+
+    <div class="dd-write-grid">
+      <div class="dd-write-editor">
+        <div class="dd-write-head">
+          <label for="write-text" class="dd-write-label"><i class="dd-dot" aria-hidden="true"></i> Your draft</label>
+          <span class="dd-write-hint" id="write-hint">Any dictation tool works &mdash; Wispr Flow, macOS Dictation, Windows Voice Typing &mdash; and so does typing.</span>
+        </div>
+        <textarea id="write-text" name="text" spellcheck="true" maxlength="{{ max_text_bytes }}" data-max-bytes="{{ max_text_bytes }}"
+          placeholder="Hold your dictation key and describe how to use the project&hellip;"
+          aria-describedby="write-hint write-keys write-count">{{ default_sample }}</textarea>
+        <div class="dd-write-foot">
+          <p id="write-keys" class="dd-write-keys"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> checks now &middot; re-checks 0.6 s after you pause</p>
+          <span id="write-count" class="dd-write-count" aria-live="off">0 / 20 KB</span>
+        </div>
+        <div class="dd-btn-row dd-btn-row-left dd-write-actions">
+          <button class="dd-btn dd-btn-lime" type="button" id="write-check">Check now {{ arrow() }}</button>
+          <button class="dd-btn dd-btn-dark" type="button" id="write-copy">Copy as Markdown</button>
+          <button class="dd-btn dd-btn-ghost" type="button" id="write-sample">Load sample</button>
+        </div>
+      </div>
+
+      <aside class="dd-write-panel" aria-labelledby="write-findings-title">
+        <div class="dd-write-panel-top">
+          <h2 id="write-findings-title" class="dd-write-panel-title">Findings</h2>
+          <p class="dd-write-summary" id="write-summary">Claims appear here as you speak.</p>
+        </div>
+        <ol class="dd-write-list" id="write-findings" aria-live="polite" aria-relevant="additions text" aria-busy="false"></ol>
+        <p class="dd-write-empty" id="write-empty">Mention a flag like <code>--port</code>, a command, an env var or a setting and it shows up here with the evidence from the code.</p>
+        <p class="dd-write-note" id="write-note"></p>
+        <noscript><p class="dd-write-note">The live check needs JavaScript. The CLI does the same offline: <code>docs-drift check</code>.</p></noscript>
+      </aside>
+    </div>
+  </section>
+
+  <section class="dd-write-steps" aria-labelledby="write-steps-title">
+    <h2 id="write-steps-title" class="dd-h-s">Three steps, no keyboard required.</h2>
+    <ol>
+      <li><span>01</span><h3>Dictate</h3><p>Click into the draft and hold your dictation key. Wispr Flow types wherever the cursor is, so the text lands here as you speak.</p></li>
+      <li><span>02</span><h3>Pause</h3><p>About 0.6 s after a burst of words, every flag, command, endpoint, env var, setting and default is matched against the saved static index of the repository.</p></li>
+      <li><span>03</span><h3>Apply</h3><p>Accept a suggestion to rewrite just that span, then copy the Markdown into your README. Nothing is executed; nothing leaves the page but your text.</p></li>
+    </ol>
+    <p class="dd-voice-note">Static index only: Git history is not re-run for text you write here, so renames come from index near-misses or from the saved scan of the same claim. The same check runs in VS Code as you dictate and in AI agents through MCP &mdash; see <a href="{{ settings.project_url }}/blob/main/docs/write-with-voice.md">the guide</a> and <a href="/built-with-voice">how this was built with voice</a>.</p>
+  </section>
+</main>
+{% endblock %}

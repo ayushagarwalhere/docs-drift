@@ -22,6 +22,9 @@ from rich.table import Table
 from rich.tree import Tree
 
 from docs_drift import __version__
+from docs_drift.badge import DEFAULT_LABEL, stale_count, validate_label
+from docs_drift.badge import endpoint as badge_endpoint
+from docs_drift.badge import svg as badge_svg
 from docs_drift.baseline import DEFAULT_BASELINE, load_baseline, new_findings, save_baseline
 from docs_drift.config import Config, ConfigError, HistoryConfig, load_config
 from docs_drift.docs.defaults import normalize_value
@@ -90,6 +93,13 @@ def _version(value: bool) -> None:
         raise typer.Exit()
 
 
+def _utf8_streams(*streams: object) -> None:
+    """Windows pipes, files and NUL (which claims to be a TTY) default to a legacy code page; reports use arrows."""
+    for stream in streams:
+        if isinstance(stream, TextIOWrapper) and (stream.encoding or "").lower().replace("-", "") != "utf8":
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
@@ -116,8 +126,7 @@ def main(
     ] = False,
 ) -> None:
     """Read global options and configuration before dispatching a command."""
-    if isinstance(sys.stdout, TextIOWrapper) and not sys.stdout.isatty():
-        sys.stdout.reconfigure(encoding="utf-8")
+    _utf8_streams(sys.stdout, sys.stderr)
     if no_color:
         ctx.color = False
     if ctx.invoked_subcommand is None:
@@ -562,6 +571,50 @@ def check(  # noqa: PLR0912 - independent gate options.
         )
     if failures:
         raise typer.Exit(code=1)
+
+
+@app.command(cls=Command)
+def badge(
+    ctx: typer.Context,
+    json_path: Annotated[
+        Path | None, typer.Option("--json", help="Write the shields.io endpoint JSON to this file.")
+    ] = None,
+    svg_path: Annotated[Path | None, typer.Option("--svg", help="Write a static flat SVG badge to this file.")] = None,
+    label: Annotated[str, typer.Option("--label", help="Left-hand badge text.")] = DEFAULT_LABEL,
+    min_confidence: Annotated[float | None, typer.Option("--min-confidence")] = None,
+    baseline: Annotated[
+        Path | None, typer.Option("--baseline", help="Count only drift absent from this baseline.")
+    ] = None,
+) -> None:
+    """Scan, then print or write a docs-health badge: "0 stale" or "N stale"."""
+    if min_confidence is not None and not 0 <= min_confidence <= 1:
+        raise typer.BadParameter("Choose a confidence between 0 and 1.", param_hint="--min-confidence")
+    try:
+        validate_label(label)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc), param_hint="--label") from exc
+    options: CLIOptions = ctx.ensure_object(CLIOptions)
+    from docs_drift.scanning import run_scan  # noqa: PLC0415 - optional dependency or shared pipeline import.
+
+    findings = run_scan(options.repo, options.config).findings
+    if baseline is not None:
+        baseline_path = baseline if baseline.is_absolute() else options.repo / baseline
+        try:
+            findings = new_findings(findings, load_baseline(baseline_path))
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc), param_hint="--baseline") from exc
+    threshold = options.config.min_confidence if min_confidence is None else min_confidence
+    stale = stale_count(findings, threshold)
+    payload = json.dumps(badge_endpoint(stale, label), ensure_ascii=False) + "\n"
+    for destination, text in ((json_path, payload), (svg_path, badge_svg(stale, label) + "\n")):
+        if destination is not None:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(text, encoding="utf-8", newline="\n")
+    if json_path is None and svg_path is None:
+        typer.echo(payload, nl=False)
+    elif not options.quiet:
+        written = ", ".join(str(path) for path in (json_path, svg_path) if path is not None)
+        typer.echo(f"Badge: {stale} stale. Wrote {written}.")
 
 
 @app.command(cls=Command)

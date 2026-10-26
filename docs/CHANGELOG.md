@@ -13,6 +13,18 @@ All notable user-facing changes are recorded here, following
   text, explains findings, previews fixes and applies them only on an explicit,
   destructive-annotated call. Paths are confined to the repository root, output and
   time are bounded, and scans are cached until files change.
+- Web demo: a "Turn this into a PR" panel on every report. While the clone still
+  exists, a live scan plans the certain edits `docs-drift fix` would make and serves
+  them as a `git apply`-able `fix.patch` pinned to the scanned commit, a suggested PR
+  title and description with evidence links to that commit, and contributor-friendly
+  issue drafts (`/api/scans/<id>/fix.patch`, `pr.md`, `issues.md`). Each finding
+  shows whether it is in the patch. Nothing is reworded or guessed, and the drafts
+  leave verification to the person opening the PR.
+- `docs-drift badge`: a docs-health badge (`0 stale` / `N stale`) as a shields.io
+  endpoint JSON and/or a flat SVG, from a fresh scan that respects configuration,
+  `--min-confidence` and `--baseline`. The web demo serves `/badge/<owner>/<repo>.svg`
+  and `.json` from its latest cached default-branch scan without starting new scans.
+  See [the badge guide](badge.md) for a GitHub Actions workflow.
 - GitHub publishing (`docs-drift github pr-review` / `issue`, `github` extra): a
   sticky PR summary comment, inline review comments with GitHub suggested changes
   on diff lines, deduplicated reruns, an optional Check Run, and one scheduled

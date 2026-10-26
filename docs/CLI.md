@@ -41,6 +41,10 @@ json` exports the index, and `fix --format json` exports the exact edit plan.
 Mutation commands retain concise status messages. Human reports wrap with the
 terminal width, and structured formats always include low-confidence findings.
 
+`badge` prints a shields.io endpoint payload (`0 stale` or `N stale`) counted like
+`check --fail-on drift`; `--json PATH` and `--svg PATH` write the payload and a flat
+SVG. See the [badge guide](badge.md) for publishing it from GitHub Actions.
+
 | Format | Purpose |
 | --- | --- |
 | terminal | File groups, highlighted claims, suggestions, commits, and health |

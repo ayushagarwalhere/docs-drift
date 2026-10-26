@@ -25,7 +25,7 @@
     {{ glyph('braces', 'dd-drifter dd-drifter-b') }}
     {{ wordmark('dd-hero-wordmark') }}
     <nav class="dd-hero-links" aria-label="Sections">
-      <a href="#how">How it works</a><a href="#cases">Cases</a><a href="/case-study">Real case</a><a href="/built-with-voice">Built with voice</a>
+      <a href="#how">How it works</a><a href="#cases">Cases</a><a href="/case-study">Real case</a><a href="/write">Write with voice</a><a href="/built-with-voice">Built with voice</a>
     </nav>
     <div class="dd-hero-body">
       <h1 class="dd-h-xl" data-rise>If a newcomer can't copy-paste your README, your docs are broken.</h1>
@@ -451,6 +451,12 @@ wrote 4 good-first-issue drafts</pre>
         {{ glyph('terminal', 'dd-cta-glyph') }}
         <p><code id="install-command">pipx install docs-drift</code><br>then run <code>docs-drift scan</code> in any repository.</p>
         <button class="dd-btn dd-btn-white" id="copy-install" type="button">Copy ↗</button>
+      </div>
+      <div class="dd-cta-card is-white">
+        <h3 class="dd-h-s">Dictate your docs</h3>
+        {{ glyph('mic', 'dd-cta-glyph') }}
+        <p>Hold your dictation key and describe a project. Each flag and env var you say is checked against the code.</p>
+        <a class="dd-btn dd-btn-dark" href="/write">Write with voice {{ arrow() }}</a>
       </div>
     </div>
   </section>

@@ -1,10 +1,30 @@
 """Versioned report renderers; every renderer returns a complete string."""
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import cast
 
 from docs_drift.models import ScanResult
+
+
+@dataclass
+class ContributePanel:
+    """The web report's "Turn this into a PR" panel. The template escapes every value."""
+
+    scan_id: str
+    prepared: bool
+    patch_available: bool
+    patched: int
+    manual: int
+    withheld: int
+    issues_available: bool
+    commands: list[str] = field(default_factory=list)
+    files: list[tuple[str, int, int]] = field(default_factory=list)
+    statuses: dict[str, str] = field(default_factory=dict)
+    badge_image: str | None = None
+    badge_markdown: str | None = None
+    badge_endpoint: str | None = None
+    note: str | None = None
 
 
 @dataclass
@@ -22,6 +42,7 @@ class RenderOptions:
     command: str = "docs-drift scan"
     share_id: str | None = None
     build_sha: str = "development"
+    contribute: ContributePanel | None = None
 
 
 def render(scan_result: ScanResult, format: str = "terminal", options: RenderOptions | None = None) -> str:

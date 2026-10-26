@@ -24,6 +24,9 @@ class Settings:
     live_enabled: bool = True
     build_sha: str = "development"
     project_url: str = "https://github.com/ayushagarwalhere/docs-drift"
+    # /write re-checks dictated text ~600 ms after each burst, so it gets its own, larger budget.
+    write_rate_limit: int = 60
+    write_rate_window: int = 60
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -47,4 +50,5 @@ class Settings:
             live_enabled=os.environ.get("DOCS_DRIFT_LIVE_ENABLED", "1") == "1",
             build_sha=os.environ.get("DOCS_DRIFT_BUILD_SHA", os.environ.get("RENDER_GIT_COMMIT", "development"))[:40],
             project_url=os.environ.get("DOCS_DRIFT_PROJECT_URL", "https://github.com/ayushagarwalhere/docs-drift"),
+            write_rate_limit=integer("DOCS_DRIFT_WRITE_RATE_LIMIT", 60, 600),
         )

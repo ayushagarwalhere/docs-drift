@@ -15,6 +15,19 @@ All notable user-facing changes are recorded here, following
   doc-defined example, another tool, a placeholder, and so on). The original verdict
   and the model's reason stay in the finding's new `triage` field. Measured gain is
   small; see `docs/llm-triage-eval.md`.
+- Web demo: a "Turn this into a PR" panel on every report. While the clone still
+  exists, a live scan plans the certain edits `docs-drift fix` would make and serves
+  them as a `git apply`-able `fix.patch` pinned to the scanned commit, a suggested PR
+  title and description with evidence links to that commit, and contributor-friendly
+  issue drafts (`/api/scans/<id>/fix.patch`, `pr.md`, `issues.md`). Each finding
+  shows whether it is in the patch. Nothing is reworded or guessed, and the drafts
+  leave verification to the person opening the PR.
+- `docs-drift badge`: a docs-health badge (`0 stale` / `N stale`) as a shields.io
+  endpoint JSON and/or a flat SVG, from a fresh scan that respects configuration,
+  `--min-confidence` and `--baseline`. The web demo serves `/badge/<owner>/<repo>.svg`
+  and `.json` from its latest cached default-branch scan without starting new scans.
+  See [the badge guide](docs/badge.md) for a GitHub Actions workflow.
+
 - `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
   extra, for AI coding agents. It checks the repository, single documents and unsaved
   text, explains findings, previews fixes and applies them only on an explicit,
@@ -77,6 +90,15 @@ All notable user-facing changes are recorded here, following
   or `docs/schema/scan-result.v1.json`.
 - The terminal report shows drift age relative to HEAD instead of days before
   the current date, so repeated runs on the same commit print the same text.
+- Web demo: a **Write with voice** page (`/write`). Dictate or type documentation
+  and every flag, command, env var and setting is checked against a saved static
+  index about 600 ms after you pause, with verdicts, `file:line` evidence,
+  one-click suggestions and Copy as Markdown. Live scans now keep a scrubbed,
+  size-capped copy of their static index after the clone is deleted, and the
+  bundled examples ship one (`scripts/build_write_indexes.py`). Checks reuse the
+  MCP `check_text` document path, are limited to 20 KB, origin-checked and have
+  their own rate limit (`DOCS_DRIFT_WRITE_RATE_LIMIT`). See
+  [Write with voice](docs/write-with-voice.md).
 
 ### Fixed
 

@@ -1,0 +1,42 @@
+{
+  "head_sha": "e36fa00d8efd0c431f810f11ada620cddb44eb7f",
+  "patch": "--- a/README.md\n+++ b/README.md\n@@ -1,11 +1,11 @@\n # node-tool\n \n-- Build the release with `npm run build:prod`.\n-- The API URL comes from `process.env.API_URL`.\n-- The service exposes `GET /health`.\n+- Build the release with `npm run build`.\n+- The API URL comes from `process.env.API_BASE_URL`.\n+- The service exposes `GET /healthz`.\n \n Preview a deployment:\n \n ```sh\n-npx node-tool deploy --dry-run\n+npx node-tool deploy\n ```\n",
+  "files": [
+    {
+      "path": "README.md",
+      "edits": 4,
+      "additions": 4,
+      "deletions": 4
+    }
+  ],
+  "findings": [
+    {
+      "claim_id": "claim_d2134d75a71ba55b7b92cfc68346a9db4429fc018d51970b9963c0b63bcd20a3",
+      "status": "patched",
+      "note": "Replace a confirmed renamed identifier. Included in fix.patch."
+    },
+    {
+      "claim_id": "claim_d12598cc77a7e55240db1ae1c97f7c9b9bc25bb8327ea4337c0c333592d49816",
+      "status": "patched",
+      "note": "Replace a confirmed renamed identifier. Included in fix.patch."
+    },
+    {
+      "claim_id": "claim_4cc2cc9a97ebd3a12eba8a94222339b2daae59de003d4e96979461be916694e6",
+      "status": "patched",
+      "note": "Replace a confirmed renamed identifier. Included in fix.patch."
+    },
+    {
+      "claim_id": "claim_5a3da990541e200bea67bf8bbdb3c744c24208a2ac2f4d03e6d866fa93a00949",
+      "status": "manual",
+      "note": "No certain edit; a maintainer needs to decide the correct wording."
+    },
+    {
+      "claim_id": "claim_795780b9865b0206fed67875f3d950558e498427f8020a071496fada6573e72f",
+      "status": "patched",
+      "note": "Remove --dry-run, deleted in e36fa00. Included in fix.patch."
+    }
+  ],
+  "notes": [
+    "--dry-run was removed in e36fa00; check whether this example should change more than this."
+  ]
+}

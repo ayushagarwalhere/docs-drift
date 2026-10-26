@@ -112,7 +112,9 @@ def run_scan(  # noqa: PLR0913, PLR0912, PLR0915 - staged pipeline with optional
     history: bool = True,
     no_cache: bool = False,
     stage_callback: Callable[[str, dict[str, int]], None] | None = None,
+    on_index: Callable[[CodeIndex, list[Package]], None] | None = None,
 ) -> ScanResult:
+    """Scan ``repo``; ``on_index`` receives the static index, e.g. to keep it after the checkout is gone."""
     repo = repo.resolve()
     docs_root = (docs_repo or repo).resolve()
     if not docs_root.is_dir():
@@ -139,6 +141,8 @@ def run_scan(  # noqa: PLR0913, PLR0912, PLR0915 - staged pipeline with optional
         index = build_index(repo, config, no_cache=no_cache)
         packages = detect_packages(repo, [repo / p for p in index.source_paths])
         timings["index"] = time.perf_counter() - start
+        if on_index is not None:
+            on_index(index, packages)
         if stage_callback:
             stage_callback(
                 "matching", {"docs": len(result.docs), "claims": len(result.claims), "symbols": len(index.symbols)}

@@ -24,7 +24,7 @@ true-positive set is small. Treat every number here as an estimate.
 - **Round 2:** findings from fresh scans with the round-2 rule fixes, on the same
   repositories plus held-out ones (pipx, mkdocs, tox, rich-cli). There are 19 false
   positives and 4 true positives (click `FileType`, rich-cli `--line-number` and
-  `--p`, mkdocs `mkdocs/search_index.json`). One more labelled true positive
+  `--p`, and the MkDocs search index path in its Getting Started page). One more labelled true positive
   (rich-cli README.md:196) has no rule finding, so there is nothing to triage.
 - **Category split:** each false positive is either *not about this project* (an
   example the doc defines, another tool's flag or config, a placeholder, a user path,

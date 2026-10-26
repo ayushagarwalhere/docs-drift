@@ -1,0 +1,35 @@
+{
+  "head_sha": "3fb52f15482ad07d8de83c72fc4ad3ab46dd9548",
+  "patch": "--- a/README.md\n+++ b/README.md\n@@ -1,10 +1,10 @@\n # py-cli\n \n The CLI has a `serve` subcommand.\n-- `serve` accepts `--port` (default 8000).\n+- `serve` accepts `--listen` (default 8000).\n - `serve` accepts `--host` (default 127.0.0.1).\n-- The `--workers` default is `4`.\n+- The `--workers` default is `8`.\n - Set `APP_DEBUG` to enable debug logging.\n-- Use the `migrate` subcommand to upgrade the database.\n+- Use the `db-upgrade` subcommand to upgrade the database.\n \n Run `make test` to check the project.\n",
+  "files": [
+    {
+      "path": "README.md",
+      "edits": 3,
+      "additions": 3,
+      "deletions": 3
+    }
+  ],
+  "findings": [
+    {
+      "claim_id": "claim_8ed4cec49e3a4c86e8ad548b85452e088ae736718c1e6952b86b5a914bbf0447",
+      "status": "patched",
+      "note": "Replace a confirmed renamed identifier. Included in fix.patch."
+    },
+    {
+      "claim_id": "claim_5f2199daeec9e79f6ef17af18d53109eb79f967fe9b7512433afe6780161c526",
+      "status": "manual",
+      "note": "No certain edit; a maintainer needs to decide the correct wording."
+    },
+    {
+      "claim_id": "claim_3e4a78859ff7e5aa9a087b4ac2fbe545e5615d96016374321ac2175a11e957f6",
+      "status": "patched",
+      "note": "Replace a confirmed renamed identifier. Included in fix.patch."
+    },
+    {
+      "claim_id": "claim_0ddc043944f8c1b30f1c40e0aa64cdc5d8f10259074ba7769279304b72a52160",
+      "status": "patched",
+      "note": "Update the documented default. Included in fix.patch."
+    }
+  ],
+  "notes": []
+}

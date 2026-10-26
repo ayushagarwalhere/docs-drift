@@ -6,7 +6,9 @@
     "file": "judge-fixture.json",
     "kind": "fixture",
     "verified": false,
-    "note": "SYNTHETIC FIXTURE / precomputed static scan. One intentionally stale claim; not a real-world accuracy result. Review the proposed replacement before editing. Rebuild and inspect the two commits with scripts/build_judge_demo.py."
+    "note": "SYNTHETIC FIXTURE / precomputed static scan. One intentionally stale claim; not a real-world accuracy result. Review the proposed replacement before editing. Rebuild and inspect the two commits with scripts/build_judge_demo.py.",
+    "checkout": "uv run python scripts/build_judge_demo.py --output judge && cd judge/judge-fixture",
+    "fixes": "judge-fixture.fixes.json"
   },
   {
     "scan_id": "example-rich-cli-reviewed",
@@ -30,7 +32,9 @@
     "file": "py-cli.json",
     "kind": "fixture",
     "verified": true,
-    "note": "Synthetic fixture with a deterministic Git history."
+    "note": "Synthetic fixture with a deterministic Git history.",
+    "checkout": "uv run python -m tests.fixtures.build_fixtures && cd tests/fixtures/repos/py-cli",
+    "fixes": "py-cli.fixes.json"
   },
   {
     "scan_id": "example-fastapi-svc",
@@ -39,7 +43,8 @@
     "file": "fastapi-svc.json",
     "kind": "fixture",
     "verified": true,
-    "note": "Synthetic fixture with a deterministic Git history."
+    "note": "Synthetic fixture with a deterministic Git history.",
+    "checkout": "uv run python -m tests.fixtures.build_fixtures && cd tests/fixtures/repos/fastapi-svc"
   },
   {
     "scan_id": "example-node-tool",
@@ -48,7 +53,9 @@
     "file": "node-tool.json",
     "kind": "fixture",
     "verified": true,
-    "note": "Synthetic fixture with a deterministic Git history."
+    "note": "Synthetic fixture with a deterministic Git history.",
+    "checkout": "uv run python -m tests.fixtures.build_fixtures && cd tests/fixtures/repos/node-tool",
+    "fixes": "node-tool.fixes.json"
   },
   {
     "scan_id": "example-clean-repo",
@@ -57,7 +64,8 @@
     "file": "clean-repo.json",
     "kind": "fixture",
     "verified": true,
-    "note": "Synthetic fixture with a deterministic Git history."
+    "note": "Synthetic fixture with a deterministic Git history.",
+    "checkout": "uv run python -m tests.fixtures.build_fixtures && cd tests/fixtures/repos/clean-repo"
   },
   {
     "scan_id": "example-rich-cli",

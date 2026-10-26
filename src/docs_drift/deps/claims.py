@@ -272,6 +272,20 @@ def _bare_node_accepted(match: re.Match[str], pattern_index: int, text: str, con
     return _node_context(rest) or _HEADING_CONTEXT.search(context) is not None
 
 
+_FEATURE_AFTER = re.compile(
+    r"^\s*\)?\s*(?:type\s+hints?|typing|annotations?|f-strings?|syntax|features?|keywords?|walrus|"
+    r"dataclass(?:es)?|pattern\s+matching|match\s+statements?|generics?|union\s+types?|"
+    r"standard\s+library|stdlib|built-?ins?|semantics|grammar|operators?)\b",
+    re.I,
+)
+_FEATURE_BEFORE = re.compile(r"\b(?:introduced|added|new|available|appeared|landed)\s+(?:in|since|from|with)\s*$", re.I)
+
+
+def _describes_language_feature(text: str, match: re.Match[str]) -> bool:
+    """'Python 3.6+ type hints' or 'introduced in Python 3.8' is language history, not a project requirement."""
+    return bool(_FEATURE_AFTER.match(text[match.end() :]) or _FEATURE_BEFORE.search(text[: match.start()]))
+
+
 def runtime_claims_in_text(text: str, context: str = "") -> list[tuple[str, str, int]]:
     """Return (value, matched text, column offset) for runtime-version statements in one line of prose.
 
@@ -290,6 +304,8 @@ def runtime_claims_in_text(text: str, context: str = "") -> list[tuple[str, str,
     for index, pattern in enumerate(_PATTERNS):
         for match in pattern.finditer(text):
             if not _bare_node_accepted(match, index, text, context):
+                continue
+            if _describes_language_feature(text, match):
                 continue
             value = _runtime_value(match["rt"], ">=", match["ver"])
             if value is None:

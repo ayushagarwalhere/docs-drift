@@ -8,13 +8,16 @@ from pathlib import Path
 from typing import Any
 
 from docs_drift.config import Config, HistoryConfig
+from docs_drift.fix.bundle import FixBundle, build_fix_bundle
 from docs_drift.history_cache import CACHE_DISABLED
-from docs_drift.limits import MAX_FILE_BYTES, MAX_LINE_CHARS, MAX_NESTING, MAX_RESULT_BYTES
+from docs_drift.index.base import CodeIndex
+from docs_drift.limits import MAX_FILE_BYTES, MAX_FIX_BUNDLE_BYTES, MAX_LINE_CHARS, MAX_NESTING, MAX_RESULT_BYTES
 from docs_drift.llm.privacy import mask_secrets
-from docs_drift.models import ScanResult
+from docs_drift.models import Package, ScanResult
 from docs_drift.web.git import JobError, checkout, disk_bytes, resolve
 from docs_drift.web.settings import Settings
 from docs_drift.web.validation import validate_repository
+from docs_drift.web.write import WRITE_INDEX_FILE, build_write_index, dump_write_index
 
 
 def scrub(value: Any) -> Any:
@@ -69,10 +72,12 @@ def preflight(repo: Path) -> None:
                     )
 
 
-def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
+def execute(repo: Path, settings: Settings, emit: Any, keep_index: Path | None = None) -> ScanResult:
+    """Scan ``repo``; with ``keep_index``, also save the static index for /write checks after cleanup."""
     from docs_drift.scanning import run_scan  # noqa: PLC0415 - worker-only scanner import.
 
     preflight(repo)
+    captured: list[tuple[CodeIndex, list[Package]]] = []
     token = CACHE_DISABLED.set(True)
     try:
         result = run_scan(
@@ -80,9 +85,14 @@ def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
             Config(history=HistoryConfig(max_commits=settings.history_commits)),
             stage_callback=emit,
             no_cache=True,
+            on_index=lambda index, packages: captured.append((index, packages)),
         )
     finally:
         CACHE_DISABLED.reset(token)
+    if keep_index is not None and captured:
+        index, packages = captured[0]
+        saved = build_write_index(repo, index, packages, result.head_sha, scrub=scrub)
+        keep_index.write_text(dump_write_index(saved), encoding="utf-8")
     if not result.docs:
         raise JobError(
             "no_docs", "No documentation files were found.", "Try a repository with a README or a supported docs site."
@@ -92,6 +102,21 @@ def execute(repo: Path, settings: Settings, emit: Any) -> ScanResult:
         "fallback for inactive projects; lookups are capped and blobs download on demand."
     )
     return result
+
+
+def fix_bundle(result: ScanResult, repo: Path) -> FixBundle | None:
+    """Certain rule edits only, planned while the disposable checkout still exists.
+
+    A failure here never fails the scan: the report is still useful without a patch.
+    """
+    token = CACHE_DISABLED.set(True)
+    try:
+        bundle = build_fix_bundle(result, repo)
+    except Exception:
+        return None
+    finally:
+        CACHE_DISABLED.reset(token)
+    return bundle if len(bundle.model_dump_json().encode()) <= MAX_FIX_BUNDLE_BYTES else None
 
 
 def main() -> None:
@@ -120,7 +145,9 @@ def main() -> None:
             return
         repo = checkout(repository, sha, root, settings, deadline)
         clone_seconds, downloaded = time.monotonic() - start, disk_bytes(root)
-        result = public_result(execute(repo, settings, emit), repository.url)
+        scanned = execute(repo, settings, emit, root / WRITE_INDEX_FILE)
+        bundle = fix_bundle(scanned, repo)
+        result = public_result(scanned, repository.url)
         data = result.model_dump_json()
         if len(data.encode()) > MAX_RESULT_BYTES:
             raise JobError(
@@ -129,6 +156,8 @@ def main() -> None:
                 "Scan a smaller repository or run the CLI locally.",
             )
         (root / "result.json").write_text(data, encoding="utf-8")
+        if bundle is not None:
+            (root / "fixes.json").write_text(bundle.model_dump_json(), encoding="utf-8")
         print(json.dumps({"status": "done", "clone_seconds": clone_seconds, "download_bytes": downloaded}), flush=True)
     except JobError as exc:
         print(

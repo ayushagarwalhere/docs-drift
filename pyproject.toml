@@ -166,5 +166,5 @@ exclude = ["^tests/fixtures/repos/", "^tests/fixtures/injection/"]
 known_first_party = ["docs_drift", "scripts", "tests", "benchmark"]
 optional_dependencies_dev_groups = ["dev", "docs"]
 [tool.deptry.per_rule_ignores]
-# These are development-only QA scripts, not shipped runtime imports.
-DEP004 = ["playwright", "PIL"]
+# Development-only QA scripts, and the pytest plugin (loaded only by pytest via its pytest11 entry point).
+DEP004 = ["playwright", "PIL", "pytest"]
