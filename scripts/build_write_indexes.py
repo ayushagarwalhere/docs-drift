@@ -51,6 +51,8 @@ def fetch_pinned(url: str, sha: str, target: Path) -> Path:
 def bake(repo: Path, file: str, output: Path) -> None:
     target = output / file
     execute(repo, Settings(), lambda *_: None, keep_index=target)
+    if not target.read_bytes().endswith(b"\n"):  # committed files end with a newline (end-of-file-fixer)
+        target.write_bytes(target.read_bytes() + b"\n")
     index = WriteIndex.model_validate_json(target.read_text(encoding="utf-8"))
     state = index.unavailable or f"{len(index.symbols)} symbols, {len(index.source_paths)} paths"
     print(f"{file}: {state} ({target.stat().st_size:,} bytes, {index.head_sha[:8]})")

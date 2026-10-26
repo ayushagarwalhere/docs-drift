@@ -66,7 +66,7 @@ jobs:
         run: |
           uv venv "$RUNNER_TEMP/wheel-env" --python 3.13
           WHEEL=$(find "$GITHUB_WORKSPACE/dist" -name '*.whl')
-          uv pip install --python "$RUNNER_TEMP/wheel-env/bin/python" "$WHEEL[dev,docs,web,graph,llm,watch,lsp]"
+          uv pip install --python "$RUNNER_TEMP/wheel-env/bin/python" "$WHEEL[dev,docs,web,graph,llm,watch,lsp,mcp,github,github-app]"
           python scripts/release.py stage-tests --out "$RUNNER_TEMP/wheel-tests"
           cd "$RUNNER_TEMP/wheel-tests"
           "$RUNNER_TEMP/wheel-env/bin/python" -c "import docs_drift; assert 'site-packages' in docs_drift.__file__, docs_drift.__file__"

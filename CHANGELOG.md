@@ -6,6 +6,8 @@ All notable user-facing changes are recorded here, following
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-27
+
 ### Added
 
 - Opt-in model triage (`--llm-triage` on `scan` and `check`, or `[llm] triage = true`).
@@ -162,5 +164,6 @@ All notable user-facing changes are recorded here, following
 Changelogs are ignored by default. Historical examples such as `--port` may stay
 in this file without being treated as current usage instructions.
 
-[Unreleased]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ayushagarwalhere/docs-drift/releases/tag/v0.1.0

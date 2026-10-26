@@ -33,6 +33,28 @@ with `No such option '--line-number'` (exit 2): the Click declaration is
 and the [declaration](https://github.com/Textualize/rich-cli/blob/46f4d2469097be395558768714a5f07ebccf1412/src/rich_cli/__main__.py#L358).
 [Full investigation, including the false positives in that scan](REAL-CASE.md).
 
+## Real bugs it found
+
+Scanning 64 popular repositories turned up stale documentation that we verified by
+hand against the source at a pinned commit. Fixes are being sent upstream.
+
+<!-- docs-drift-ignore: every name in this table belongs to another project. -->
+| Project | What the docs say | What the code does |
+| --- | --- | --- |
+| Textualize/rich | README, docs and 10 translations: Python 3.8 / 3.6.3 | requires Python ≥3.9 (also reported by a user in #4206) |
+| pypa/pip-tools | config example uses `[tool.pip-tools.pip-sync]` | the section is `sync`; the example breaks both commands |
+| tj/commander.js | `CLIFORCE_COLOR` | reads `CLICOLOR_FORCE` |
+| pallets/click | links to a `FileType` class | the class is `click.File` |
+| pdm-project/pdm | `--reuse-env` | renamed to `--recreate` in 2.17 |
+| plasma-umass/scalene | runs `--json` | the flag was removed |
+| mkmkdocs | `mksearch_index.json` | built at `search/search_index.json` |
+| Textualize/rich-cli | `--line-number`, `--p`, `-F` | `--line-numbers`, `-p`; `-F` is `--text-full` |
+| vitest-dev/vitest | `npm run test --project e2e` | flags after `npm run` need `--` |
+| PyCQA/isort | `-sl` | `--sl` (`-sl` parses as `--skip l`) |
+
+Plus pyinstaller, locust, verdaccio, tldr, aiohttp, textual and pm2: 19 verified
+fixes across 17 projects.
+
 ## What it checks
 
 | Claim in your docs | Checked against |
@@ -192,12 +214,15 @@ variables; see [Go and Rust CLIs](go-rust.md).
 ## Accuracy
 
 <!-- accuracy:start -->
-Real-world accuracy is **not yet established**. The 12-repository protocol and
-blank human labeling sheet are in [the benchmark](benchmark.md); its
-[dated results](benchmark.md) keep precision/recall pending until the owner
-labels them. Fixture scores establish plumbing, not product accuracy. Missing
-findings can be intentional examples, third-party tools or indexing limitations;
-review every report. [Known limitations](LIMITATIONS.md).
+On an agent-reviewed sample of real repositories, every finding reported at the
+default threshold was a true documentation bug after the October calibration
+(5/5 on 20 repositories, 8/8 on a further 45), up from 1 in 277 before it. These
+labels come from agent review rather than independent human labelling, and both
+sets informed the tuning, so treat them as optimistic. Method, repositories, SHAs and
+every label: [benchmark](benchmark.md).
+The 12-repository human-labelling protocol is still open in
+[the benchmark protocol](benchmark.md). Static matching is partial; review
+every report. [Known limitations](LIMITATIONS.md).
 <!-- accuracy:end -->
 
 ## Configuration
@@ -220,6 +245,10 @@ mode is opt-in, sends only redacted excerpts, and can be replayed offline.
 [Security policy](SECURITY.md) · [Threat model](SECURITY.md).
 
 ## Try it in the browser
+
+Live demo: **https://13-211-179-95.sslip.io** (no sign-in). Paste a public GitHub
+repository, open a saved report, or dictate docs on
+[/write](https://13-211-179-95.sslip.io/write) and watch each claim get checked.
 
 The web app scans a public GitHub repository without sign-in, and includes saved
 reports you can open instantly. Each report can be turned into a pull request: a

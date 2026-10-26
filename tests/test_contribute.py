@@ -39,6 +39,7 @@ def fixtures(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def py_cli(fixtures: Path) -> ScanResult:
     return run_scan(fixtures / "py-cli", Config())
 
+
 # Assembled at runtime so secret scanners never see a key-shaped literal in the repository.
 FAKE_SECRET = "abc" + "def" + "123456"
 

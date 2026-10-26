@@ -6,13 +6,17 @@ All notable user-facing changes are recorded here, following
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-27
+
 ### Added
 
-- `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
-  extra, for AI coding agents. It checks the repository, single documents and unsaved
-  text, explains findings, previews fixes and applies them only on an explicit,
-  destructive-annotated call. Paths are confined to the repository root, output and
-  time are bounded, and scans are cached until files change.
+- Opt-in model triage (`--llm-triage` on `scan` and `check`, or `[llm] triage = true`).
+  A small model sees a redacted documentation excerpt for each rule drift finding.
+  It can only downgrade a finding to `unverifiable`, and only when it cites
+  verbatim excerpt text showing the name is not about this project (a
+  doc-defined example, another tool, a placeholder, and so on). The original verdict
+  and the model's reason stay in the finding's new `triage` field. Measured gain is
+  small; see `docs/llm-triage-eval.md`.
 - Web demo: a "Turn this into a PR" panel on every report. While the clone still
   exists, a live scan plans the certain edits `docs-drift fix` would make and serves
   them as a `git apply`-able `fix.patch` pinned to the scanned commit, a suggested PR
@@ -25,6 +29,22 @@ All notable user-facing changes are recorded here, following
   `--min-confidence` and `--baseline`. The web demo serves `/badge/<owner>/<repo>.svg`
   and `.json` from its latest cached default-branch scan without starting new scans.
   See [the badge guide](badge.md) for a GitHub Actions workflow.
+
+- Go and Rust CLI indexing (partial): Cobra, spf13/pflag, the standard `flag`
+  package, urfave/cli and bep/simplecobra in Go; clap (derive and builder),
+  structopt and argh in Rust. Literal flags, short and long aliases,
+  subcommands, literal defaults and environment variables (`os.Getenv`,
+  `std::env::var`, urfave `EnvVars`, clap `env`, viper `BindEnv`, `env:` tags)
+  are indexed so documented flags, commands and variables can be matched;
+  dynamic environment prefixes (viper `SetEnvPrefix`/`AutomaticEnv`, `envy`)
+  make names under them unverifiable instead of missing. Executables come from
+  `package main` directories, `go.mod` and `Cargo.toml`. Adds the
+  `tree-sitter-go` and `tree-sitter-rust` grammar wheels. See `docs/go-rust.md`.
+- `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
+  extra, for AI coding agents. It checks the repository, single documents and unsaved
+  text, explains findings, previews fixes and applies them only on an explicit,
+  destructive-annotated call. Paths are confined to the repository root, output and
+  time are bounded, and scans are cached until files change.
 - GitHub publishing (`docs-drift github pr-review` / `issue`, `github` extra): a
   sticky PR summary comment, inline review comments with GitHub suggested changes
   on diff lines, deduplicated reruns, an optional Check Run, and one scheduled
@@ -82,11 +102,32 @@ All notable user-facing changes are recorded here, following
   or `docs/schema/scan-result.v1.json`.
 - The terminal report shows drift age relative to HEAD instead of days before
   the current date, so repeated runs on the same commit print the same text.
+- Web demo: a **Write with voice** page (`/write`). Dictate or type documentation
+  and every flag, command, env var and setting is checked against a saved static
+  index about 600 ms after you pause, with verdicts, `file:line` evidence,
+  one-click suggestions and Copy as Markdown. Live scans now keep a scrubbed,
+  size-capped copy of their static index after the clone is deleted, and the
+  bundled examples ship one (`scripts/build_write_indexes.py`). Checks reuse the
+  MCP `check_text` document path, are limited to 20 KB, origin-checked and have
+  their own rate limit (`DOCS_DRIFT_WRITE_RATE_LIMIT`). See
+  [Write with voice](write-with-voice.md).
 
 ### Fixed
 
+- A command run from a checkout script path (`script/run-tests groups`) is no
+  longer reported as an unknown subcommand because some other indexed CLI has
+  subcommands; only its flags are checked.
 - PR comparisons no longer report history-confirmed renames as new drift when the
   base snapshot (scanned without history) already had the same claim missing.
+- Accuracy on real repositories: a `missing` finding now passes the default threshold
+  only with evidence that the documentation names one specific declaration (an explicit
+  `{class}`/`:func:` role, a near-miss of one declared flag or path, a wrong-dash flag,
+  a `make` target absent from a static Makefile, or "`--long` or `-s`" pairs that the
+  code assigns to different options). Many false positives are gone: `None` code defaults,
+  free-form schema maps, quoted option values and pass-through arguments, defaults bound
+  to the wrong setting, hedged, placeholder, gitignored and other repositories' paths,
+  and renames to an ancestor key or another naming convention. A tracked `build/`
+  package is now indexed, and a locked index cache no longer fails the scan.
 
 ## [0.1.0] - 2026-10-24
 
@@ -123,5 +164,6 @@ All notable user-facing changes are recorded here, following
 Changelogs are ignored by default. Historical examples such as `--port` may stay
 in this file without being treated as current usage instructions.
 
-[Unreleased]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/ayushagarwalhere/docs-drift/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ayushagarwalhere/docs-drift/releases/tag/v0.1.0

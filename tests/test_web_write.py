@@ -3,6 +3,7 @@
 import asyncio
 import json
 import time
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,8 @@ from docs_drift.web.write import (
     normalize_dictation,
 )
 
-EXAMPLES = Path(__file__).resolve().parents[1] / "src/docs_drift/web/examples"
+# Read the examples shipped inside the installed package, so this also passes against the built wheel.
+EXAMPLES = Path(str(files("docs_drift").joinpath("web/examples")))
 ORIGIN = {"origin": "http://127.0.0.1:8080"}
 
 # Assembled at runtime so secret scanners never see a key-shaped literal in the repository.

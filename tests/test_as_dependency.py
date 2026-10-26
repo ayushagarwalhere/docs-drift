@@ -2,7 +2,6 @@
 
 import json
 import re
-import runpy
 import shlex
 import subprocess
 import sys
@@ -516,12 +515,13 @@ def test_dependency_guide_snippets_match_shipped_hooks() -> None:
 # python -m docs_drift and the CLI flag ------------------------------------------------------
 
 
-def test_python_module_entry_point(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
-    monkeypatch.setattr(sys, "argv", ["docs-drift", "--version"])
-    with pytest.raises(SystemExit) as raised:
-        runpy.run_module("docs_drift", run_name="__main__")
-    assert raised.value.code == 0
-    assert capsys.readouterr().out.strip() == docs_drift.__version__
+def test_python_module_entry_point() -> None:
+    # A real interpreter, so this also holds for an installed wheel (runpy under pytest's import hook does not).
+    run = subprocess.run(
+        [sys.executable, "-m", "docs_drift", "--version"], capture_output=True, text=True, check=False, timeout=120
+    )
+    assert run.returncode == 0, run.stderr
+    assert run.stdout.strip() == docs_drift.__version__
 
 
 def test_check_no_history_skips_attribution(repos: Path) -> None:
