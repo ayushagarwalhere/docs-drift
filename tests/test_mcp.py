@@ -456,11 +456,11 @@ def test_untracked_files_invalidate_cached_scan(tmp_path: Path) -> None:
     _build_repo(tmp_path, Repository("paths", (_commit(1, "Document assets", ("README.md", readme)),)))
     repo = tmp_path / "paths"
     server = create_server(repo)
-    first = structured(call(server, "check_docs", {"history": False}))
+    first = structured(call(server, "check_docs", {"history": False, "min_confidence": 0}))
     assert by_claim(first, "assets/logo.svg")["verdict"] == "missing"
     (repo / "assets").mkdir()
     (repo / "assets" / "logo.svg").write_text("<svg/>\n", encoding="utf-8")
-    second = structured(call(server, "check_docs", {"history": False}))
+    second = structured(call(server, "check_docs", {"history": False, "min_confidence": 0}))
     assert second["cached"] is False
     assert "assets/logo.svg" not in {f["claim"] for f in second["findings"]}
 

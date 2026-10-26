@@ -26,6 +26,7 @@ from docs_drift.web.write import (
     dump_write_index,
     load_write_index,
     materialize,
+    normalize_dictation,
 )
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "src/docs_drift/web/examples"
@@ -152,8 +153,9 @@ def test_check_reports_ok_renamed_missing_and_default_on_the_baked_example(tmp_p
 
         rich = by_claim(check(client, "example-rich-cli", "Add the `--line-number` switch.\n").json())
         candidate = rich["--line-number"]
-        assert candidate["verdict"] == "missing" and candidate["suggestion"] is None
-        assert candidate["candidate"]["name"] == "--line-numbers" and candidate["edit"]["certain"] is False
+        # One near-miss declared flag is strong evidence: the rule now suggests it directly.
+        assert candidate["verdict"] == "missing" and candidate["suggestion"] == "--line-numbers"
+        assert candidate["edit"]["new_text"] == "--line-numbers"
 
         assert check(client, "example-py-cli", "Nothing to check here.\n").json()["findings"] == []
         meta = client.get("/api/write/repos/example-py-cli").json()
@@ -276,3 +278,19 @@ def test_write_page_navigation_and_csp(tmp_path: Path) -> None:
         voice = client.get("/built-with-voice").text
         assert 'href="/write"' in voice and "how you use it" in voice
         assert "write.js" not in client.get("/case-study").text
+
+
+@pytest.mark.parametrize(
+    ("dictated", "expected"),
+    [
+        ("Run serve --port 9000.", "Run serve `--port` 9000."),
+        ("Set APP_DEBUG to 1.", "Set `APP_DEBUG` to 1."),
+        ("Already `--port` and `APP_DEBUG`.", "Already `--port` and `APP_DEBUG`."),
+        ("```sh\nserve --port 9000\n```\nUse --port.", "```sh\nserve --port 9000\n```\nUse `--port`."),
+        ("See https://example.com/--x and a-b--c.", "See https://example.com/--x and a-b--c."),
+        ("NOTE: HTTP and CI are words, A_B is a name.", "NOTE: HTTP and CI are words, `A_B` is a name."),
+    ],
+)
+def test_dictation_marks_bare_flags_and_env_names_as_code(dictated: str, expected: str) -> None:
+    assert normalize_dictation(dictated) == expected
+    assert normalize_dictation(dictated).count("\n") == dictated.count("\n")

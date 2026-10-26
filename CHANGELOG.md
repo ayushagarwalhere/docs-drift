@@ -28,6 +28,16 @@ All notable user-facing changes are recorded here, following
   and `.json` from its latest cached default-branch scan without starting new scans.
   See [the badge guide](docs/badge.md) for a GitHub Actions workflow.
 
+- Go and Rust CLI indexing (partial): Cobra, spf13/pflag, the standard `flag`
+  package, urfave/cli and bep/simplecobra in Go; clap (derive and builder),
+  structopt and argh in Rust. Literal flags, short and long aliases,
+  subcommands, literal defaults and environment variables (`os.Getenv`,
+  `std::env::var`, urfave `EnvVars`, clap `env`, viper `BindEnv`, `env:` tags)
+  are indexed so documented flags, commands and variables can be matched;
+  dynamic environment prefixes (viper `SetEnvPrefix`/`AutomaticEnv`, `envy`)
+  make names under them unverifiable instead of missing. Executables come from
+  `package main` directories, `go.mod` and `Cargo.toml`. Adds the
+  `tree-sitter-go` and `tree-sitter-rust` grammar wheels. See `docs/go-rust.md`.
 - `docs-drift mcp`: a Model Context Protocol server, available with the new `mcp`
   extra, for AI coding agents. It checks the repository, single documents and unsaved
   text, explains findings, previews fixes and applies them only on an explicit,
@@ -102,8 +112,20 @@ All notable user-facing changes are recorded here, following
 
 ### Fixed
 
+- A command run from a checkout script path (`script/run-tests groups`) is no
+  longer reported as an unknown subcommand because some other indexed CLI has
+  subcommands; only its flags are checked.
 - PR comparisons no longer report history-confirmed renames as new drift when the
   base snapshot (scanned without history) already had the same claim missing.
+- Accuracy on real repositories: a `missing` finding now passes the default threshold
+  only with evidence that the documentation names one specific declaration (an explicit
+  `{class}`/`:func:` role, a near-miss of one declared flag or path, a wrong-dash flag,
+  a `make` target absent from a static Makefile, or "`--long` or `-s`" pairs that the
+  code assigns to different options). Many false positives are gone: `None` code defaults,
+  free-form schema maps, quoted option values and pass-through arguments, defaults bound
+  to the wrong setting, hedged, placeholder, gitignored and other repositories' paths,
+  and renames to an ancestor key or another naming convention. A tracked `build/`
+  package is now indexed, and a locked index cache no longer fails the scan.
 
 ## [0.1.0] - 2026-10-24
 

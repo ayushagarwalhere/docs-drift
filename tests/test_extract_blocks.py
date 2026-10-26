@@ -142,8 +142,12 @@ def test_yaml_and_json_emit_dotted_config_keys(tmp_path: Path) -> None:
 
 
 def test_toml_filename_hint_enables_config_claims(tmp_path: Path) -> None:
-    found = claims('```toml title="pyproject.toml"\n[tool.demo]\ntimeout = 30\n```\n', project(tmp_path))
-    assert [item.value for item in found] == ["tool.demo.timeout"]
+    # Keys are documented relative to the project's own [tool.<name>] table; other tools' tables are not claims.
+    found = claims(
+        '```toml title="pyproject.toml"\n[tool.example-app]\ntimeout = 30\n[tool.isort]\nprofile = "black"\n```\n',
+        project(tmp_path),
+    )
+    assert [item.value for item in found] == ["timeout"]
 
 
 def test_http_and_curl_blocks_emit_endpoint_claims(tmp_path: Path) -> None:

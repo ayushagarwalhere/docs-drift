@@ -67,7 +67,9 @@ def test_rst_literals_use_the_same_api_context(text: str, kind: ClaimKind) -> No
         ("--workers", (ClaimKind.cli_flag, "--workers")),
         ("APP_DEBUG", (ClaimKind.env_var, "APP_DEBUG")),
         ("API_URL", (ClaimKind.env_var, "API_URL")),
-        ("TOKEN", (ClaimKind.env_var, "TOKEN")),
+        # A bare suffix word names a concept or class (`URL` instance), not a variable.
+        ("TOKEN", None),
+        ("GITHUB_TOKEN", (ClaimKind.env_var, "GITHUB_TOKEN")),
         ("HTTP", None),
         ("JSON", None),
         ("API", None),
@@ -282,3 +284,8 @@ def test_call_arguments_and_shebangs_do_not_become_filenames() -> None:
 def test_basename_source_location_keeps_the_file_without_line_suffix() -> None:
     claim = extract("The file `main.py:12` contains the declaration.").claims[0]
     assert claim.kind == ClaimKind.file_path and claim.value == "main.py"
+
+
+def test_test_node_ids_are_not_checkout_paths() -> None:
+    result = extract("Each file becomes one test item, named like `docs/guide.md::docs-drift`.\n")
+    assert not [c for c in result.claims if c.kind.value == "file_path"]

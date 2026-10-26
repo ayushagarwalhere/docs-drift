@@ -6,7 +6,10 @@ registrations and scope/index omissions as missing. Read confidence and evidence
 do not file an issue based on an unreviewed result.
 
 All supported frameworks have partial coverage. Django/DRF, yargs, Next.js/NestJS
-routes and Go/Rust configuration are not implemented. Function existence does not
+routes and Go/Rust declarations other than CLI flags, subcommands and environment
+variables are not implemented; hand-written Go/Rust flag parsers are not read, and
+shell examples of Go/Rust executables are not yet validated as whole commands
+([Go and Rust CLIs](go-rust.md)). Function existence does not
 prove signatures or behavior. RST support is basic; MDX strips known wrappers
 without executing components. Cross-package fallback can be ambiguous.
 

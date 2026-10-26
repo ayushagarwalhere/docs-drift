@@ -1113,6 +1113,23 @@
           "default": false,
           "title": "Ts Type",
           "type": "boolean"
+        },
+        "nargs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nargs"
+        },
+        "open_map": {
+          "default": false,
+          "title": "Open Map",
+          "type": "boolean"
         }
       },
       "required": [
@@ -1141,7 +1158,11 @@
         "package_script",
         "make_target",
         "ci_job",
-        "cli_argument"
+        "cli_argument",
+        "attribute",
+        "variable",
+        "parameter",
+        "module"
       ],
       "title": "SymbolKind",
       "type": "string"

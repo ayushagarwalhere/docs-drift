@@ -90,11 +90,9 @@ class CodeIndex:
         except ValueError:
             return []
         normalized = normalize_name(name)
-        return list(
-            dict.fromkeys(
-                (*self.by_name.get((symbol_kind, normalized), []), *self.by_alias.get((symbol_kind, normalized), []))
-            )
-        )
+        found = (*self.by_name.get((symbol_kind, normalized), []), *self.by_alias.get((symbol_kind, normalized), []))
+        # Symbols are unhashable models; de-duplicate by identity of their stable id.
+        return list({item.symbol_id: item for item in found}.values())
 
 
 def normalize_name(value: str) -> str:
@@ -145,6 +143,10 @@ def source_files(  # noqa: PLR0912, PLR0915 - bounded file validation before par
         "coverage",
         "__pycache__",
     }
+    if (root / ".git").exists():
+        # Build output is ignored by Git, so a tracked `build/` directory is source code: the
+        # `build` package of pypa/build (src/build/) or a project's build scripts.
+        skip.discard("build")
     result = []
     for relative in paths:
         posix = relative.as_posix()
@@ -211,6 +213,8 @@ NAMED_LANGUAGES = {
     ".env.sample": "dotenv",
     ".env.template": "dotenv",
 }
+# Task-runner files are matched case-insensitively (Justfile, .justfile, makefile).
+CASEFOLD_NAMES = {"makefile": "make", "gnumakefile": "make", "justfile": "just", ".justfile": "just"}
 # Case-insensitive suffixes the indexers read.
 SUFFIX_LANGUAGES = {
     ".py": "python",
@@ -231,11 +235,14 @@ SUFFIX_LANGUAGES = {
     ".mk": "make",
     ".sh": "shell",
     ".dockerfile": "dockerfile",
+    # Go/Rust: CLI declarations only (see index/go_cli.py and index/rust_cli.py).
+    ".go": "go",
+    ".rs": "rust",
 }
 
 
 def language_for(path: Path) -> str | None:
-    named = NAMED_LANGUAGES.get(path.name)
+    named = NAMED_LANGUAGES.get(path.name) or CASEFOLD_NAMES.get(path.name.casefold())
     if named is not None:
         return named
     if path.name.casefold().endswith(".dockerfile"):  # also a bare ".dockerfile", which has no suffix

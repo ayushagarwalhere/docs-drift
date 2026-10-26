@@ -122,10 +122,17 @@ def test_report_requires_human_attribution_and_preserves_published_labels(
     sheet.write_text(filled)
     with pytest.raises(ValueError, match="labeler's name"):
         compute.report(target, sheet, None)
+    (tmp_path / "docs").mkdir(exist_ok=True)
+    (tmp_path / "docs/benchmark.md").write_text(
+        f"# Old results\n\n{compute.AGENT_REVIEW_HEADING}, October 2026\n\nKept by hand.\n", encoding="utf-8"
+    )
     report = compute.report(target, sheet, "Synthetic reviewer — test", final=True)
     assert "No false positives were found in the human-labeled sample" in report
     assert "Synthetic reviewer" in (tmp_path / "README.md").read_text(encoding="utf-8")
-    assert "Results" in (tmp_path / "docs/benchmark.md").read_text(encoding="utf-8")
+    page = (tmp_path / "docs/benchmark.md").read_text(encoding="utf-8")
+    assert "Results" in page
+    assert "Old results" not in page
+    assert page.endswith("Kept by hand.\n")
     # A second run reads the UTF-8 index correctly on Windows.
     assert compute.report(target, sheet, "Synthetic reviewer — test", final=True) == report
     raw_measurement = target / "a--b.measurement.json"

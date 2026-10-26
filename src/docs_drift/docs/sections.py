@@ -42,7 +42,7 @@ def _historical_heading(heading: str) -> bool:
 def _historical_file(path: str) -> bool:
     return (
         re.match(
-            r"^(?:change[-_ ]?log|history|releases?|upgrading|migrations?)(?:[._ -]|$)",
+            r"^(?:change[-_ ]?log|changes|news|history|releases?|upgrading|migrations?)(?:[._ -]|$)",
             PurePosixPath(path).stem,
             re.IGNORECASE,
         )
@@ -163,8 +163,21 @@ def _simple_tokens(text: str, *, rst: bool) -> list[Token]:
             while index < len(lines) and (not lines[index].strip() or lines[index].lstrip().startswith(":")):
                 index += 1
             content_start = index
-            while index < len(lines) and (not lines[index].strip() or lines[index].startswith((" ", "\t"))):
+            # The body is indented past the directive; a less-indented line (list continuation prose such as
+            # "Twine will prompt...") ends it even though it is still indented relative to the margin.
+            directive_indent = len(lines[start]) - len(lines[start].lstrip())
+            body_indent = len(lines[index]) - len(lines[index].lstrip()) if index < len(lines) else 0
+            while (
+                index < len(lines)
+                and (not lines[index].strip() or lines[index].startswith((" ", "\t")))
+                and (
+                    not lines[index].strip()
+                    or len(lines[index]) - len(lines[index].lstrip()) >= max(body_indent, directive_indent + 1)
+                )
+            ):
                 index += 1
+            while index > content_start and not lines[index - 1].strip():
+                index -= 1
             import textwrap  # noqa: PLC0415 - optional dependency or shared pipeline import.
 
             token = Token(
@@ -217,6 +230,44 @@ def _mark_paragraphs(tokens: list[Token], mapping: dict[int, Section]) -> None:
                 section.historical_spans.append((first, end))
 
 
+_VERSION_DIRECTIVE = re.compile(r"^(\s*)\.\.\s+(?:version(?:added|changed|removed)|deprecated)::")
+_VERSION_FENCE = re.compile(r"^\s*(`{3,}|~{3,}|:{3,})\s*\{(?:version(?:added|changed|removed)|deprecated)\}")
+
+
+def _version_note_spans(lines: list[str]) -> list[tuple[int, int]]:
+    """Find `.. versionadded::`-style notes (RST directives and MyST fences); they record history."""
+    spans = []
+    for index, line in enumerate(lines):
+        directive = _VERSION_DIRECTIVE.match(line)
+        if directive:
+            indent = len(directive.group(1))
+            end = index
+            for following in range(index + 1, len(lines)):
+                text = lines[following]
+                if text.strip() and len(text) - len(text.lstrip()) <= indent:
+                    break
+                if text.strip():
+                    end = following
+            spans.append((index + 1, end + 1))
+            continue
+        fence = _VERSION_FENCE.match(line)
+        if fence:
+            marker = fence.group(1)
+            close = next(
+                (n for n in range(index + 1, len(lines)) if lines[n].strip() == marker[0] * len(lines[n].strip())
+                 and len(lines[n].strip()) >= len(marker)),
+                len(lines) - 1,
+            )  # fmt: skip
+            spans.append((index + 1, close + 1))
+    return spans
+
+
+def _mark_version_notes(lines: list[str], mapping: dict[int, Section]) -> None:
+    for first, end in _version_note_spans(lines):
+        for section in {id(mapping[n]): mapping[n] for n in range(first, end + 1) if n in mapping}.values():
+            section.historical_spans.append((max(first, section.start_line), min(end, section.end_line)))
+
+
 def is_historical_span(section: Section, line: int) -> bool:
     """Paragraph markers suppress their full paragraph, never the rest of a current section."""
     return section.start_line <= line <= section.end_line and (
@@ -244,4 +295,5 @@ def parse_document(doc: DocFile, text: str) -> ParsedDoc:
     sections = _sections(doc, source, tokens, skipped)
     mapping = {line: section for section in sections for line in range(section.start_line, section.end_line + 1)}
     _mark_paragraphs(tokens, mapping)
+    _mark_version_notes(source.splitlines(), mapping)
     return ParsedDoc(doc, sections, tokens, mapping, text)

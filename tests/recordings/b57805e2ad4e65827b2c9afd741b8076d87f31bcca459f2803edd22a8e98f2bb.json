@@ -38,9 +38,9 @@
     "usage": {
       "input_tokens": 1984,
       "output_tokens": 296,
-      "cache_read_tokens": 910,
+      "cache_read_tokens": 0,
       "cache_write_tokens": 0,
-      "cost": 0.0002349
+      "cost": 0.0003168
     },
     "replayed": false
   },

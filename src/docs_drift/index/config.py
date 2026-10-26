@@ -133,18 +133,21 @@ def _schema(repo: Path, path: Path, text: str) -> list[Symbol]:
         if not isinstance(node, dict):
             return
         for key, item in node.get("properties", {}).items():
+            if not isinstance(item, dict):
+                continue
             name = f"{prefix}.{key}" if prefix else key
-            result.append(
-                _symbol(
-                    repo,
-                    path,
-                    SymbolKind.config_key,
-                    name,
-                    1,
-                    str(item["default"]) if "default" in item else None,
-                    "json-schema",
-                )
+            symbol = _symbol(
+                repo,
+                path,
+                SymbolKind.config_key,
+                name,
+                1,
+                str(item["default"]) if "default" in item else None,
+                "json-schema",
             )
+            # A free-form map (``set_env = { A = "1" }``) takes user-chosen keys, not schema keys.
+            symbol.open_map = bool(item.get("additionalProperties")) or bool(item.get("patternProperties"))
+            result.append(symbol)
             visit(item, name)
 
     visit(data)

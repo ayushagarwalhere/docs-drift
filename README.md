@@ -152,8 +152,8 @@ flowchart LR
 ```
 
 1. Markdown, RST and MDX are parsed into located claims.
-2. Source is parsed with Python's `ast` and tree-sitter (JS/TS) into an index of
-   declarations. Your code is never imported or executed.
+2. Source is parsed with Python's `ast` and tree-sitter (JS/TS, plus Go/Rust CLI
+   declarations) into an index of declarations. Your code is never imported or executed.
 3. Each claim is matched to the index; renames are detected by similarity and history.
 4. Git history finds the commit where a symbol disappeared or changed.
 
@@ -179,11 +179,15 @@ the rules already decided, and every answer must cite source that passes validat
 | JavaScript / TypeScript | Express | partial |
 | JavaScript / TypeScript | Next.js / NestJS routes | none |
 | JSON / YAML / TOML / INI | literal settings | partial |
-| Go / Rust | language-specific configuration | none |
+| Go | Cobra / pflag / flag / urfave/cli flags, commands and env vars | partial |
+| Rust | clap (derive and builder) / structopt / argh flags, commands and env vars | partial |
+| Go / Rust | functions, types, routes and other declarations | none |
 <!-- support-table:end -->
 
 "Partial" means static, literal patterns. Dynamic registration and generated
 code can be reported as unverifiable rather than guessed.
+Go and Rust coverage is limited to CLI flags, subcommands and environment
+variables; see [Go and Rust CLIs](docs/go-rust.md).
 
 ## Accuracy
 

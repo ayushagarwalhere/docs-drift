@@ -39,13 +39,50 @@ def similarity(old: str, new: str) -> int:
     return round(0.6 * fuzz.ratio(old_folded, new_folded) + 0.4 * token_score)
 
 
+def _case_style(value: str) -> str:
+    value = value.lstrip("-")
+    if any(char.isalpha() for char in value) and value == value.upper():
+        return "upper"
+    if "_" in value.strip("_") and value == value.casefold():
+        return "snake"
+    if "-" in value and value == value.casefold():
+        return "kebab"
+    if re.fullmatch(r"[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+", value):
+        return "capwords"
+    if re.fullmatch(r"[a-z][a-z0-9]*(?:[A-Z][a-z0-9]*)+", value):
+        return "camel"
+    return "other"
+
+
+def plausible_rename(old: str, new: str) -> bool:
+    """Reject candidates that cannot be the same name renamed.
+
+    A dotted key is never renamed to its own ancestor (``set_env.A`` is an entry of ``set_env``),
+    a name is not renamed by dropping its last word, and the same words in another naming
+    convention (``tool_result`` / ``ToolResult``) name a different kind of thing: a string value
+    or field versus a class.
+    """
+    if old.startswith((new + ".", new + "_", new + "-")):
+        # An ancestor key, or the same name without its last word (`get_requires_for_build_sdist`
+        # is a PEP 517 hook beside `get_requires_for_build`, not its old spelling).
+        return False
+    old_tokens, _ = _parts(old)
+    new_tokens, _ = _parts(new)
+    return not (old_tokens == new_tokens and _case_style(old) != _case_style(new))
+
+
 def rename_finding(claim: Claim, index: CodeIndex, base: Finding) -> Finding:
     """Upgrade a missing result only when one same-kind candidate is clearly close."""
     if base.verdict != Verdict.missing or claim.kind not in _KINDS:
         return base
     key = (claim.kind, claim.value)
     if key not in index.rename_cache:
-        pool = [symbol for kind in _KINDS[claim.kind] for symbol in index.by_kind.get(kind, [])]
+        pool = [
+            symbol
+            for kind in _KINDS[claim.kind]
+            for symbol in index.by_kind.get(kind, [])
+            if plausible_rename(claim.value, symbol.name)
+        ]
         index.rename_cache[key] = nlargest(
             2,
             ((similarity(claim.value, symbol.name), symbol) for symbol in pool),

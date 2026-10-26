@@ -82,6 +82,10 @@ class SymbolKind(StrEnum):
     make_target = "make_target"
     ci_job = "ci_job"
     cli_argument = "cli_argument"
+    attribute = "attribute"
+    variable = "variable"
+    parameter = "parameter"
+    module = "module"
 
 
 class Verdict(StrEnum):
@@ -179,6 +183,11 @@ class Symbol(PipelineModel):
     handler: str | None = None
     partial_prefix: bool = False
     ts_type: bool = False
+    # Positional arity as declared (``...`` marks a pass-through argument: argparse REMAINDER or
+    # click ``nargs=-1`` with UNPROCESSED values); later tokens belong to another program.
+    nargs: str | None = None
+    # A configuration key whose children are free-form (JSON-schema additionalProperties).
+    open_map: bool = False
 
 
 class CommitRef(PipelineModel):

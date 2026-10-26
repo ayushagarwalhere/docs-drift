@@ -18,6 +18,7 @@ from docs_drift.docs.discover import DiscoveryWarning, discover_docs, read_doc
 from docs_drift.docs.discover import _format as doc_format
 from docs_drift.docs.extract_blocks import extract_block_claims, project_command_names
 from docs_drift.docs.extract_inline import extract_claims
+from docs_drift.docs.local_defs import apply_local_definitions
 from docs_drift.docs.sections import ParsedDoc, is_historical_span, parse_document
 from docs_drift.models import Claim, ClaimLocation, ScanResult, SuppressedClaim
 
@@ -155,7 +156,7 @@ def _dependency_claims(parsed: ParsedDoc, config: Config, timings: dict[str, flo
         return extract_dependency_claims(parsed)
 
 
-def scan_claims(
+def scan_claims(  # noqa: PLR0915 - staged per-document pipeline.
     repo: Path,
     config: Config,
     *,
@@ -194,6 +195,7 @@ def scan_claims(
                     )
         warnings_out.extend(str(item.message) for item in caught)
     command_context = project_command_names(source_repo or root)
+    project_names = frozenset(name.casefold() for names in command_context for name in names)
     for doc in docs:
         try:
             with _timed(timings, "parse"):
@@ -202,7 +204,7 @@ def scan_claims(
                 )
             sections.extend(parsed.sections)
             with _timed(timings, "inline"):
-                inline = extract_claims(parsed)
+                inline = extract_claims(parsed, project_names=project_names)
             with _timed(timings, "blocks"):
                 blocks = extract_block_claims(parsed, source_repo or root, command_context=command_context)
             historical += inline.historical_skipped + blocks.historical_skipped
@@ -210,7 +212,8 @@ def scan_claims(
             if doc.format.value == "rst":
                 from docs_drift.docs.preprocess import rst_claims  # noqa: PLC0415 - optional dependency or shared pipeline import.
 
-                source.extend(rst_claims(parsed))
+                source.extend(rst_claims(parsed, project_names=project_names))
+            source = apply_local_definitions(parsed, source)
             with _timed(timings, "defaults"):
                 defaults = extract_defaults(parsed, source)
             dependency_claims = _dependency_claims(parsed, config, timings)

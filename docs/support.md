@@ -15,6 +15,8 @@
 | JavaScript / TypeScript | Express | partial |
 | JavaScript / TypeScript | Next.js / NestJS routes | none |
 | JSON / YAML / TOML / INI | literal settings | partial |
-| Go / Rust | language-specific configuration | none |
+| Go | Cobra / pflag / flag / urfave/cli flags, commands and env vars | partial |
+| Rust | clap (derive and builder) / structopt / argh flags, commands and env vars | partial |
+| Go / Rust | functions, types, routes and other declarations | none |
 
 No framework is claimed fully supported.

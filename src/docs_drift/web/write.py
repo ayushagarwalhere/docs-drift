@@ -12,6 +12,7 @@ over from the saved scan of the same revision only when the claim is identical.
 from __future__ import annotations
 
 import hashlib
+import re
 import shutil
 import threading
 import uuid
@@ -279,6 +280,38 @@ class IndexedDriftService(DriftService):
         return relative, result, edits
 
 
+_FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+_CODE_SPAN = re.compile(r"(`+[^`]*`+)")
+_BARE_FLAG = re.compile(r"(?<![`\w/-])(--[A-Za-z][\w-]*[A-Za-z0-9])(?![`\w])")
+_BARE_ENV = re.compile(r"(?<![`\w$])([A-Z][A-Z0-9]*_[A-Z0-9_]*[A-Z0-9])(?![`\w])")
+
+
+def normalize_dictation(text: str) -> str:
+    """Dictation never types Markdown backticks; mark bare --flags and ENV_NAMES as code so they are checked.
+
+    Only prose outside fenced blocks and existing code spans changes, and line numbers never move, so the
+    findings still point at the text the writer sees.
+    """
+    out: list[str] = []
+    fence: str | None = None
+    for line in text.split("\n"):
+        opener = _FENCE.match(line)
+        if fence is not None:
+            if opener and opener.group(1)[0] == fence[0] and len(opener.group(1)) >= len(fence):
+                fence = None
+            out.append(line)
+            continue
+        if opener:
+            fence = opener.group(1)
+            out.append(line)
+            continue
+        parts = _CODE_SPAN.split(line)
+        for index in range(0, len(parts), 2):
+            parts[index] = _BARE_ENV.sub(r"`\1`", _BARE_FLAG.sub(r"`\1`", parts[index]))
+        out.append("".join(parts))
+    return "\n".join(out)
+
+
 def _verdict_label(finding: Finding) -> str:
     return {
         Verdict.ok: "ok",
@@ -414,7 +447,7 @@ class WriteChecker:
         self, key: str, write_index: WriteIndex, saved: ScanResult | None, path: str, text: str, ticket: Ticket
     ) -> dict[str, Any]:
         service = self.service(key, write_index, saved)
-        relative, result, edits = service.check_write(path, text, ticket)
+        relative, result, edits = service.check_write(path, normalize_dictation(text), ticket)
         if any(w.startswith("Could not process") for w in result.warnings):
             raise DocsDriftError("This text could not be parsed as Markdown.", "Simplify the formatting and retry.")
         body = present(relative, text, result, edits, service.index)

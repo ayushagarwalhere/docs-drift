@@ -38,7 +38,11 @@ def match_default(claim: Claim, index: CodeIndex) -> Finding:
     defaults = {
         (symbol.default, symbol.file, symbol.line): symbol for symbol in candidates if symbol.default is not None
     }
-    if len(defaults) != 1:
+    # Two commands may declare the same flag name; when one default is not a literal (a constant,
+    # a call), comparing against the other command's literal would bind to the wrong declaration.
+    declarations = {symbol.qualified_name for symbol in candidates}
+    unresolved = any(symbol.default is None for symbol in candidates)
+    if len(defaults) != 1 or (len(declarations) > 1 and unresolved):
         return Finding(
             claim=claim,
             verdict=Verdict.unverifiable,
@@ -49,6 +53,23 @@ def match_default(claim: Claim, index: CodeIndex) -> Finding:
     symbol = next(iter(defaults.values()))
     actual = normalize_value(symbol.default or "", subject=claim.value)
     expected = normalize_value(claim.expected_default or "", subject=claim.value)
+    if symbol.default == "None" and expected.kind != "none":
+        # `default=None` is a "not given" sentinel that code resolves later (a config fallback,
+        # an environment variable, a library constant); the documented value is the effective one.
+        return Finding(
+            claim=claim,
+            matched_symbol=symbol,
+            verdict=Verdict.unverifiable,
+            evidence=[
+                Evidence(file=claim.doc_path, line=claim.line, text=claim.raw_text),
+                Evidence(file=symbol.file, line=symbol.line, text=f"{symbol.qualified_name} default={symbol.default}"),
+            ],
+            confidence=0.3,
+            reasons=[
+                f"The code default is None, which is resolved at runtime; the documented "
+                f"{claim.expected_default!r} cannot be compared statically."
+            ],
+        )
     equal = expected.equals(actual)
     verdict = Verdict.ok if equal is True else Verdict.default_changed if equal is False else Verdict.unverifiable
     confidence = 0.95 if equal is not None else 0.35

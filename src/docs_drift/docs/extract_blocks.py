@@ -16,6 +16,8 @@ from urllib.parse import urlsplit
 
 from markdown_it.token import Token
 
+from docs_drift.docs.extract_inline import PACKAGE_MANAGER_BUILTINS, SYSTEM_PATH
+from docs_drift.docs.qualifiers import context_qualifier
 from docs_drift.docs.sections import ParsedDoc, is_historical_span
 from docs_drift.ids import make_claim_id
 from docs_drift.models import Claim, ClaimKind, Extraction
@@ -170,7 +172,9 @@ def _is_project_command(  # noqa: PLR0911
     if executable == "npx" and len(tokens) >= MIN_COMMAND_ARGUMENTS:
         return tokens[1].casefold() in names_folded
     if executable in {"uv", "poetry"} and len(tokens) >= MIN_MODULE_COMMAND_TOKENS and tokens[1] == "run":
-        return True
+        return True  # The runner's target is validated later; its arguments only when it is a project command.
+    if executable in {"pnpm", "yarn"} and len(tokens) >= MIN_COMMAND_ARGUMENTS and tokens[1] != "run":
+        return tokens[1].casefold() not in PACKAGE_MANAGER_BUILTINS  # `yarn config set` is yarn's own command.
     if executable in {"npm", "pnpm", "yarn", "make", "just"} and len(tokens) >= MIN_COMMAND_ARGUMENTS:
         return tokens[1] == "run" and len(tokens) >= MIN_MODULE_COMMAND_TOKENS if executable == "npm" else True
     if tokens[0].startswith(("./", ".\\")) or "/" in tokens[0] or "\\" in tokens[0]:
@@ -240,8 +244,15 @@ def _claim(  # noqa: PLR0913, PLR0917
     )
 
 
-def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
-    parsed: ParsedDoc, token: Token, language: str, repo: Path, names: set[str], modules: set[str], counts: ClaimCounter
+def _shell_block(  # noqa: PLR0912, PLR0913, PLR0917
+    parsed: ParsedDoc,
+    token: Token,
+    language: str,
+    repo: Path,
+    names: set[str],
+    modules: set[str],
+    counts: ClaimCounter,
+    plugins: frozenset[tuple[str, str]] = frozenset(),
 ) -> list[Claim]:
     if token.map is None:
         return []
@@ -252,7 +263,8 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
         stripped = source.lstrip()
         if prompt_mode and not stripped.startswith(("$ ", "> ")):
             continue
-        command_line = re.sub(r"^(?:\$\s|>\s)", "", stripped)
+        # Completion demos press TAB (`--[TAB][TAB]`); the markers are keystrokes, not arguments.
+        command_line = re.sub(r"\[TAB\]", "", re.sub(r"^(?:\$\s|>\s)", "", stripped))
         # Captured --help rows are evidence too, even though they are output rather than runnable commands.
         help_flag = re.match(r"^\s*(--?[A-Za-z][\w-]*)\s+.*\[\s*default\s*:", source, re.I)
         if help_flag:
@@ -286,8 +298,26 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
                 )
                 if item:
                     claims.append(item)
-            full = " ".join(tokens)
-            item = _claim(parsed, ClaimKind.code_command, full, full, line, 1, Extraction.code_block, counts)
+            command_start, forwarded = _command_start(tokens, names)
+            if (
+                tokens[0].casefold() in {"uv", "poetry"}
+                and forwarded is None
+                and not _is_project_command(tokens[2:], repo, names, modules)
+            ):
+                forwarded = "tool"  # `uv run pytest -k x`: the flags belong to pytest, not to this project.
+            plugin = _plugin_command(tokens, command_start, plugins)
+            context = (
+                context_qualifier("plugin", plugin)
+                if plugin
+                else context_qualifier("forwarded", tokens[0])
+                if forwarded == "script"
+                else None
+            )
+            # shlex.join keeps quoted prompts ("invent a dog") as one argument when the command is re-split.
+            full = shlex.join(tokens)
+            item = _claim(
+                parsed, ClaimKind.code_command, full, part, line, 1, Extraction.code_block, counts, qualifier=context
+            )
             if item:
                 claims.append(item)
             wrapper = tokens[0].casefold()
@@ -309,60 +339,144 @@ def _shell_block(  # noqa: PLR0912, PLR0913, PLR0915, PLR0917
                     )
                     if target_claim:
                         claims.append(target_claim)
-            positional: list[str] = []
-            positional_seen = False
-            command_start = 1
-            program = tokens[0].casefold()
-            if (
-                program in {"python", "python3", "py"}
-                and len(tokens) >= MIN_MODULE_COMMAND_TOKENS
-                and tokens[1] == "-m"
-            ) or (program in {"uv", "poetry"} and len(tokens) >= MIN_MODULE_COMMAND_TOKENS and tokens[1] == "run"):
-                command_start = WRAPPED_COMMAND_OFFSET
-            elif program == "npx" and len(tokens) >= MIN_COMMAND_ARGUMENTS:
-                command_start = MIN_COMMAND_ARGUMENTS
-            elif program == "npm" and len(tokens) >= MIN_MODULE_COMMAND_TOKENS and tokens[1] == "run":
-                command_start = WRAPPED_COMMAND_OFFSET
-            elif program in {"pnpm", "yarn", "make", "just"} and len(tokens) >= MIN_COMMAND_ARGUMENTS:
-                command_start = MIN_COMMAND_ARGUMENTS
-            index = command_start
-            while index < len(tokens):
-                value = tokens[index]
-                if value == "--":
-                    break
-                if value.startswith("-"):
-                    flag = value.split("=", 1)[0]
-                    item = _claim(
-                        parsed,
-                        ClaimKind.cli_flag,
-                        flag,
-                        value,
-                        line,
-                        1,
-                        Extraction.code_block,
-                        counts,
-                        qualifier=positional[-1] if positional else None,
-                    )
-                    if item:
-                        claims.append(item)
-                    if "=" not in value and index + 1 < len(tokens) and not tokens[index + 1].startswith("-"):
-                        index += 1
-                elif not positional_seen and value not in {"run", "exec"}:
-                    positional_seen = True
-                    # Paths, URLs and numeric arguments are not subcommand names.
-                    # Keep them in the complete command for separate validation.
-                    if re.fullmatch(r"[A-Za-z][\w-]*", value):
-                        positional.append(value)
-                        item = _claim(
-                            parsed, ClaimKind.cli_command, value, value, line, 1, Extraction.code_block, counts
-                        )
-                        if item:
-                            claims.append(item)
-                index += 1
+            if forwarded:
+                # Arguments after a task-runner target or a helper script go to some other program.
+                continue
+            claims.extend(_argument_claims(parsed, tokens, command_start, line, counts, context))
     return claims
 
 
-def _config_claims(parsed: ParsedDoc, token: Token, language: str, counts: ClaimCounter) -> list[Claim]:
+def _command_start(tokens: list[str], names: set[str]) -> tuple[int, str | None]:
+    """Return where the project's own arguments begin, and why they are forwarded elsewhere, if so."""
+    program = tokens[0].casefold()
+    if program in {"uv", "poetry"} and len(tokens) >= MIN_MODULE_COMMAND_TOKENS and tokens[1] == "run":
+        inner, forwarded = _command_start(tokens[2:], names)
+        return inner + 2, forwarded
+    if program in {"python", "python3", "py"} and len(tokens) >= MIN_MODULE_COMMAND_TOKENS and tokens[1] == "-m":
+        return WRAPPED_COMMAND_OFFSET, None
+    if program == "npx" and len(tokens) >= MIN_COMMAND_ARGUMENTS:
+        return MIN_COMMAND_ARGUMENTS, None
+    if program in {"npm", "pnpm", "yarn", "make", "just"}:
+        return len(tokens), "target"
+    executable = PurePosixPath(tokens[0].replace("\\", "/")).name.casefold()
+    if ("/" in tokens[0] or "\\" in tokens[0]) and executable not in {name.casefold() for name in names}:
+        return len(tokens), "script"
+    return 1, None
+
+
+def _plugin_command(tokens: list[str], start: int, plugins: frozenset[tuple[str, str]]) -> str | None:
+    """`llm install llm-python` makes a later `llm python ...` the plugin's command, not the project's."""
+    executable = PurePosixPath(tokens[max(0, start - 1)].replace("\\", "/")).name.casefold()
+    first = next((token for token in tokens[start:] if not token.startswith("-")), None)
+    return f"{executable}-{first}" if first and (executable, first.casefold()) in plugins else None
+
+
+def installed_plugins(parsed: ParsedDoc, names: set[str]) -> frozenset[tuple[str, str]]:
+    """Collect `<bin> install <bin>-<name>` plugin installations shown anywhere in the document."""
+    found: set[tuple[str, str]] = set()
+    folded = {name.casefold() for name in names}
+    for match in re.finditer(r"(?m)^\W*([\w.-]+)\s+install\s+(?:-\S+\s+)*([\w.-]+)", parsed.text):
+        executable, package = match.group(1).casefold(), match.group(2).casefold()
+        if executable in folded and package.startswith(executable + "-"):
+            found.add((executable, package.removeprefix(executable + "-")))
+    return frozenset(found)
+
+
+def _argument_claims(  # noqa: PLR0913, PLR0917
+    parsed: ParsedDoc,
+    tokens: list[str],
+    command_start: int,
+    line: int,
+    counts: ClaimCounter,
+    context: str | None,
+) -> list[Claim]:
+    claims: list[Claim] = []
+    positional: list[str] = []
+    positional_seen = False
+    index = command_start
+    while index < len(tokens):
+        value = tokens[index]
+        if value == "--":
+            break
+        # A lone '-' is stdin and '-5' a negative number: both are values, not options.
+        if re.fullmatch(r"--?[A-Za-z][\w-]*(?:=.*)?", value):
+            flag = value.split("=", 1)[0]
+            item = _claim(
+                parsed,
+                ClaimKind.cli_flag,
+                flag,
+                value,
+                line,
+                1,
+                Extraction.code_block,
+                counts,
+                qualifier=context or (positional[-1] if positional else None),
+            )
+            if item:
+                claims.append(item)
+            if "=" not in value and index + 1 < len(tokens) and not tokens[index + 1].startswith("-"):
+                index += 1
+        elif value.startswith("-"):
+            pass
+        elif not positional_seen and value not in {"run", "exec"}:
+            positional_seen = True
+            # Paths, URLs and numeric arguments are not subcommand names.
+            # Keep them in the complete command for separate validation.
+            if re.fullmatch(r"[A-Za-z][\w-]*", value):
+                positional.append(value)
+                item = _claim(
+                    parsed,
+                    ClaimKind.cli_command,
+                    value,
+                    value,
+                    line,
+                    1,
+                    Extraction.code_block,
+                    counts,
+                    qualifier=context,
+                )
+                if item:
+                    claims.append(item)
+        index += 1
+    return claims
+
+
+_DICTCONFIG_SECTIONS = frozenset({"formatters", "handlers", "loggers", "filters", "root"})
+
+
+def _normalize_project(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).casefold()
+
+
+def _project_config(data: Any, project_names: frozenset[str]) -> Any:
+    """Keep only configuration this project reads from a pasted config example.
+
+    A ``pyproject.toml`` snippet holds ``[tool.<name>]`` tables for many tools. Only the
+    project's own table is a claim, and its keys are documented relative to that table.
+    A ``logging.dictConfig`` mapping follows the standard library's schema, not the project's.
+    """
+    if not isinstance(data, dict):
+        return data
+    if "version" in data and _DICTCONFIG_SECTIONS & set(data):
+        return {}
+    own = {_normalize_project(name) for name in project_names}
+    # A `package.json` (or similar) example carries the project's settings under its own key.
+    nested = [value for key, value in data.items() if _normalize_project(str(key)) in own and isinstance(value, dict)]
+    if len(data) > 1 and len(nested) == 1:
+        return nested[0]
+    tool = data.get("tool")
+    if isinstance(tool, dict):
+        merged: dict[str, Any] = {}
+        for name, table in tool.items():
+            if _normalize_project(str(name)) in own and isinstance(table, dict):
+                merged.update(table)
+        return merged
+    return data
+
+
+def _config_claims(
+    parsed: ParsedDoc, token: Token, language: str, counts: ClaimCounter, project_names: frozenset[str] = frozenset()
+) -> list[Claim]:
     if token.map is None:
         return []
     section = parsed.line_to_section.get(token.map[0] + 1)
@@ -382,6 +496,7 @@ def _config_claims(parsed: ParsedDoc, token: Token, language: str, counts: Claim
             data = _simple_yaml(token.content)
     except (ValueError, tomllib.TOMLDecodeError):
         return []
+    data = _project_config(data, project_names)
     line_start = token.map[0] + 2
     document_lines = parsed.text.splitlines()
     config_lines = token.content.splitlines()
@@ -432,6 +547,8 @@ def _flatten_config(data: Any, lines: list[str], first_line: int, prefix: str = 
     if not isinstance(data, dict):
         return result
     for key, value in data.items():
+        if prefix and re.search(r"[.()]", str(key)):
+            continue  # Logger names (`uvicorn.error`) and factory keys (`()`) are data, not nested settings.
         dotted = f"{prefix}.{key}" if prefix else str(key)
         line = next(
             (first_line + i for i, source in enumerate(lines) if re.match(rf"\s*{re.escape(str(key))}\s*[:=]", source)),
@@ -467,11 +584,50 @@ def _dotenv_claims(parsed: ParsedDoc, token: Token, counts: ClaimCounter) -> lis
     return result
 
 
+_LOCAL_HOST = re.compile(
+    r"^(?:localhost|127(?:\.\d+){3}|0\.0\.0\.0|\[?::1\]?|testserver|(?:[\w-]+\.)*example(?:\.(?:com|org|net|test))?|"
+    r"[\w-]+\.(?:test|local|localhost))$",
+    re.IGNORECASE,
+)
+
+
+def _external_host(url: str) -> str | None:
+    """A request to someone else's server documents that server, not this project's routes."""
+    try:
+        host = urlsplit(url if "://" in url else f"http://{url}").hostname or ""
+    except ValueError:
+        return None
+    return host if host and not _LOCAL_HOST.match(host) else None
+
+
+_HOST_TOKEN = re.compile(r"(?:https?://)?((?:[\w-]+\.)+[a-z]{2,}|localhost|127(?:\.\d+){3})(?::\d+)?(?:/\S*)?", re.I)
+_FILE_LIKE_HOST = re.compile(r"[\w-]+\.(?:py|json|txt|md|html?|ya?ml|toml|db|sh|cfg|ini)", re.I)
+_REQUEST_LOOKBACK = 10
+
+
+def _preceded_by_external_request(parsed: ParsedDoc, fence_start: int) -> bool:
+    """A raw request block that echoes the command just above it shares that command's target host."""
+    hosts: list[str] = []
+    in_code = False
+    for line in parsed.lines[max(0, fence_start - _REQUEST_LOOKBACK) : fence_start]:
+        if line.lstrip().startswith(("```", "~~~")):
+            in_code = not in_code
+        elif in_code:
+            hosts.extend(match.group(1) for match in _HOST_TOKEN.finditer(line))
+    hosts = [host for host in hosts if not _FILE_LIKE_HOST.fullmatch(host)]
+    return bool(hosts) and all(_external_host(host) for host in hosts)
+
+
 def _http_claims(parsed: ParsedDoc, token: Token, counts: ClaimCounter, language: str) -> list[Claim]:
     if token.map is None:
         return []
     result: list[Claim] = []
     pending_method = "GET"
+    host_header = re.search(r"(?im)^\s*Host:\s*(\S+)", token.content)
+    if language == "http" and host_header and _external_host(host_header.group(1)):
+        return []  # An HTTP client's request to a remote server (e.g. `Host: pie.dev`).
+    if language == "http" and not host_header and _preceded_by_external_request(parsed, token.map[0]):
+        return []  # "Which looks similar to the actual Request-Line that is sent" after `http DELETE pie.dev/delete`.
     for offset, line in enumerate(token.content.splitlines()):
         stripped = line.strip()
         method = re.search(r"\b(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(https?://[^\s]+|/[^\s]+)", stripped, re.I)
@@ -480,12 +636,18 @@ def _http_claims(parsed: ParsedDoc, token: Token, counts: ClaimCounter, language
         if method:
             pending_method, path = method.group(1).upper(), method.group(2)
             if path.startswith(("http://", "https://")):
+                if _external_host(path):
+                    continue
                 path = urlsplit(path).path or "/"
         elif curl:
+            if _external_host(curl.group(0)):
+                continue
             pending_method = curl_method.group(1).upper() if curl_method else "GET"
             path = urlsplit(curl.group(0)).path or "/"
         else:
             continue
+        if SYSTEM_PATH.match(path) or re.search(r"(?:^|/)\.\.?(?:/|$)", path):
+            continue  # Host filesystem paths and unnormalised dot segments are not application routes.
         item = _claim(
             parsed,
             ClaimKind.endpoint,
@@ -569,12 +731,14 @@ def extract_block_claims(
     names, modules = command_context if command_context is not None else project_command_names(repo)
     counts: ClaimCounter = Counter()
     claims = []
+    plugins = installed_plugins(parsed, names)
+    project_names = frozenset({name.casefold() for name in names} | {name.casefold() for name in modules})
     for token in parsed.tokens:
         if token.type != "fence":
             continue
         language = _block_type(token)
         if language in _SHELL_LANGS:
-            claims.extend(_shell_block(parsed, token, language, repo, names, modules, counts))
+            claims.extend(_shell_block(parsed, token, language, repo, names, modules, counts, plugins))
             if "curl" in token.content:
                 claims.extend(_http_claims(parsed, token, counts, language))
         elif language == "http":
@@ -582,7 +746,7 @@ def extract_block_claims(
         elif language in {"env", "dotenv"}:
             claims.extend(_dotenv_claims(parsed, token, counts))
         elif language in {"json", "yaml", "yml", "toml"}:
-            claims.extend(_config_claims(parsed, token, language, counts))
+            claims.extend(_config_claims(parsed, token, language, counts, project_names))
         elif language in {"python", "py", "js", "javascript", "ts", "typescript"}:
             claims.extend(_import_claims(parsed, token, language, modules, counts))
     current = []

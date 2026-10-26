@@ -26,6 +26,9 @@ def register(indexer_type: type[_T]) -> type[_T]:
 
 # Imported last so registration is available without a circular registry dependency.
 from docs_drift.index.config import ConfigIndexer as _ConfigIndexer  # noqa: E402, F401
+
+# Go/Rust CLI declarations (static, literal-only).
+from docs_drift.index.go_cli import GoCLIIndexer as _GoCLIIndexer  # noqa: E402, F401
 from docs_drift.index.js_cli import JavaScriptCLIIndexer as _JavaScriptCLIIndexer  # noqa: E402, F401
 from docs_drift.index.js_routes import JavaScriptRouteIndexer as _JavaScriptRouteIndexer  # noqa: E402, F401
 from docs_drift.index.js_symbols import JavaScriptIndexer as _JavaScriptIndexer  # noqa: E402, F401
@@ -34,10 +37,11 @@ from docs_drift.index.python_routes import PythonRouteIndexer as _PythonRouteInd
 from docs_drift.index.python_source import clear_python_cache  # noqa: E402
 from docs_drift.index.python_symbols import PythonIndexer as _PythonIndexer  # noqa: E402, F401
 from docs_drift.index.python_symbols import _module_name  # noqa: E402
+from docs_drift.index.rust_cli import RustCLIIndexer as _RustCLIIndexer  # noqa: E402, F401
 from docs_drift.index.tasks import TaskIndexer as _TaskIndexer  # noqa: E402, F401
 
 INDEX_SCHEMA = 1
-INDEXER_VERSION = f"{__version__}:6"
+INDEXER_VERSION = f"{__version__}:9"
 
 
 def _fingerprints(repo: Path, files: Sequence[Path]) -> dict[str, str]:
@@ -194,15 +198,20 @@ def build_index(repo: Path, config: Config, *, no_cache: bool = False) -> CodeIn
             }
             for relative in fingerprints
         }
-        _write_cache(
-            cache_path,
-            {
-                "schema": INDEX_SCHEMA,
-                "indexer_version": INDEXER_VERSION,
-                "files": {**old_files, **fresh_files},
-                "warnings": list(dict.fromkeys(result.warnings)),
-            },
-        )
+        try:
+            _write_cache(
+                cache_path,
+                {
+                    "schema": INDEX_SCHEMA,
+                    "indexer_version": INDEXER_VERSION,
+                    "files": {**old_files, **fresh_files},
+                    "warnings": list(dict.fromkeys(result.warnings)),
+                },
+            )
+        except OSError as exc:
+            # The cache only speeds up the next scan; a locked file (Windows virus scanners,
+            # a concurrent scan) must not fail this one.
+            result.warnings.append(f"Index cache not written: {type(exc).__name__}: {exc}")
     clear_python_cache()
     _module_name.cache_clear()
     return result

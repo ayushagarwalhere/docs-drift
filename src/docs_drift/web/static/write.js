@@ -228,7 +228,18 @@
   };
 
   const saveDraft = () => store('dd-write-draft', JSON.stringify({ scan_id: repo.value, text: text.value }));
-  text.addEventListener('input', () => { pristine = false; updateCount(); saveDraft(); check(); });
+  // Spoken punctuation from dictation: "dash dash port" becomes "--port", keeping the caret in place.
+  const SPOKEN_FLAG = /\b(?:dash|minus)[\s-]+(?:dash|minus)[\s-]*([A-Za-z][\w-]*)/gi;
+  const writtenFlags = () => {
+    if (!SPOKEN_FLAG.test(text.value)) return;
+    SPOKEN_FLAG.lastIndex = 0;
+    const caret = text.selectionStart;
+    const before = text.value.slice(0, caret).replace(SPOKEN_FLAG, (_, name) => `--${name.toLowerCase()}`);
+    const after = text.value.slice(caret).replace(SPOKEN_FLAG, (_, name) => `--${name.toLowerCase()}`);
+    text.value = before + after;
+    text.setSelectionRange(before.length, before.length);
+  };
+  text.addEventListener('input', () => { writtenFlags(); pristine = false; updateCount(); saveDraft(); check(); });
   text.addEventListener('keydown', event => {
     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); lastChecked = ''; check(true); }
   });

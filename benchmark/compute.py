@@ -16,6 +16,8 @@ from docs_drift.models import ScanResult
 LABEL_COLUMNS = 9
 Z = 1.959963984540054
 
+AGENT_REVIEW_HEADING = "## Agent-reviewed real-repository sample"
+
 
 def wilson(successes: int, total: int) -> tuple[float, float] | None:
     if not 0 <= successes <= total:
@@ -254,9 +256,14 @@ def report(run: Path, sheet: Path, labeler: str | None, *, final: bool = False, 
     )
     text = "\n".join(lines)
     (run / "RESULTS.md").write_text(text, encoding="utf-8")
-    (ROOT / "docs/benchmark.md").write_text(
+    page = ROOT / "docs/benchmark.md"
+    # Hand-maintained sections (the agent-reviewed sample) follow the generated results; keep them.
+    previous = page.read_text(encoding="utf-8") if page.exists() else ""
+    kept = previous[previous.index(AGENT_REVIEW_HEADING) :] if AGENT_REVIEW_HEADING in previous else ""
+    page.write_text(
         text + "\nHuman labeling instructions and blank columns are in `benchmark/labels_todo.md` "
-        "in the source checkout. Raw local scan files are reproducible with the commands above.\n",
+        "in the source checkout. Raw local scan files are reproducible with the commands above.\n"
+        + (f"\n{kept}" if kept else ""),
         encoding="utf-8",
     )
     (run / "metrics.json").write_text(json.dumps(summary, indent=2) + "\n")

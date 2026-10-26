@@ -30,6 +30,7 @@ nav:
   - Claims and verdicts: claims.md
   - Dependency drift: dependencies.md
   - Supported ecosystems: support.md
+  - Go and Rust CLIs: go-rust.md
   - Rules:
       - DD001: rules/DD001.md
       - DD002: rules/DD002.md

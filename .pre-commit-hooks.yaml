@@ -10,7 +10,7 @@
   language: python
   pass_filenames: false
   require_serial: true
-  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile)|(^|/)(Makefile|GNUmakefile|justfile|Dockerfile|\.env\.(example|sample|template)))$'
+  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile|go|rs)|(^|/)(Makefile|GNUmakefile|\.?justfile|Dockerfile|\.env\.(example|sample|template)))$'
   minimum_pre_commit_version: '3.0.0'
 - id: docs-drift-fast
   name: docs-drift (fast, no history)
@@ -19,5 +19,5 @@
   language: python
   pass_filenames: false
   require_serial: true
-  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile)|(^|/)(Makefile|GNUmakefile|justfile|Dockerfile|\.env\.(example|sample|template)))$'
+  files: '(?i)(\.(md|mdx|markdown|rst|txt|text|py|pyi|js|jsx|mjs|cjs|ts|tsx|mts|cts|json|ya?ml|toml|ini|cfg|mk|sh|dockerfile|go|rs)|(^|/)(Makefile|GNUmakefile|\.?justfile|Dockerfile|\.env\.(example|sample|template)))$'
   minimum_pre_commit_version: '3.0.0'

@@ -59,6 +59,9 @@ SOURCE = (
 def replay_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DOCS_DRIFT_LLM_MODE", "replay")
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    # The rules now recognise options defined by a document's own example code, so `--loud` is
+    # no longer drift. Switch that rule off here to keep a rule miss for triage to judge.
+    monkeypatch.setattr("docs_drift.docs.pipeline.apply_local_definitions", lambda parsed, claims: claims)
 
 
 def greeter(tmp_path: Path, **llm: object) -> ScanResult:
@@ -415,7 +418,13 @@ def test_config_enables_triage_without_prose_verification(tmp_path: Path) -> Non
     run = CliRunner().invoke(
         app,
         ["scan", "--repo", str(repo)],
-        env={"DOCS_DRIFT_LLM_MODE": "replay", "DOCS_DRIFT_LLM_RECORDINGS": str(tmp_path / "none")},
+        env={
+            "DOCS_DRIFT_LLM_MODE": "replay",
+            "DOCS_DRIFT_LLM_RECORDINGS": str(tmp_path / "none"),
+            "COLUMNS": "200",
+        },
     )
     # Triage was attempted (and missed replay); prose verification never ran.
-    assert run.exit_code == 2 and "--llm-triage" in run.output
+    # The error panel wraps at the terminal width, so compare without layout characters.
+    flat = "".join(ch for ch in run.output if ch.isalnum() or ch == "-")
+    assert run.exit_code == 2 and "Modeltriagenotice" in flat

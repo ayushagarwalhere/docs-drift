@@ -1,6 +1,7 @@
 """Static route decorators for common Python web frameworks."""
 
 import ast
+import re
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -94,7 +95,83 @@ class PythonRouteIndexer:
                         symbol.raw_path = path_value
                         symbol.handler = f"{module}.{node.name}".strip(".")
                         result.append(symbol)
+            result.extend(_call_routes(repo, path, source, tree, module))
         return result
+
+
+# Calls that register a route without a decorator: ``add_route(view, r"^/(?P<db>[^/]+)$")`` (datasette, aiohttp,
+# Starlette), ``Route("/x", endpoint)`` (Starlette), ``add_url_rule`` (Flask) and ``re_path`` (Django).
+_ROUTE_CALLS = frozenset({"add_route", "add_api_route", "add_url_rule", "add_websocket_route", "Route", "re_path"})
+_HTTP_METHODS = frozenset({"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ANY", "*"})
+_AIOHTTP_DEFINITIONS = frozenset(
+    f"web.{name}" for name in ("get", "post", "put", "patch", "delete", "head", "options", "route", "view")
+)
+# ``(\.(?P<format>\w+))?`` and similar optional extension suffixes: the path is served with or without them.
+_OPTIONAL_SUFFIX = re.compile(r"\((?:\\\.|\[\.\])\(\?P<\w+>[^()]*\)\)\?")
+_NAMED_GROUP = re.compile(r"\(\?P<(\w+)>(?:[^()\\]|\\.|\([^()]*\))*\)")
+
+
+def regex_template(raw: str) -> str:
+    """Turn a route regex into a ``{param}`` template; unparsed regex syntax is left in place."""
+    value = raw.removeprefix("^").removesuffix("$").removesuffix(r"\Z")
+    value = _OPTIONAL_SUFFIX.sub("", value)
+    value = _NAMED_GROUP.sub(lambda match: "{" + match.group(1) + "}", value)
+    value = re.sub(r"\\([./-])", r"\1", value)
+    return value if value.startswith("/") else "/" + value
+
+
+def _route_path(call: ast.Call, source: str) -> tuple[str | None, str | None]:
+    strings = [
+        (index, value)
+        for index, item in enumerate(call.args)
+        if (value := _literal(item, source)) is not None and isinstance(item, ast.Constant)
+    ]
+    path_node = next((kw.value for kw in call.keywords if kw.arg in {"path", "rule", "route"}), None)
+    method = next((value for _, value in strings if value.upper() in _HTTP_METHODS), None)
+    path_value = _literal(path_node, source) if path_node is not None else None
+    if path_value is None:
+        path_value = next((value for _, value in strings if value.startswith(("/", "^"))), None)
+    return method, path_value
+
+
+def _call_routes(repo: Path, path: Path, source: str, tree: ast.Module, module: str) -> list[Symbol]:
+    result = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = ast.unparse(node.func).rsplit(".", 1)[-1]
+        # aiohttp route definitions: ``app.add_routes([web.post("/", handler)])``.
+        aiohttp = ast.unparse(node.func) in _AIOHTTP_DEFINITIONS
+        if name not in _ROUTE_CALLS and not aiohttp:
+            continue
+        method, raw = _route_path(node, source)
+        if aiohttp and name.upper() in _HTTP_METHODS:
+            method = name
+        if not raw:
+            continue
+        template = regex_template(raw) if name in {"add_route", "re_path"} or raw.startswith("^") else raw
+        methods_node = next((kw.value for kw in node.keywords if kw.arg == "methods"), None)
+        methods = [method.upper().replace("*", "ANY")] if method else ["ANY"]
+        if methods_node is not None:
+            try:
+                methods = [str(item).upper() for item in ast.literal_eval(methods_node)]
+            except (ValueError, TypeError, SyntaxError):
+                methods = ["ANY"]
+        for http_method in methods:
+            normalized_method, normalized_path = normalize_route(http_method, template)
+            symbol = _symbol(
+                repo,
+                path,
+                SymbolKind.route,
+                f"{normalized_method.upper()} {normalized_path}",
+                node.lineno,
+                name=f"{normalized_method.upper()} {normalized_path}",
+                framework=name,
+            )
+            # The original regex lets a concrete documented URL be checked by a full match.
+            symbol.raw_path = raw
+            result.append(symbol)
+    return result
 
 
 @register
