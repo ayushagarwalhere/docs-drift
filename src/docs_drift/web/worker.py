@@ -19,6 +19,8 @@ from docs_drift.web.settings import Settings
 from docs_drift.web.validation import validate_repository
 from docs_drift.web.write import WRITE_INDEX_FILE, build_write_index, dump_write_index
 
+MAX_SKIPPED_SHOWN = 5
+
 
 def scrub(value: Any) -> Any:
     if isinstance(value, str):
@@ -42,41 +44,62 @@ def public_result(result: ScanResult, url: str) -> ScanResult:
     return ScanResult.model_validate(data)
 
 
-def preflight(repo: Path) -> None:
-    """Reject pathological parser input before any extractor or JSON/TOML parser sees it."""
-    for path in repo.rglob("*"):
+def preflight(repo: Path, *, skip: bool = False) -> list[str]:
+    """Keep pathological parser input away from every extractor and JSON/TOML parser.
+
+    With ``skip`` (public scans of a disposable clone), an offending file is emptied in place
+    and its path returned, so one minified bundle, lock file or dataset does not fail the whole
+    scan. The path still exists, so documentation that links to it is not reported as drift.
+    Without ``skip``, the first offending file raises ``JobError``.
+    """
+    skipped: list[str] = []
+
+    def reject(path: Path, code: str, message: str, hint: str) -> None:
+        if not skip:
+            raise JobError(code, message, hint)
+        path.write_bytes(b"")
+        skipped.append(path.relative_to(repo).as_posix())
+
+    for path in sorted(repo.rglob("*")):
         if not path.is_file() or ".git" in path.relative_to(repo).parts or path.is_symlink():
             continue
         if path.stat().st_size > MAX_FILE_BYTES:
-            raise JobError(
+            reject(
+                path,
                 "too_large",
                 "A source or documentation file exceeds the 1 MB demo limit.",
                 "Scan this repository locally or choose a smaller example.",
             )
+            continue
         text = path.read_text(encoding="utf-8", errors="replace")
         if any(len(line) > MAX_LINE_CHARS for line in text.splitlines()):
-            raise JobError(
+            reject(
+                path,
                 "input_limit",
                 "A file contains an excessively long line.",
                 "Remove generated/minified content or scan locally.",
             )
+            continue
         if path.suffix in {".json", ".yaml", ".yml", ".toml"}:
             depth = 0
             for character in text:
                 depth += (character in "[{") - (character in "]}")
                 if depth > MAX_NESTING:
-                    raise JobError(
+                    reject(
+                        path,
                         "input_limit",
                         "A configuration file is nested too deeply.",
                         "Scan locally after reviewing the input.",
                     )
+                    break
+    return skipped
 
 
 def execute(repo: Path, settings: Settings, emit: Any, keep_index: Path | None = None) -> ScanResult:
     """Scan ``repo``; with ``keep_index``, also save the static index for /write checks after cleanup."""
     from docs_drift.scanning import run_scan  # noqa: PLC0415 - worker-only scanner import.
 
-    preflight(repo)
+    skipped = preflight(repo, skip=True)
     captured: list[tuple[CodeIndex, list[Package]]] = []
     token = CACHE_DISABLED.set(True)
     try:
@@ -96,6 +119,12 @@ def execute(repo: Path, settings: Settings, emit: Any, keep_index: Path | None =
     if not result.docs:
         raise JobError(
             "no_docs", "No documentation files were found.", "Try a repository with a README or a supported docs site."
+        )
+    if skipped:
+        shown = ", ".join(skipped[:MAX_SKIPPED_SHOWN]) + (" and more" if len(skipped) > MAX_SKIPPED_SHOWN else "")
+        result.warnings.append(
+            f"Skipped {len(skipped)} file(s) that are too large, minified or deeply nested for the public demo: "
+            f"{shown}. Their paths still count; their contents were not read. Scan locally to include them."
         )
     result.warnings.append(
         f"Public demo history uses a {settings.history_days}-day window or a {settings.history_commits}-commit "

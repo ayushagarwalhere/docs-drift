@@ -220,7 +220,21 @@ def test_worker_executes_only_static_scanner_and_enforces_input_limits(tmp_path:
     assert not CACHE_DISABLED.get()
     (tmp_path / "large.txt").write_text("x" * 8193)
     with pytest.raises(JobError, match="long line"):
-        worker.execute(tmp_path, Settings(), lambda *args: None)
+        worker.preflight(tmp_path)
+
+
+def test_public_scan_skips_minified_and_oversized_files_instead_of_failing(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("Run `app.py`. The bundle is `dist/app.min.js`.\n")
+    (tmp_path / "app.py").write_text("def main() -> None:\n    pass\n")
+    (tmp_path / "dist").mkdir()
+    (tmp_path / "dist/app.min.js").write_text("var a=1;" * 2000)
+    (tmp_path / "data.json").write_text("[" * 200 + "]" * 200)
+    (tmp_path / "big.csv").write_text("a,b\n" * 300_000)
+    result = worker.execute(tmp_path, Settings(), lambda *args: None)
+    assert all(not f.is_drift for f in result.findings), [(f.claim.value, f.verdict) for f in result.findings]
+    warning = next(w for w in result.warnings if w.startswith("Skipped 3 file(s)"))
+    assert "dist/app.min.js" in warning and "data.json" in warning and "big.csv" in warning
+    assert (tmp_path / "dist/app.min.js").read_bytes() == b""
 
 
 @pytest.mark.parametrize(
