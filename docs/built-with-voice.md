@@ -4,7 +4,14 @@ docs-drift was built for the WeMakeDevs × Wispr Flow "No Hands" challenge, with
 requirements, prompts and docs dictated through Flow. Usage cards are shown as
 supplied; hashes are in [provenance.json](assets/flow/provenance.json).
 
-## Latest card — 25 October 2026
+## Latest card — 27 October 2026
+
+![Wispr Flow card: 2,01,753 total words dictated](assets/flow/wispr-words-2026-10-27.jpg)
+
+Challenge leaderboard on 27 October 2026: **5,07,100 words, rank #4** (owner-reported).
+The card above shows 201,753 words dictated (2,01,753 in Indian notation).
+
+## 25 October 2026
 
 ![Flow Highlights: 5-day streak, 139,355 total words dictated, 222 words per minute, 16 apps](assets/flow/flow-highlights-2026-10-25.png)
 
@@ -18,8 +25,8 @@ supplied; hashes are in [provenance.json](assets/flow/provenance.json).
 
 ![Card: 26,412 total words dictated](assets/flow/usage-card-supplied.png)
 
-Between the 22 and 25 October cards the account total grew from 31,351 to
-139,355 words. These are account-level totals across all apps, not a
+Between the 22 and 27 October cards the account total grew from 31,351 to
+201,753 words. These are account-level totals across all apps, not a
 docs-drift-only word count.
 
 ## Owner-reported project dictation: release preparation

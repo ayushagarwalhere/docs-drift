@@ -5,7 +5,7 @@ Read [the protocol](PROTOCOL.md) before reviewing
 `2026-10-18-r4`; its source hash, exact repository pins, sampling seeds,
 source archive and measurements are retained in that run directory.
 The recorded Git commit alone is insufficient: this run used a dirty checkout.
-Use `scanner-source.zip` to recover the actual measured product source.
+`run.py` also writes `scanner-source.zip` (the measured product source) into each run; those archives stay local.
 Release packaging now adds version metadata and changes public report links, so
 the current source digest differs from r4. Compute the frozen run in an isolated
 checkout with r4's archived src, pyproject and lockfile restored, then copy your

@@ -28,9 +28,7 @@ pip install "docs-drift[mcp]"
 docs-drift mcp --repo /path/to/repo
 ```
 
-The MCP command first ships in docs-drift 0.1.1. Until that release is on PyPI, point
-uvx at the Git repository:
-`uvx --from "docs-drift[mcp] @ git+https://github.com/ayushagarwalhere/docs-drift" docs-drift mcp`.
+The MCP command ships in docs-drift 0.1.1 and later.
 
 The server uses stdio by default. The repository root is `--repo`. Without it, the
 server uses `CLAUDE_PROJECT_DIR` when that environment variable is set, and otherwise the

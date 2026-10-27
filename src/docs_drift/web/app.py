@@ -37,6 +37,8 @@ from docs_drift.report.html import graph_data
 from docs_drift.web.cleanup import remove_workspace
 from docs_drift.web.jobs import Job, LocalQueue, Store
 from docs_drift.web.settings import Settings
+from docs_drift.web.try_routes import CHECK_PATH as TRY_CHECK_PATH
+from docs_drift.web.try_routes import MAX_TRY_BODY_BYTES, register_try_routes
 from docs_drift.web.validation import validate_repository
 from docs_drift.web.write import MAX_WRITE_BODY_BYTES
 from docs_drift.web.write_routes import CHECK_PATH as WRITE_CHECK_PATH
@@ -154,6 +156,7 @@ def create_app(  # noqa: PLR0915 - route factory.
     )
     large_paths = {"/github/webhook": MAX_WEBHOOK_BYTES} if github_router is not None else {}
     large_paths[WRITE_CHECK_PATH] = MAX_WRITE_BODY_BYTES  # /write sends up to 20 KB of documentation text.
+    large_paths[TRY_CHECK_PATH] = MAX_TRY_BODY_BYTES  # /try sends two 20 KB panes plus the original code.
     app.add_middleware(SafetyMiddleware, large_paths=large_paths)
     if github_router is not None:
         app.include_router(github_router)
@@ -454,6 +457,9 @@ def create_app(  # noqa: PLR0915 - route factory.
         buckets=buckets,
         salt=salt,
     )
+
+    # --- Try it (/try, /api/try/check): a throwaway sandbox, registered in try_routes.py. ---
+    register_try_routes(app, settings=settings, templates=templates, context=context, buckets=buckets, salt=salt)
 
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     return app

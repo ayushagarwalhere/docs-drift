@@ -7,6 +7,9 @@
 [![CI](https://github.com/ayushagarwalhere/docs-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/ayushagarwalhere/docs-drift/actions/workflows/ci.yml)
 [![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
+**Live demo: [13-211-179-95.sslip.io](https://13-211-179-95.sslip.io)** · no sign-in ·
+[test it yourself in 60 seconds](https://13-211-179-95.sslip.io/try) · [dictate docs and watch them get checked](https://13-211-179-95.sslip.io/write)
+
 A README says `--port`. The code was renamed to `--listen` three weeks ago. A new
 contributor copies the command, it fails, and they decide your docs can't be
 trusted. docs-drift catches that before they do. It reads your documentation,
@@ -118,7 +121,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
-      - uses: ayushagarwalhere/docs-drift@v0.1.0
+      - uses: ayushagarwalhere/docs-drift@v0.1.1
         with:
           base-ref: origin/${{ github.base_ref }}
           fail-on-drift: 'true'
@@ -157,8 +160,6 @@ repository. Claude Code setup:
 claude mcp add docs-drift -- uvx --from "docs-drift[mcp]" docs-drift mcp
 ```
 
-Until docs-drift 0.1.1 is on PyPI, use
-`--from "docs-drift[mcp] @ git+https://github.com/ayushagarwalhere/docs-drift"` instead.
 [MCP guide](docs/mcp.md): Cursor, VS Code, Windsurf and Claude Desktop setup, plus the tool reference.
 
 ## How it works
@@ -246,9 +247,13 @@ mode is opt-in, sends only redacted excerpts, and can be replayed offline.
 
 ## Try it in the browser
 
-Live demo: **https://13-211-179-95.sslip.io** (no sign-in). Paste a public GitHub
-repository, open a saved report, or dictate docs on
-[/write](https://13-211-179-95.sslip.io/write) and watch each claim get checked.
+Live demo: **https://13-211-179-95.sslip.io** (no sign-in).
+
+- **[/try](https://13-211-179-95.sslip.io/try)**: edit a small CLI and its README side by side. Rename a flag or
+  change a default in the code, and the README lines it breaks are flagged with a
+  one-click fix. Nothing to install.
+- **Scan a repository**: paste any public GitHub URL on the home page, or open a saved report.
+- **[/write](https://13-211-179-95.sslip.io/write)**: dictate docs and watch each claim get checked against the code.
 
 The web app scans a public GitHub repository without sign-in, and includes saved
 reports you can open instantly. Each report can be turned into a pull request: a

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}{% from '_macros.html' import arrow, glyph %}
+{% block title %}Try it yourself &middot; docs-drift{% endblock %}
+{% block scripts %}<script src="/static/try.js" defer></script>{% endblock %}
+{% block content %}
+<main id="main" class="dd-page dd-write dd-try">
+  <section class="dd-page-hero dd-write-hero">
+    {{ glyph('lens', 'dd-page-glyph') }}
+    <p class="dd-page-kicker">Try it yourself &middot; about 60 seconds &middot; no sign-in</p>
+    <h1 class="dd-h-xl">Change the code. Watch the docs go stale.</h1>
+    <p class="dd-p-m dd-page-lede">Below is a tiny CLI and its README. They agree. Refactor the code, like a real pull request would, and docs-drift points at every README line that is now wrong &mdash; with the commit that broke it and a one-click fix.</p>
+    <ol class="dd-try-jump" aria-label="Three ways to test">
+      <li><a href="#sandbox"><span>01</span>Break it yourself</a></li>
+      <li><a href="#live"><span>02</span>Scan a real repository</a></li>
+      <li><a href="#voice"><span>03</span>Dictate docs</a></li>
+    </ol>
+  </section>
+
+  <section id="sandbox" class="dd-write-app dd-try-app" aria-labelledby="sandbox-title">
+    <div class="dd-write-bar dd-try-bar">
+      <div class="dd-try-step">
+        <span class="dd-try-num">01</span>
+        <div>
+          <h2 id="sandbox-title" class="dd-try-title">Break it yourself</h2>
+          <p class="dd-try-sub">Pick a refactor, or edit either file by hand.</p>
+        </div>
+      </div>
+      <div class="dd-try-scenarios" role="group" aria-label="Refactor the code">
+        <button type="button" class="dd-chip" data-scenario="rename">Rename a flag</button>
+        <button type="button" class="dd-chip" data-scenario="default">Change a default</button>
+        <button type="button" class="dd-chip" data-scenario="env">Drop an env var</button>
+        <button type="button" class="dd-chip dd-chip-ghost" data-scenario="reset">Reset</button>
+      </div>
+      <p class="dd-write-status" id="try-status" role="status">Ready.</p>
+    </div>
+
+    <div class="dd-try-grid">
+      <div class="dd-write-editor dd-try-pane">
+        <div class="dd-write-head">
+          <label for="try-code" class="dd-write-label"><i class="dd-dot" aria-hidden="true"></i> app.py</label>
+          <span class="dd-write-hint">The code. Parsed, never run.</span>
+        </div>
+        <textarea id="try-code" class="dd-try-code" spellcheck="false" maxlength="{{ max_text_bytes }}" autocapitalize="off" autocomplete="off" wrap="off">{{ sample_code }}</textarea>
+        <textarea id="try-original" hidden aria-hidden="true" tabindex="-1">{{ sample_code }}</textarea>
+      </div>
+      <div class="dd-write-editor dd-try-pane">
+        <div class="dd-write-head">
+          <label for="try-readme" class="dd-write-label"><i class="dd-dot" aria-hidden="true"></i> README.md</label>
+          <span class="dd-write-hint">The docs. Edit freely.</span>
+        </div>
+        <textarea id="try-readme" class="dd-try-code" spellcheck="false" maxlength="{{ max_text_bytes }}" wrap="soft">{{ sample_readme }}</textarea>
+        <textarea id="try-readme-original" hidden aria-hidden="true" tabindex="-1">{{ sample_readme }}</textarea>
+      </div>
+      <aside class="dd-write-panel dd-try-panel" aria-labelledby="try-findings-title">
+        <div class="dd-write-panel-top">
+          <h2 id="try-findings-title" class="dd-write-panel-title">Findings</h2>
+          <p class="dd-write-summary" id="try-summary">Checking&hellip;</p>
+        </div>
+        <ol class="dd-write-list" id="try-findings" aria-live="polite" aria-relevant="additions text" aria-busy="false"></ol>
+        <p class="dd-write-empty" id="try-empty" hidden>No checkable claims in README.md. Mention a flag like <code>--workers</code>, a command or an env var.</p>
+        <div class="dd-btn-row dd-btn-row-left dd-write-actions">
+          <button class="dd-btn dd-btn-lime" type="button" id="try-check">Check docs against code {{ arrow() }}</button>
+        </div>
+        <p class="dd-write-note" id="try-note"></p>
+        <noscript><p class="dd-write-note">The sandbox needs JavaScript. The CLI does the same offline: <code>pipx install docs-drift</code>, then <code>docs-drift check</code>.</p></noscript>
+      </aside>
+    </div>
+  </section>
+
+  <section id="live" class="dd-try-more" aria-labelledby="live-title">
+    <div class="dd-try-card is-white">
+      <span class="dd-try-num">02</span>
+      <h2 id="live-title" class="dd-try-title">Scan a real repository, live</h2>
+      <p>One click clones <b>Textualize/rich-cli</b> on our server and checks its README against its code. Its README documents <code>--line-number</code>; the CLI only ever had <code>--line-numbers</code>. Takes about a minute. Or paste any small public GitHub repository.</p>
+      <form id="scan-form" class="dd-form" novalidate>
+        <label for="repo-url" class="dd-sr">Public GitHub repository</label>
+        <div class="dd-inputrow"><input id="repo-url" name="repo_url" type="text" inputmode="url" maxlength="512" required placeholder="github.com/owner/repository" autocomplete="off" spellcheck="false" aria-describedby="scan-error"><button class="dd-btn dd-btn-dark" type="submit" id="scan-button">Scan repository ↗</button></div>
+        <p id="scan-error" role="alert" hidden></p>
+      </form>
+      <div class="dd-shortcuts"><button type="button" class="dd-btn dd-btn-lime" data-repo="https://github.com/Textualize/rich-cli">Scan rich-cli live {{ arrow() }}</button><a href="/scan/example-rich-cli-reviewed">or open the saved, reviewed report &rarr;</a></div>
+      <p class="dd-notice" id="live-notice" {% if live_available %}hidden{% endif %}>Live scans are paused right now. The saved report still opens instantly.</p>
+      <p class="dd-try-meta"><span id="service-status">Rule-based &middot; no API key</span></p>
+    </div>
+    <div id="voice" class="dd-try-card is-dark">
+      <span class="dd-try-num">03</span>
+      <h2 class="dd-try-title">Dictate docs, checked as you speak</h2>
+      <p>Open the editor, hold your dictation key (Wispr Flow, Windows Voice Typing or macOS Dictation) and say how to use a project. Every flag you say is checked against the code before you commit it.</p>
+      <p class="dd-try-example">Try saying: <q>Start the server with serve dash dash port eight thousand.</q></p>
+      <div class="dd-btn-row dd-btn-row-left"><a class="dd-btn dd-btn-lime" href="/write">Open Write with voice {{ arrow() }}</a></div>
+    </div>
+  </section>
+
+  <section class="dd-write-steps dd-try-cli" aria-labelledby="cli-title">
+    <h2 id="cli-title" class="dd-h-s">On your own repository</h2>
+    <pre class="dd-try-pre"><b>$</b> pipx install docs-drift
+<b>$</b> docs-drift scan        <span># every stale doc line, with evidence</span>
+<b>$</b> docs-drift fix --write <span># apply only what the code proves</span></pre>
+  </section>
+</main>
+{% endblock %}

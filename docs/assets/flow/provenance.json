@@ -1,6 +1,15 @@
 {
   "cards": [
     {
+      "file": "wispr-words-2026-10-27.jpg",
+      "sha256": "753ecccf144b530f909584bb7da1a374b16f1425c72c6e971d28818fe759af11",
+      "received_date": "2026-10-27",
+      "capture_date": "not independently established",
+      "values": {
+        "total_words_dictated": 201753
+      }
+    },
+    {
       "file": "flow-highlights-2026-10-25.png",
       "sha256": "4d490b40e20c47d10c034276d9e8e12669ab151af52e68b9baa8b0a34e0eb99a",
       "received_date": "2026-10-25",

@@ -40,6 +40,10 @@ node_modules/
 # Full raw benchmark scans stay local; committed samples, pins, measurements and source snapshots reproduce them.
 benchmark/runs/*/*--*.json
 benchmark/runs/*/*.log
+benchmark/runs/*/scanner-source.zip
+# Screenshots written by scripts/check_html.py and scripts/check_web.py
+examples/py-cli-*-*.png
+examples/web-*-*-*.png
 docs-drift-bench-*/
 !editors/vscode/.vscode/
 !editors/vscode/.vscode/launch.json

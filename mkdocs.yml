@@ -68,6 +68,3 @@ nav:
   - Write with voice: write-with-voice.md
   - Built with voice: built-with-voice.md
   - Changelog: CHANGELOG.md
-exclude_docs: |
-  /VERIFICATION.md
-  /WEB-VERIFICATION.md
